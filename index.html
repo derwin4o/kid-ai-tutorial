@@ -1018,6 +1018,82 @@ with open("notes.txt", "r") as f:
           { q: 'What does "with open(filename) as f:" do?', options: ['Creates a new file', 'Opens a file and automatically closes it when done', 'Deletes a file', 'Prints a file'], answer: 1 },
           { q: 'How do you read all lines of a file into a list?', options: ['f.read()', 'f.lines()', 'f.readlines()', 'f.all()'], answer: 2 }
         ]
+      },
+      {
+        id: 'm10',
+        title: 'Multi-turn Chat',
+        content: `
+          <p>So far every script sends one message and gets one answer. Real chatbots
+          remember what you said before. Let's build one.</p>
+
+          <h3>How conversation history works</h3>
+          <p>The Anthropic API doesn't automatically remember previous messages.
+          You keep a list called <code style="color:var(--green)">messages</code> and
+          add to it every turn:</p>
+          <div class="code-block">
+            <pre>messages = []
+
+# Turn 1
+messages.append({"role": "user", "content": "My name is Ada."})
+# ... get response, add it too ...
+messages.append({"role": "assistant", "content": "Nice to meet you, Ada!"})
+
+# Turn 2 — Claude now knows your name
+messages.append({"role": "user", "content": "What's my name?"})</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>A full chatbot loop</h3>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+messages = []
+MAX_HISTORY = 6  # keep last 3 exchanges (6 messages)
+
+print("Chat with Claude. Type 'quit' to exit.")
+
+while True:
+    user_input = input("You: ")
+    if user_input.lower() == "quit":
+        break
+
+    messages.append({"role": "user", "content": user_input})
+
+    # Keep history to last MAX_HISTORY messages
+    if len(messages) > MAX_HISTORY:
+        messages = messages[-MAX_HISTORY:]
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=256,
+        messages=messages
+    )
+    reply = response.content[0].text
+    messages.append({"role": "assistant", "content": reply})
+    print(f"Claude: {reply}\\n")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 10 Challenge</div>
+            <p>1. Copy the chatbot script above into a file called <strong>chatbot.py</strong>.<br>
+            2. Run it and have a 5-message conversation with Claude.<br>
+            3. In message 5, ask Claude something that requires it to remember message 1.<br>
+            4. Does it remember?</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              Try telling Claude your name in the first message, then asking
+              "What's my name?" later. If the history is working, it will know.<br><br>
+              If you get a token limit error, reduce MAX_HISTORY to 4.
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'In the Anthropic API, what list stores the conversation history?', options: ['history', 'chat', 'messages', 'conversation'], answer: 2 },
+          { q: 'What role does the AI\'s response get in the messages list?', options: ['ai', 'bot', 'assistant', 'claude'], answer: 2 },
+          { q: 'Why limit conversation history length?', options: ['It\'s required by the API', 'To save API tokens and reduce cost', 'Because Claude forgets anyway', 'To make responses faster'], answer: 1 }
+        ]
       }
     ];
 
