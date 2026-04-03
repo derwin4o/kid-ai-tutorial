@@ -945,6 +945,79 @@ Now translate this: What time is it?
           { q: 'What is few-shot prompting?', options: ['Using a small AI model', 'Giving the AI examples of what you want before your question', 'A fast way to run code', 'Sending short messages'], answer: 1 },
           { q: 'Which prompt will get a better answer?', options: ['Tell me about loops', 'In 2 sentences for a beginner, explain what a Python for loop does', 'loops?', 'loop info'], answer: 1 }
         ]
+      },
+      {
+        id: 'm9',
+        title: 'Python + Files',
+        content: `
+          <p>Real programs read and write files — logs, data, results. Let's learn how
+          Python handles files, then feed file content to Claude.</p>
+
+          <h3>Writing a file</h3>
+          <div class="code-block">
+            <pre>with open("notes.txt", "w") as f:
+    f.write("Line one\\n")
+    f.write("Line two\\n")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Reading a file</h3>
+          <div class="code-block">
+            <pre>with open("notes.txt", "r") as f:
+    content = f.read()
+    print(content)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Reading line by line</h3>
+          <div class="code-block">
+            <pre>with open("notes.txt", "r") as f:
+    for line in f.readlines():
+        print(line.strip())</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Send each line to Claude</h3>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+with open("notes.txt", "r") as f:
+    for line in f.readlines():
+        line = line.strip()
+        if not line:
+            continue
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=64,
+            messages=[{"role": "user", "content": f"Summarize in 5 words: {line}"}]
+        )
+        print(f"Original: {line}")
+        print(f"Summary:  {message.content[0].text}")
+        print()</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 9 Challenge</div>
+            <p>1. Create a file called <strong>facts.txt</strong> with 3 interesting facts (one per line).<br>
+            2. Write a Python script that reads each line and asks Claude to give it a fun emoji.<br>
+            3. Print the original fact + the emoji Claude chose.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              Create facts.txt with nano:<br>
+              <code style="color:var(--green)">nano facts.txt</code><br><br>
+              Your prompt to Claude could be:<br>
+              <code style="color:var(--green)">f"Give exactly one emoji that matches this fact: {line}"</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Which Python function opens a file?', options: ['read()', 'file()', 'open()', 'load()'], answer: 2 },
+          { q: 'What does "with open(filename) as f:" do?', options: ['Creates a new file', 'Opens a file and automatically closes it when done', 'Deletes a file', 'Prints a file'], answer: 1 },
+          { q: 'How do you read all lines of a file into a list?', options: ['f.read()', 'f.lines()', 'f.readlines()', 'f.all()'], answer: 2 }
+        ]
       }
     ];
 
