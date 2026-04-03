@@ -1132,7 +1132,13 @@ git init</pre>
       const container = document.getElementById('ask-responses');
       const item = document.createElement('div');
       item.className = 'ask-response-item';
-      item.innerHTML = `<div class="ask-response-q">You asked: ${question.replace(/</g,'&lt;')}</div>${answer.replace(/</g,'&lt;')}`;
+      const qLine = document.createElement('div');
+      qLine.className = 'ask-response-q';
+      qLine.textContent = 'You asked: ' + question;
+      const aLine = document.createElement('div');
+      aLine.textContent = answer;
+      item.appendChild(qLine);
+      item.appendChild(aLine);
       container.insertBefore(item, container.firstChild);
       // Keep max 3 responses
       while (container.children.length > 3) container.removeChild(container.lastChild);
