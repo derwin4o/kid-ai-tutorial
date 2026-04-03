@@ -376,6 +376,15 @@
     // ── Quiz state (in-memory, resets on page refresh) ────────────────
     const quizState = {}; // { moduleId: currentQuestionIndex }
 
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // ── Claude API utility ────────────────────────────────────────────
     async function callClaude(userMessage, systemPrompt, maxTokens) {
       const apiKey = localStorage.getItem('anthropicKey');
@@ -395,9 +404,14 @@
           messages: [{ role: 'user', content: userMessage }]
         })
       });
-      if (!response.ok) throw new Error('api-error');
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(`api-error-${response.status}`);
+      }
       const data = await response.json();
-      return data.content[0].text;
+      const text = data?.content?.[0]?.text;
+      if (typeof text !== 'string') throw new Error('api-error:unexpected-response');
+      return text;
     }
 
     // ── Module definitions (content added in Tasks 3-7) ──────────────
@@ -777,14 +791,15 @@ git init</pre>
     function renderQuizQuestion(moduleId, quiz) {
       const currentQ = quizState[moduleId] || 0;
       if (!quiz || quiz.length === 0) return '<div class="quiz-passed">✓ Complete</div>';
+      if (currentQ >= quiz.length) return '<div class="quiz-passed">✓ Complete</div>';
       const q = quiz[currentQ];
       return `
         <div class="quiz-progress">Question ${currentQ + 1} of ${quiz.length}</div>
-        <div class="quiz-question">${q.q}</div>
+        <div class="quiz-question">${esc(q.q)}</div>
         <div class="quiz-options">
           ${q.options.map((opt, i) =>
-            `<button class="quiz-option" id="qopt-${moduleId}-${i}"
-              onclick="submitQuizAnswer('${moduleId}', ${currentQ}, ${i})">${opt}</button>`
+            `<button class="quiz-option" id="qopt-${esc(moduleId)}-${i}"
+              onclick="submitQuizAnswer(${JSON.stringify(moduleId)}, ${currentQ}, ${i})">${esc(opt)}</button>`
           ).join('')}
         </div>
       `;
@@ -792,6 +807,7 @@ git init</pre>
 
     function submitQuizAnswer(moduleId, questionIndex, selectedIndex) {
       const mod = MODULES.find(m => m.id === moduleId);
+      if (!mod || !mod.quiz || !mod.quiz[questionIndex]) return;
       const correct = mod.quiz[questionIndex].answer;
       const btn = document.getElementById(`qopt-${moduleId}-${selectedIndex}`);
 
