@@ -490,7 +490,8 @@ print(message.content[0].text)</pre>
           ✓ Call Claude from Python code</p>
 
           <h3>Your mission</h3>
-          <p>Dad will give you a specific task for the project. It might be:</p>
+          <p>Dad will give you a specific task for the project. If you don't have one yet,
+          build this: a script that lets you type any question and Claude answers it. It might be:</p>
           <ul style="margin: 0.5rem 0 0.5rem 1.5rem; line-height: 2;">
             <li>Writing a script that summarizes text with Claude</li>
             <li>Building a small tool that answers questions about a topic</li>
@@ -580,10 +581,15 @@ git init</pre>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Mission 6 Challenge</div>
+            <p style="color:#ff8844;border:1px solid #ff8844;border-radius:4px;padding:0.4rem 0.6rem;font-size:0.85rem;">
+              ⚠️ Before you commit: open your Python files and replace your real API key with the text
+              <code>YOUR_API_KEY_HERE</code> again. Never commit a real API key to Git.
+            </p>
             <p>1. Go into your <strong>ai-lab</strong> folder in the terminal.<br>
             2. Run <code>git init</code>.<br>
-            3. Run <code>git add .</code> then <code>git commit -m "my first AI tool"</code>.<br>
-            4. Run <code>git log --oneline</code> — you should see your commit.</p>
+            3. Open your Python files and replace the API key with <code>YOUR_API_KEY_HERE</code>.<br>
+            4. Run <code>git add .</code> then <code>git commit -m "my first AI tool"</code>.<br>
+            5. Run <code>git log --oneline</code> — you should see your commit.</p>
             <p>When you see your commit in the log, you're a real engineer. Mark it done.</p>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
