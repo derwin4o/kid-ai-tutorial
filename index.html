@@ -408,7 +408,75 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           </div>
         `
       },
-    ]; // Tasks 3-5 complete; Tasks 6-7 will add Modules 4, 5, 6
+      {
+        id: 'm4',
+        title: 'Your first API call',
+        content: `
+          <p>This is the big one. You're going to write a Python script that talks to
+          Claude directly — no browser, just code.</p>
+
+          <h3>Step 1: Get an API key</h3>
+          <p>Ask dad for an Anthropic API key. It looks like:
+          <code style="color:var(--green)">sk-ant-...</code>
+          Keep it secret — never share it or put it on the internet.</p>
+
+          <h3>Step 2: Install the library</h3>
+          <p>In your terminal:</p>
+          <div class="code-block">
+            <pre>pip3 install anthropic</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Step 3: Write the script</h3>
+          <p>Create a file called <code style="color:var(--green)">ask_claude.py</code>
+          in your ai-lab folder:</p>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+message = client.messages.create(
+    model="claude-haiku-4-5-20251001",
+    max_tokens=256,
+    messages=[
+        {"role": "user", "content": "Tell me one cool fact about computers."}
+    ]
+)
+
+print(message.content[0].text)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <p>Replace <code style="color:var(--green)">YOUR_API_KEY_HERE</code> with the
+          key dad gave you. Then run it:</p>
+          <div class="code-block">
+            <pre>python3 ask_claude.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Step 4: Customize the prompt</h3>
+          <p>Change the message text to anything you want to ask. Try:
+          <em>"Explain loops in Python in one sentence."</em></p>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 4 Challenge</div>
+            <p>1. Get the API key from dad.<br>
+            2. Install the library with pip3.<br>
+            3. Create ask_claude.py and run it — you should see Claude's answer in the terminal.<br>
+            4. Change the prompt to your own question and run it again.</p>
+            <p>When Claude answers your custom question, come back and mark it done.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              If you get an error like <em>ModuleNotFoundError: No module named 'anthropic'</em>,
+              run <code style="color:var(--green)">pip3 install anthropic</code> again and make sure
+              it says "Successfully installed".<br><br>
+              If you get an <em>AuthenticationError</em>, double-check the API key — make sure you
+              copied the whole thing including the <code>sk-ant-</code> part.
+            </div>
+          </div>
+        `
+      },
+    ]; // Tasks 3-6 complete; Task 7 will add Modules 5, 6
 
     // ── Render ───────────────────────────────────────────────────────
     function renderModules() {
