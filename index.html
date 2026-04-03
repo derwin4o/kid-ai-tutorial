@@ -361,6 +361,53 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           </div>
         `
       },
+      {
+        id: 'm3',
+        title: 'What is AI?',
+        content: `
+          <p>Before we talk to AI with code, let's understand what AI actually is.
+          Spoiler: it's not magic, and it's not a robot brain.</p>
+
+          <h3>The autocomplete analogy</h3>
+          <p>You know how your phone suggests the next word when you type a message?
+          AI language models (like me — Claude) are like that, but trained on almost
+          every book, article, and website ever written. They get very good at predicting
+          what a helpful, smart answer looks like.</p>
+
+          <h3>What is a prompt?</h3>
+          <p>A <strong style="color:var(--green)">prompt</strong> is the message you send to an AI.
+          The AI reads your prompt and generates a response. The better your prompt,
+          the better the response. This skill is called <em>prompt engineering</em>.</p>
+
+          <h3>What is an API?</h3>
+          <p>An <strong style="color:var(--green)">API</strong> (Application Programming Interface)
+          is a way for programs to talk to each other. Instead of opening a chat window,
+          you send a message from your Python code and get the AI's response back as text
+          your program can use.</p>
+
+          <h3>What can you build with it?</h3>
+          <p>Chatbots, writing assistants, code reviewers, data analyzers, game characters
+          that can talk — anything that needs language understanding. That's what you're
+          going to help dad build.</p>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 3 Challenge</div>
+            <p>Open a browser and go to <strong>claude.ai</strong> (or ask dad which AI chat to use).
+            Type this prompt:</p>
+            <div class="code-block">
+              <pre>Explain what a Python function is in 2 sentences, for a 13-year-old.</pre>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <p>Read the answer. Does it make sense? When you're done, come back and mark it done.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              Just open any web browser (Firefox), go to claude.ai or chat.openai.com,
+              and type the prompt. No account needed for basic use on some platforms.
+              Ask dad if you're not sure which one to use.
+            </div>
+          </div>
+        `
+      },
     ]; // populated in later tasks
 
     // ── Render ───────────────────────────────────────────────────────
