@@ -292,6 +292,75 @@
           </div>
         `
       },
+      {
+        id: 'm2',
+        title: 'Python in 30 min',
+        content: `
+          <p>Python is the language of AI. It reads almost like English. Let's learn just
+          enough to do real things.</p>
+
+          <h3>Variables — storing information</h3>
+          <div class="code-block">
+            <pre>name = "Ada"
+age = 13
+print(name, "is", age, "years old")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Functions — reusable blocks of code</h3>
+          <div class="code-block">
+            <pre>def greet(name):
+    print("Hello,", name)
+
+greet("Ada")
+greet("World")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Loops — doing things many times</h3>
+          <div class="code-block">
+            <pre>for i in range(5):
+    print("Line", i)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Input — asking the user something</h3>
+          <div class="code-block">
+            <pre>name = input("What is your name? ")
+print("Welcome,", name)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>How to run a Python file</h3>
+          <p>Save your code in a file called <code style="color:var(--green)">hello.py</code>,
+          then run it:</p>
+          <div class="code-block">
+            <pre>python3 hello.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 2 Challenge</div>
+            <p>Inside your <strong>ai-lab</strong> folder, create a file called
+            <strong>hello.py</strong> with this code:</p>
+            <div class="code-block">
+              <pre>name = input("What is your name? ")
+print("Hello,", name + "! You are training to be an AI engineer.")</pre>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <p>Run it with <code>python3 hello.py</code>. Enter your name when it asks.
+            See your message? Come back and mark it done.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              To create the file, open a text editor:<br><br>
+              <code style="color:var(--green)">cd ai-lab</code><br>
+              <code style="color:var(--green)">nano hello.py</code><br><br>
+              Type or paste the code. Save with Ctrl+O, Enter, then exit with Ctrl+X.<br>
+              Then run: <code style="color:var(--green)">python3 hello.py</code>
+            </div>
+          </div>
+        `
+      },
     ]; // populated in later tasks
 
     // ── Render ───────────────────────────────────────────────────────
