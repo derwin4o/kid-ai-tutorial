@@ -203,7 +203,7 @@
 <body>
   <header>
     <h1>&gt; AI Engineer Training</h1>
-    <p class="subtitle">5 missions. Complete them in order. No skipping.</p>
+    <p class="subtitle">6 missions. Complete them in order. No skipping.</p>
   </header>
   <div class="ls-warning" id="ls-warning">
     Warning: progress won't be saved in private/incognito mode.
@@ -476,7 +476,127 @@ print(message.content[0].text)</pre>
           </div>
         `
       },
-    ]; // Tasks 3-6 complete; Task 7 will add Modules 5, 6
+      {
+        id: 'm5',
+        title: 'Build something real',
+        content: `
+          <p>You've got all the pieces. Now you're going to build something that actually
+          helps dad's AI project.</p>
+
+          <h3>What you've learned</h3>
+          <p>✓ Navigate the terminal<br>
+          ✓ Write Python (variables, functions, loops, input)<br>
+          ✓ Understand what AI and APIs are<br>
+          ✓ Call Claude from Python code</p>
+
+          <h3>Your mission</h3>
+          <p>Dad will give you a specific task for the project. It might be:</p>
+          <ul style="margin: 0.5rem 0 0.5rem 1.5rem; line-height: 2;">
+            <li>Writing a script that summarizes text with Claude</li>
+            <li>Building a small tool that answers questions about a topic</li>
+            <li>Automating something repetitive using AI</li>
+          </ul>
+          <p>Use your <code style="color:var(--green)">ask_claude.py</code> as a starting point.
+          Modify the prompt, add an <code>input()</code> so users can type questions,
+          or loop through a list of items.</p>
+
+          <h3>Template to start from</h3>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+def ask(prompt):
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=512,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return message.content[0].text
+
+# Your code here
+user_input = input("Ask something: ")
+response = ask(user_input)
+print("Claude says:", response)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 5 Challenge</div>
+            <p>Build the tool dad describes. Make it run without errors.
+            Show dad it works. Come back and mark it done.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              Start simple. Get it working with one hard-coded prompt first,
+              then add <code>input()</code> to make it interactive.
+              If you're stuck, paste your error message into Claude and ask it
+              to explain what's wrong.
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 'm6',
+        title: 'Save your work with Git',
+        content: `
+          <p>Every engineer saves their work with Git. It's like a time machine for your code —
+          you can always go back to any version you saved. Let's set it up.</p>
+
+          <h3>What is Git?</h3>
+          <p>Git tracks changes to your files. Every time you save a "commit", Git
+          remembers exactly what your code looked like at that moment. If you break
+          something, you can go back.</p>
+
+          <h3>Set up Git (first time only)</h3>
+          <div class="code-block">
+            <pre>git config --global user.name "Your Name"
+git config --global user.email "your@email.com"</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Initialize a repo in your project</h3>
+          <div class="code-block">
+            <pre>cd ~/ai-lab
+git init</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Save your work</h3>
+          <p>Tell Git which files to include:</p>
+          <div class="code-block">
+            <pre>git add .</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p>Save a snapshot with a message describing what you did:</p>
+          <div class="code-block">
+            <pre>git commit -m "my first AI tool"</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p>See your history:</p>
+          <div class="code-block">
+            <pre>git log --oneline</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 6 Challenge</div>
+            <p>1. Go into your <strong>ai-lab</strong> folder in the terminal.<br>
+            2. Run <code>git init</code>.<br>
+            3. Run <code>git add .</code> then <code>git commit -m "my first AI tool"</code>.<br>
+            4. Run <code>git log --oneline</code> — you should see your commit.</p>
+            <p>When you see your commit in the log, you're a real engineer. Mark it done.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              If git is not installed: <code style="color:var(--green)">sudo apt install git</code><br><br>
+              If git complains about your name/email, run the config commands at the top first,
+              replacing "Your Name" and "your@email.com" with your actual details.<br><br>
+              <code style="color:var(--green)">git config --global user.name "Ada"</code><br>
+              <code style="color:var(--green)">git config --global user.email "ada@example.com"</code>
+            </div>
+          </div>
+        `
+      }
+    ];
 
     // ── Render ───────────────────────────────────────────────────────
     function renderModules() {
