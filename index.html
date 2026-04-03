@@ -773,6 +773,62 @@ git init</pre>
       }
     ];
 
+    // ── Quiz engine ───────────────────────────────────────────────────
+    function renderQuizQuestion(moduleId, quiz) {
+      const currentQ = quizState[moduleId] || 0;
+      if (!quiz || quiz.length === 0) return '<div class="quiz-passed">✓ Complete</div>';
+      const q = quiz[currentQ];
+      return `
+        <div class="quiz-progress">Question ${currentQ + 1} of ${quiz.length}</div>
+        <div class="quiz-question">${q.q}</div>
+        <div class="quiz-options">
+          ${q.options.map((opt, i) =>
+            `<button class="quiz-option" id="qopt-${moduleId}-${i}"
+              onclick="submitQuizAnswer('${moduleId}', ${currentQ}, ${i})">${opt}</button>`
+          ).join('')}
+        </div>
+      `;
+    }
+
+    function submitQuizAnswer(moduleId, questionIndex, selectedIndex) {
+      const mod = MODULES.find(m => m.id === moduleId);
+      const correct = mod.quiz[questionIndex].answer;
+      const btn = document.getElementById(`qopt-${moduleId}-${selectedIndex}`);
+
+      if (selectedIndex !== correct) {
+        btn.classList.add('wrong');
+        const allBtns = btn.closest('.quiz-options').querySelectorAll('.quiz-option');
+        allBtns.forEach(b => b.disabled = true);
+        setTimeout(() => {
+          btn.classList.remove('wrong');
+          allBtns.forEach(b => b.disabled = false);
+        }, 600);
+        return;
+      }
+
+      btn.classList.add('correct');
+      const allBtns = btn.closest('.quiz-options').querySelectorAll('.quiz-option');
+      allBtns.forEach(b => b.disabled = true);
+
+      setTimeout(() => {
+        const nextQ = questionIndex + 1;
+        if (nextQ < mod.quiz.length) {
+          quizState[moduleId] = nextQ;
+          document.getElementById(`quiz-${moduleId}`).innerHTML = renderQuizQuestion(moduleId, mod.quiz);
+        } else {
+          saveProgress(moduleId);
+          renderModules();
+          const idx = MODULES.findIndex(m => m.id === moduleId);
+          if (idx < MODULES.length - 1) {
+            setTimeout(() => {
+              const next = document.querySelectorAll('.module')[idx + 1];
+              if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+          }
+        }
+      }, 500);
+    }
+
     // ── Render ───────────────────────────────────────────────────────
     function renderModules() {
       const progress = getProgress();
@@ -801,11 +857,11 @@ git init</pre>
           </div>
           <div class="module-body" id="mod-${mod.id}">
             ${mod.content}
-            <button class="mark-done-btn" id="btn-${mod.id}"
-              onclick="markDone('${mod.id}')"
-              ${isDone ? 'disabled' : ''}>
-              ${isDone ? '✓ Already completed' : '✓ Mark as done — unlock next mission'}
-            </button>
+            <div class="quiz-section" id="quiz-${mod.id}">
+              ${isDone
+                ? '<div class="quiz-passed">✓ Quiz passed</div>'
+                : renderQuizQuestion(mod.id, mod.quiz || [])}
+            </div>
           </div>
         `;
 
