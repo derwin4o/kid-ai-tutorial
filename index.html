@@ -198,6 +198,146 @@
       margin-bottom: 1rem;
       display: none;
     }
+    /* ── Quiz ─────────────────────────────────────────────────────── */
+    .quiz-section { margin-top: 1.2rem; }
+    .quiz-question { color: var(--text); font-size: 0.9rem; margin-bottom: 0.8rem; line-height: 1.6; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option {
+      background: none;
+      border: 1px solid var(--grey);
+      color: var(--text);
+      border-radius: 4px;
+      padding: 0.5rem 0.8rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: var(--font);
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .quiz-option:hover { border-color: var(--green-dim); color: var(--green-dim); }
+    .quiz-option.correct {
+      border-color: var(--green);
+      background: rgba(0,255,136,0.1);
+      color: var(--green);
+      animation: flashGreen 0.4s ease;
+    }
+    .quiz-option.wrong {
+      border-color: var(--warn);
+      background: rgba(255,136,68,0.1);
+      color: var(--warn);
+      animation: flashRed 0.4s ease;
+    }
+    @keyframes flashGreen {
+      0% { background: rgba(0,255,136,0.4); }
+      100% { background: rgba(0,255,136,0.1); }
+    }
+    @keyframes flashRed {
+      0% { background: rgba(255,136,68,0.4); }
+      100% { background: rgba(255,136,68,0.1); }
+    }
+    .quiz-passed {
+      color: var(--green);
+      font-size: 0.85rem;
+      padding: 0.4rem 0;
+    }
+    .quiz-progress { color: var(--grey); font-size: 0.75rem; margin-bottom: 0.6rem; }
+    /* ── Idea box ──────────────────────────────────────────────────── */
+    .idea-box {
+      margin-top: 1.2rem;
+      border-top: 1px solid var(--grey);
+      padding-top: 1rem;
+    }
+    .idea-prompt { color: var(--green-dim); font-size: 0.85rem; margin-bottom: 0.6rem; }
+    .idea-textarea {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.6rem 0.8rem;
+      resize: vertical;
+      min-height: 60px;
+    }
+    .idea-textarea:focus { outline: none; border-color: var(--green-dim); }
+    .idea-send-btn {
+      margin-top: 0.5rem;
+      background: none;
+      border: 1px solid var(--green-dim);
+      color: var(--green-dim);
+      border-radius: 4px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .idea-send-btn:hover { background: var(--green-dim); color: #000; }
+    .idea-response {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: #aaa;
+      line-height: 1.6;
+      font-style: italic;
+      display: none;
+    }
+    .idea-locked { color: var(--grey); font-size: 0.8rem; margin-top: 0.5rem; }
+    /* ── Ask bar ───────────────────────────────────────────────────── */
+    .ask-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      border-top: 1px solid var(--green-dim);
+      padding: 0.6rem 1rem;
+      z-index: 100;
+    }
+    .ask-bar-inner { max-width: 800px; margin: 0 auto; }
+    .ask-bar-label { color: var(--green-dim); font-size: 0.7rem; margin-bottom: 0.4rem; }
+    .ask-bar-row { display: flex; gap: 0.5rem; }
+    .ask-bar-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.4rem 0.7rem;
+    }
+    .ask-bar-input:focus { outline: none; border-color: var(--green-dim); }
+    .ask-bar-btn {
+      background: none;
+      border: 1px solid var(--green);
+      color: var(--green);
+      border-radius: 4px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: var(--font);
+      white-space: nowrap;
+    }
+    .ask-bar-btn:hover { background: var(--green); color: #000; }
+    .ask-bar-btn:disabled { border-color: var(--grey); color: var(--grey); cursor: default; }
+    .ask-responses {
+      max-width: 800px;
+      margin: 0 auto 0.5rem;
+    }
+    .ask-response-item {
+      background: var(--bg2);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .ask-response-q { color: var(--green-dim); font-size: 0.75rem; margin-bottom: 0.3rem; }
+    .ask-error { color: var(--warn); font-size: 0.8rem; margin-top: 0.3rem; }
+    /* padding so content doesn't hide behind fixed bar */
+    body.ask-bar-visible { padding-bottom: 120px; }
   </style>
 </head>
 <body>
