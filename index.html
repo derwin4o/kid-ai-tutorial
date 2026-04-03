@@ -883,6 +883,68 @@ git push -u origin main</pre>
           { q: 'What command uploads your commits to GitHub?', options: ['git upload', 'git send', 'git push', 'git sync'], answer: 2 },
           { q: 'What command downloads the latest changes from GitHub?', options: ['git download', 'git fetch', 'git pull', 'git get'], answer: 2 }
         ]
+      },
+      {
+        id: 'm8',
+        title: 'Prompt Engineering',
+        content: `
+          <p>You can get dramatically better answers from Claude just by changing how you ask.
+          This skill — writing good prompts — is called <strong style="color:var(--green)">prompt engineering</strong>.</p>
+
+          <h3>Be specific</h3>
+          <p>Bad: <em>"Tell me about dogs."</em><br>
+          Good: <em>"In 3 bullet points, explain what makes dogs good pets for families with young children."</em></p>
+
+          <h3>Give Claude a role (system prompt)</h3>
+          <p>You can set a <strong style="color:var(--green)">system prompt</strong> to tell Claude who it should be:</p>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+message = client.messages.create(
+    model="claude-haiku-4-5-20251001",
+    max_tokens=256,
+    system="You are a friendly Python teacher for beginners.",
+    messages=[
+        {"role": "user", "content": "What is a for loop?"}
+    ]
+)
+print(message.content[0].text)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Few-shot examples</h3>
+          <p>Show Claude what you want by giving examples before your question:</p>
+          <div class="code-block">
+            <pre>prompt = """
+Translate these sentences to pirate speak:
+Hello → Ahoy!
+How are you? → How be ye?
+Now translate this: What time is it?
+"""</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 8 Challenge</div>
+            <p>Write two versions of a prompt asking Claude to explain what a variable is:<br>
+            1. A vague version (short, no context)<br>
+            2. A specific version (role + audience + format)<br>
+            Run both with your script and compare the answers.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              Vague: <code style="color:var(--green)">"What is a variable?"</code><br><br>
+              Specific: <code style="color:var(--green)">"You are a teacher for 13-year-olds.
+              Explain what a variable is in Python using one real-world analogy. Keep it under 3 sentences."</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'What is a system prompt?', options: ['An error message from the terminal', 'Instructions that tell the AI how to behave before the conversation starts', 'A type of Python function', 'The user\'s first message'], answer: 1 },
+          { q: 'What is few-shot prompting?', options: ['Using a small AI model', 'Giving the AI examples of what you want before your question', 'A fast way to run code', 'Sending short messages'], answer: 1 },
+          { q: 'Which prompt will get a better answer?', options: ['Tell me about loops', 'In 2 sentences for a beginner, explain what a Python for loop does', 'loops?', 'loop info'], answer: 1 }
+        ]
       }
     ];
 
