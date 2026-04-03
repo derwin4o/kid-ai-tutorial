@@ -355,6 +355,18 @@
     </div>
   </div>
   <div id="modules-container"></div>
+  <div class="ask-bar" id="ask-bar" style="display:none" aria-label="Ask Claude anything">
+    <div class="ask-responses" id="ask-responses"></div>
+    <div class="ask-bar-inner">
+      <div class="ask-bar-label" id="ask-bar-label">Ask Claude anything about what you learned →</div>
+      <div class="ask-bar-row">
+        <input class="ask-bar-input" id="ask-bar-input" type="text"
+          placeholder="Type a question..." autocomplete="off" />
+        <button class="ask-bar-btn" id="ask-bar-btn" onclick="handleAskBar()">Ask →</button>
+      </div>
+      <div class="ask-error" id="ask-error" style="display:none"></div>
+    </div>
+  </div>
   <script>
     // ── Storage ──────────────────────────────────────────────────────
     let lsAvailable = true;
@@ -998,6 +1010,7 @@ git init</pre>
       bar.setAttribute('aria-valuenow', Math.round(pct));
       document.getElementById('progress-label').textContent =
         completedCount + ' of ' + MODULES.length + ' modules complete';
+      updateAskBarVisibility();
     }
 
     function toggleModule(bodyId) {
@@ -1051,6 +1064,84 @@ git init</pre>
       hint.classList.toggle('visible');
       btn.textContent = hint.classList.contains('visible') ? 'hide hint' : 'show hint';
     }
+
+    // ── Ask-me-anything bar ────────────────────────────────────────────
+    let askBarMode = 'question'; // 'key' | 'question'
+
+    function updateAskBarVisibility() {
+      const bar = document.getElementById('ask-bar');
+      if (!m4Complete()) { bar.style.display = 'none'; document.body.classList.remove('ask-bar-visible'); return; }
+      bar.style.display = 'block';
+      document.body.classList.add('ask-bar-visible');
+      if (!hasApiKey()) {
+        askBarMode = 'key';
+        document.getElementById('ask-bar-label').textContent = 'Enter your Anthropic API key to unlock Claude chat:';
+        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...';
+        document.getElementById('ask-bar-input').type = 'password';
+        document.getElementById('ask-bar-btn').textContent = 'Save →';
+      } else {
+        askBarMode = 'question';
+        document.getElementById('ask-bar-label').textContent = 'Ask Claude anything about what you learned →';
+        document.getElementById('ask-bar-input').placeholder = 'Type a question...';
+        document.getElementById('ask-bar-input').type = 'text';
+        document.getElementById('ask-bar-btn').textContent = 'Ask →';
+      }
+    }
+
+    async function handleAskBar() {
+      const input = document.getElementById('ask-bar-input');
+      const btn = document.getElementById('ask-bar-btn');
+      const errorEl = document.getElementById('ask-error');
+      const val = input.value.trim();
+      if (!val) return;
+      errorEl.style.display = 'none';
+
+      if (askBarMode === 'key') {
+        localStorage.setItem('anthropicKey', val);
+        input.value = '';
+        updateAskBarVisibility();
+        renderModules(); // re-render to update idea boxes
+        return;
+      }
+
+      // Ask mode
+      btn.textContent = 'thinking...';
+      btn.disabled = true;
+      input.disabled = true;
+
+      try {
+        const answer = await callClaude(
+          val,
+          'You are helping a 13-year-old learn programming and AI. Answer clearly in plain language, maximum 3 sentences.',
+          256
+        );
+        addAskResponse(val, answer);
+        input.value = '';
+      } catch(e) {
+        errorEl.textContent = 'Something went wrong — check your API key.';
+        errorEl.style.display = 'block';
+      } finally {
+        btn.textContent = 'Ask →';
+        btn.disabled = false;
+        input.disabled = false;
+        input.focus();
+      }
+    }
+
+    function addAskResponse(question, answer) {
+      const container = document.getElementById('ask-responses');
+      const item = document.createElement('div');
+      item.className = 'ask-response-item';
+      item.innerHTML = `<div class="ask-response-q">You asked: ${question.replace(/</g,'&lt;')}</div>${answer.replace(/</g,'&lt;')}`;
+      container.insertBefore(item, container.firstChild);
+      // Keep max 3 responses
+      while (container.children.length > 3) container.removeChild(container.lastChild);
+    }
+
+    // Allow Enter key in ask bar (ask-bar-input is already in DOM since HTML is before this script)
+    document.getElementById('ask-bar-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleAskBar();
+    });
 
     // Initial render
     renderModules();
