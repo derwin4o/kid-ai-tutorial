@@ -826,6 +826,63 @@ git init</pre>
           { q: 'What command stages all files for a commit?', options: ['git save .', 'git add .', 'git stage .', 'git push .'], answer: 1 },
           { q: 'What does git log show?', options: ['Your current files', 'The history of your commits', 'The git settings', 'Remote repositories'], answer: 1 }
         ]
+      },
+      {
+        id: 'm7',
+        title: 'GitHub — Put Your Code Online',
+        content: `
+          <p>Git saves your code locally. GitHub puts it on the internet so it's backed up,
+          shareable, and safe. Every real project lives on GitHub.</p>
+
+          <h3>What is GitHub?</h3>
+          <p>GitHub is a website that stores Git repositories. Think of it as Google Drive
+          for code — but smarter, because it knows about commits and history.</p>
+
+          <h3>Step 1: Create an account</h3>
+          <p>Go to <strong>github.com</strong> and create a free account.
+          Ask dad to help if needed.</p>
+
+          <h3>Step 2: Create a new repository</h3>
+          <p>Click the <strong>+</strong> button → "New repository". Name it <code style="color:var(--green)">ai-lab</code>.
+          Leave it public. Do NOT add a README (you already have your files). Click "Create repository".</p>
+
+          <h3>Step 3: Connect and push</h3>
+          <p>GitHub will show you commands. Copy the ones that start with <code style="color:var(--green)">git remote add</code>.
+          They look like this:</p>
+          <div class="code-block">
+            <pre>git remote add origin https://github.com/YOUR_USERNAME/ai-lab.git
+git branch -M main
+git push -u origin main</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <h3>Step 4: Pull — get the latest changes</h3>
+          <p>If someone else changes your code (or you edit on GitHub directly), use:</p>
+          <div class="code-block">
+            <pre>git pull</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 7 Challenge</div>
+            <p>1. Create a GitHub account (or use dad's).<br>
+            2. Create a new repo called <strong>ai-lab</strong>.<br>
+            3. Push your local ai-lab folder to it.<br>
+            4. Open the GitHub page and see your code online.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              Make sure you're inside the ai-lab folder first:<br>
+              <code style="color:var(--green)">cd ~/ai-lab</code><br><br>
+              Then run the three commands GitHub shows you after creating the repo.
+              The first one is <code style="color:var(--green)">git remote add origin ...</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'What command connects your local repo to GitHub?', options: ['git connect', 'git remote add origin', 'git link', 'git attach'], answer: 1 },
+          { q: 'What command uploads your commits to GitHub?', options: ['git upload', 'git send', 'git push', 'git sync'], answer: 2 },
+          { q: 'What command downloads the latest changes from GitHub?', options: ['git download', 'git fetch', 'git pull', 'git get'], answer: 2 }
+        ]
       }
     ];
 
