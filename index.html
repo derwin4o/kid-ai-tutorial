@@ -817,6 +817,64 @@ git init</pre>
       }
     ];
 
+    // ── Idea box ──────────────────────────────────────────────────────
+    function hasApiKey() {
+      return !!localStorage.getItem('anthropicKey');
+    }
+
+    function m4Complete() {
+      return !!getProgress()['m4'];
+    }
+
+    function renderIdeaBox(moduleId) {
+      if (!m4Complete()) {
+        return `<div class="idea-box"><p class="idea-locked">💡 Complete Mission 4 to unlock Claude chat and share your ideas.</p></div>`;
+      }
+      if (!hasApiKey()) {
+        return `<div class="idea-box"><p class="idea-locked">💡 Enter your API key in the bar at the bottom of the page to share your ideas with Claude.</p></div>`;
+      }
+      return `
+        <div class="idea-box">
+          <p class="idea-prompt">💡 What would YOU add to this mission? Tell Claude your idea.</p>
+          <textarea class="idea-textarea" id="idea-input-${moduleId}"
+            placeholder="e.g. I'd add a module about making a website with AI..."></textarea>
+          <button class="idea-send-btn" onclick="submitIdea('${moduleId}')">Send idea →</button>
+          <div class="idea-response" id="idea-response-${moduleId}"></div>
+        </div>
+      `;
+    }
+
+    async function submitIdea(moduleId) {
+      const textarea = document.getElementById(`idea-input-${moduleId}`);
+      const responseEl = document.getElementById(`idea-response-${moduleId}`);
+      const btn = textarea.nextElementSibling;
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+      responseEl.style.display = 'none';
+
+      try {
+        const reply = await callClaude(
+          text,
+          'You are encouraging a 13-year-old who is learning to code. They just finished a programming lesson and shared an idea for extending it. Respond warmly and specifically in 2 sentences max.',
+          128
+        );
+        responseEl.textContent = reply;
+        responseEl.style.display = 'block';
+      } catch(e) {
+        responseEl.textContent = e.message === 'no-key'
+          ? 'Enter your API key in the bar below first.'
+          : 'Something went wrong — check your API key.';
+        responseEl.style.color = 'var(--warn)';
+        responseEl.style.display = 'block';
+      } finally {
+        btn.textContent = 'Send idea →';
+        btn.disabled = false;
+      }
+    }
+
     // ── Quiz engine ───────────────────────────────────────────────────
     function renderQuizQuestion(moduleId, quiz) {
       const currentQ = quizState[moduleId] || 0;
@@ -908,6 +966,7 @@ git init</pre>
                 ? '<div class="quiz-passed">✓ Quiz passed</div>'
                 : renderQuizQuestion(mod.id, mod.quiz || [])}
             </div>
+            ${isDone ? renderIdeaBox(mod.id) : ''}
           </div>
         `;
 
