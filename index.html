@@ -471,7 +471,12 @@
               <code style="color:var(--green)">python3 -c "print('I am an AI engineer')"</code>
             </div>
           </div>
-        `
+        `,
+        quiz: [
+          { q: 'What command shows your current folder?', options: ['ls', 'pwd', 'cd', 'mkdir'], answer: 1 },
+          { q: 'What command creates a new folder called ai-lab?', options: ['pwd ai-lab', 'cd ai-lab', 'mkdir ai-lab', 'touch ai-lab'], answer: 2 },
+          { q: 'How do you run a Python script called hello.py?', options: ['run hello.py', 'python3 hello.py', 'start hello.py', 'execute hello.py'], answer: 1 }
+        ]
       },
       {
         id: 'm2',
@@ -540,7 +545,12 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
               Then run: <code style="color:var(--green)">python3 hello.py</code>
             </div>
           </div>
-        `
+        `,
+        quiz: [
+          { q: 'Which keyword defines a function in Python?', options: ['func', 'define', 'def', 'function'], answer: 2 },
+          { q: 'What does input() do?', options: ['Prints text to the screen', 'Asks the user to type something', 'Creates a variable', 'Loops forever'], answer: 1 },
+          { q: 'What is the output of: print(2 + 3)?', options: ['23', '2+3', '5', 'Error'], answer: 2 }
+        ]
       },
       {
         id: 'm3',
@@ -587,7 +597,12 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
               Ask dad if you're not sure which one to use.
             </div>
           </div>
-        `
+        `,
+        quiz: [
+          { q: 'What is a prompt?', options: ['A type of Python error', 'The message you send to an AI', 'A computer program', 'A database query'], answer: 1 },
+          { q: 'What does API stand for?', options: ['Artificial Programming Intelligence', 'Application Programming Interface', 'Automated Process Integration', 'Advanced Python Interface'], answer: 1 },
+          { q: 'What do LLMs predict?', options: ['The weather', 'Stock prices', 'The most helpful next word or sentence', 'Your password'], answer: 2 }
+        ]
       },
       {
         id: 'm4',
@@ -657,7 +672,12 @@ print(message.content[0].text)</pre>
               copied the whole thing including the <code>sk-ant-</code> part.
             </div>
           </div>
-        `
+        `,
+        quiz: [
+          { q: 'What Python library do you install to use Claude?', options: ['openai', 'anthropic', 'claude', 'requests'], answer: 1 },
+          { q: 'What does max_tokens control?', options: ['The speed of the response', 'How long the response can be', 'The cost of the API', 'The model version'], answer: 1 },
+          { q: 'Where should you NEVER put your real API key?', options: ['In a script you commit to Git', 'In a .env file', 'In your memory', 'In a config file you keep private'], answer: 0 }
+        ]
       },
       {
         id: 'm5',
@@ -717,7 +737,12 @@ print("Claude says:", response)</pre>
               to explain what's wrong.
             </div>
           </div>
-        `
+        `,
+        quiz: [
+          { q: 'In the template, what function wraps the Claude API call?', options: ['call()', 'ask()', 'claude()', 'query()'], answer: 1 },
+          { q: 'What Python function gets input from the user?', options: ['read()', 'scan()', 'input()', 'get()'], answer: 2 },
+          { q: 'What should you do if your script gives an error?', options: ['Delete it and start over', 'Paste the error into Claude and ask what it means', 'Give up', 'Ignore it'], answer: 1 }
+        ]
       },
       {
         id: 'm6',
@@ -783,7 +808,12 @@ git init</pre>
               <code style="color:var(--green)">git config --global user.email "ada@example.com"</code>
             </div>
           </div>
-        `
+        `,
+        quiz: [
+          { q: 'What command creates a new git repository?', options: ['git start', 'git create', 'git init', 'git new'], answer: 2 },
+          { q: 'What command stages all files for a commit?', options: ['git save .', 'git add .', 'git stage .', 'git push .'], answer: 1 },
+          { q: 'What does git log show?', options: ['Your current files', 'The history of your commits', 'The git settings', 'Remote repositories'], answer: 1 }
+        ]
       }
     ];
 
