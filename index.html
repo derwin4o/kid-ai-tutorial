@@ -234,7 +234,65 @@
     }
 
     // ── Module definitions (content added in Tasks 3-7) ──────────────
-    const MODULES = []; // populated in later tasks
+    const MODULES = [
+      {
+        id: 'm1',
+        title: 'The Terminal',
+        content: `
+          <p>The terminal is how you talk directly to your computer — no buttons, just text.
+          Every AI engineer uses it every day. Let's learn the basics.</p>
+
+          <h3>Open a terminal</h3>
+          <p>On Ubuntu: press <strong style="color:var(--green)">Ctrl + Alt + T</strong>.
+          A black window with a blinking cursor appears. That's your terminal.</p>
+
+          <h3>Commands to learn</h3>
+          <p><code style="color:var(--green)">pwd</code> — prints where you are (your current folder)</p>
+          <div class="code-block">
+            <pre>pwd</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p><code style="color:var(--green)">ls</code> — lists everything in the current folder</p>
+          <div class="code-block">
+            <pre>ls</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p><code style="color:var(--green)">mkdir</code> — makes a new folder</p>
+          <div class="code-block">
+            <pre>mkdir ai-lab</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p><code style="color:var(--green)">cd</code> — moves you into a folder</p>
+          <div class="code-block">
+            <pre>cd ai-lab</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p>Run your first Python line:</p>
+          <div class="code-block">
+            <pre>python3 -c "print('hello world')"</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Mission 1 Challenge</div>
+            <p>1. Open a terminal.<br>
+            2. Create a folder called <strong>ai-lab</strong>.<br>
+            3. Go inside it with <code>cd ai-lab</code>.<br>
+            4. Run <code>ls</code> — it should show nothing (empty folder).<br>
+            5. Run <code>python3 -c "print('I am an AI engineer')"</code></p>
+            <p>When you see your message printed, come back here and mark it done.</p>
+            <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
+            <div class="hint-body">
+              Open terminal with Ctrl+Alt+T, then type each command and press Enter:<br><br>
+              <code style="color:var(--green)">mkdir ai-lab</code><br>
+              <code style="color:var(--green)">cd ai-lab</code><br>
+              <code style="color:var(--green)">ls</code><br>
+              <code style="color:var(--green)">python3 -c "print('I am an AI engineer')"</code>
+            </div>
+          </div>
+        `
+      },
+    ]; // populated in later tasks
 
     // ── Render ───────────────────────────────────────────────────────
     function renderModules() {
