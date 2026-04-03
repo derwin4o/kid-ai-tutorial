@@ -216,7 +216,135 @@
   </div>
   <div id="modules-container"></div>
   <script>
-    // placeholder — logic added in Task 2
+    // ── Storage ──────────────────────────────────────────────────────
+    let lsAvailable = true;
+    try { localStorage.setItem('_test', '1'); localStorage.removeItem('_test'); }
+    catch(e) { lsAvailable = false; document.getElementById('ls-warning').style.display = 'block'; }
+
+    function getProgress() {
+      if (!lsAvailable) return {};
+      try { return JSON.parse(localStorage.getItem('tutorialProgress') || '{}'); }
+      catch(e) { return {}; }
+    }
+    function saveProgress(moduleId) {
+      if (!lsAvailable) return;
+      const p = getProgress();
+      p[moduleId] = true;
+      localStorage.setItem('tutorialProgress', JSON.stringify(p));
+    }
+
+    // ── Module definitions (content added in Tasks 3-7) ──────────────
+    const MODULES = []; // populated in later tasks
+
+    // ── Render ───────────────────────────────────────────────────────
+    function renderModules() {
+      const progress = getProgress();
+      const container = document.getElementById('modules-container');
+      container.innerHTML = '';
+      let completedCount = 0;
+
+      MODULES.forEach((mod, i) => {
+        const isDone = !!progress[mod.id];
+        const prevDone = i === 0 || !!progress[MODULES[i-1].id];
+        const isUnlocked = prevDone;
+        if (isDone) completedCount++;
+
+        const el = document.createElement('div');
+        el.className = 'module' +
+          (isDone ? ' done' : '') +
+          (isUnlocked ? ' unlocked' : ' locked') +
+          (i === 0 && !isDone ? ' open' : '') +
+          (isDone && i === completedCount - 1 ? '' : '');
+
+        // Auto-open the first unlocked incomplete module
+        const isCurrentModule = isUnlocked && !isDone &&
+          (i === 0 || !!progress[MODULES[i-1].id]);
+
+        el.innerHTML = `
+          <div class="module-header" onclick="toggleModule('mod-${mod.id}')">
+            <span class="module-title">Mission ${i+1}: ${mod.title}</span>
+            <span class="module-status">${isDone ? '✓ complete' : isUnlocked ? 'unlocked' : '🔒 locked'}</span>
+          </div>
+          <div class="module-body" id="mod-${mod.id}">
+            ${mod.content}
+            <button class="mark-done-btn" id="btn-${mod.id}"
+              onclick="markDone('${mod.id}')"
+              ${isDone ? 'disabled' : ''}>
+              ${isDone ? '✓ Already completed' : '✓ Mark as done — unlock next mission'}
+            </button>
+          </div>
+        `;
+
+        if (isCurrentModule || isDone) {
+          el.classList.add('open');
+        }
+
+        // Keyboard accessibility: disable tabindex on locked module interactive children
+        if (!isUnlocked) {
+          el.querySelectorAll('button, a, input, [tabindex]').forEach(child => {
+            child.setAttribute('tabindex', '-1');
+          });
+        }
+
+        container.appendChild(el);
+      });
+
+      // Update progress bar
+      const pct = MODULES.length ? (completedCount / MODULES.length) * 100 : 0;
+      const bar = document.getElementById('progress-bar');
+      bar.style.width = pct + '%';
+      bar.setAttribute('aria-valuenow', Math.round(pct));
+      document.getElementById('progress-label').textContent =
+        completedCount + ' of ' + MODULES.length + ' modules complete';
+    }
+
+    function toggleModule(bodyId) {
+      const body = document.getElementById(bodyId);
+      const card = body.closest('.module');
+      if (card.classList.contains('locked')) return;
+      card.classList.toggle('open');
+    }
+
+    function markDone(moduleId) {
+      saveProgress(moduleId);
+      renderModules();
+      // Scroll to next module
+      const idx = MODULES.findIndex(m => m.id === moduleId);
+      if (idx < MODULES.length - 1) {
+        setTimeout(() => {
+          const next = document.querySelectorAll('.module')[idx + 1];
+          if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }
+    }
+
+    function copyCode(btn) {
+      const pre = btn.closest('.code-block').querySelector('pre');
+      const text = pre.innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          btn.textContent = 'copied!';
+          setTimeout(() => btn.textContent = 'copy', 1500);
+        });
+      } else {
+        // fallback: select text
+        const range = document.createRange();
+        range.selectNode(pre);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        btn.textContent = 'selected!';
+        setTimeout(() => btn.textContent = 'copy', 1500);
+      }
+    }
+
+    function toggleHint(btn) {
+      const hint = btn.nextElementSibling;
+      hint.classList.toggle('visible');
+      btn.textContent = hint.classList.contains('visible') ? 'hide hint' : 'show hint';
+    }
+
+    // Initial render
+    renderModules();
   </script>
 </body>
 </html>
