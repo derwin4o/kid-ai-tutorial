@@ -401,8 +401,8 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
             <p>Read the answer. Does it make sense? When you're done, come back and mark it done.</p>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
-              Just open any web browser (Firefox), go to claude.ai or chat.openai.com.
-              You'll need to create a free account, or ask dad to log in first.
+              Open Firefox, go to claude.ai or chat.openai.com.
+              Both require an account — ask dad to log in, or create an account together.
               Ask dad if you're not sure which one to use.
             </div>
           </div>
@@ -470,6 +470,8 @@ print(message.content[0].text)</pre>
               If you get an error like <em>ModuleNotFoundError: No module named 'anthropic'</em>,
               run <code style="color:var(--green)">pip3 install anthropic</code> again and make sure
               it says "Successfully installed".<br><br>
+              If pip says <em>"externally-managed-environment"</em>, try:
+              <code style="color:var(--green)">pip3 install --user anthropic</code><br><br>
               If you get an <em>AuthenticationError</em>, double-check the API key — make sure you
               copied the whole thing including the <code>sk-ant-</code> part.
             </div>
