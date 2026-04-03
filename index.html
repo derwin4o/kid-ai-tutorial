@@ -838,7 +838,7 @@ git init</pre>
           <p class="idea-prompt">💡 What would YOU add to this mission? Tell Claude your idea.</p>
           <textarea class="idea-textarea" id="idea-input-${moduleId}"
             placeholder="e.g. I'd add a module about making a website with AI..."></textarea>
-          <button class="idea-send-btn" onclick="submitIdea('${moduleId}')">Send idea →</button>
+          <button class="idea-send-btn" id="idea-send-btn-${moduleId}" onclick="submitIdea('${moduleId}')">Send idea →</button>
           <div class="idea-response" id="idea-response-${moduleId}"></div>
         </div>
       `;
@@ -847,7 +847,8 @@ git init</pre>
     async function submitIdea(moduleId) {
       const textarea = document.getElementById(`idea-input-${moduleId}`);
       const responseEl = document.getElementById(`idea-response-${moduleId}`);
-      const btn = textarea.nextElementSibling;
+      if (!textarea || !responseEl) return;
+      const btn = document.getElementById(`idea-send-btn-${moduleId}`);
       const text = textarea.value.trim();
       if (!text) return;
 
@@ -864,9 +865,15 @@ git init</pre>
         responseEl.textContent = reply;
         responseEl.style.display = 'block';
       } catch(e) {
-        responseEl.textContent = e.message === 'no-key'
-          ? 'Enter your API key in the bar below first.'
-          : 'Something went wrong — check your API key.';
+        let msg;
+        if (e.message === 'no-key') {
+          msg = 'Enter your API key in the bar below first.';
+        } else if (e.message && e.message.includes('429')) {
+          msg = 'Slow down — you\'re sending too many requests. Wait a moment and try again.';
+        } else {
+          msg = 'Something went wrong — check your API key.';
+        }
+        responseEl.textContent = msg;
         responseEl.style.color = 'var(--warn)';
         responseEl.style.display = 'block';
       } finally {
