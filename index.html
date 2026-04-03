@@ -828,10 +828,10 @@ git init</pre>
 
     function renderIdeaBox(moduleId) {
       if (!m4Complete()) {
-        return `<div class="idea-box"><p class="idea-locked">💡 Complete Mission 4 to unlock Claude chat and share your ideas.</p></div>`;
+        return `<div class="idea-box"><p class="idea-locked">Complete Mission 4 first to unlock Claude chat.</p></div>`;
       }
       if (!hasApiKey()) {
-        return `<div class="idea-box"><p class="idea-locked">💡 Enter your API key in the bar at the bottom of the page to share your ideas with Claude.</p></div>`;
+        return `<div class="idea-box"><p class="idea-locked">Enter your API key in the bar at the bottom of the page.</p></div>`;
       }
       return `
         <div class="idea-box">
@@ -858,7 +858,7 @@ git init</pre>
       try {
         const reply = await callClaude(
           text,
-          'You are encouraging a 13-year-old who is learning to code. They just finished a programming lesson and shared an idea for extending it. Respond warmly and specifically in 2 sentences max.',
+          'You are encouraging a 13-year-old learning to code. They just finished a programming lesson and shared an idea. Respond warmly in 2 sentences max.',
           128
         );
         responseEl.textContent = reply;
