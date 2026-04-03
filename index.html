@@ -209,7 +209,7 @@
     Warning: progress won't be saved in private/incognito mode.
   </div>
   <div class="progress-wrap">
-    <div class="progress-label" id="progress-label">0 of 5 modules complete</div>
+    <div class="progress-label" id="progress-label">0 of 0 modules complete</div>
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Tutorial progress"></div>
     </div>
@@ -252,13 +252,10 @@
         const el = document.createElement('div');
         el.className = 'module' +
           (isDone ? ' done' : '') +
-          (isUnlocked ? ' unlocked' : ' locked') +
-          (i === 0 && !isDone ? ' open' : '') +
-          (isDone && i === completedCount - 1 ? '' : '');
+          (isUnlocked ? ' unlocked' : ' locked');
 
         // Auto-open the first unlocked incomplete module
-        const isCurrentModule = isUnlocked && !isDone &&
-          (i === 0 || !!progress[MODULES[i-1].id]);
+        const isCurrentModule = isUnlocked && !isDone;
 
         el.innerHTML = `
           <div class="module-header" onclick="toggleModule('mod-${mod.id}')">
@@ -281,7 +278,7 @@
 
         // Keyboard accessibility: disable tabindex on locked module interactive children
         if (!isUnlocked) {
-          el.querySelectorAll('button, a, input, [tabindex]').forEach(child => {
+          el.querySelectorAll('button, a, input, select, textarea, [tabindex]').forEach(child => {
             child.setAttribute('tabindex', '-1');
           });
         }
@@ -325,9 +322,16 @@
         navigator.clipboard.writeText(text).then(() => {
           btn.textContent = 'copied!';
           setTimeout(() => btn.textContent = 'copy', 1500);
+        }).catch(() => {
+          // Fallback: select text
+          const range = document.createRange();
+          range.selectNode(pre);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+          btn.textContent = 'selected!';
+          setTimeout(() => btn.textContent = 'copy', 1500);
         });
       } else {
-        // fallback: select text
         const range = document.createRange();
         range.selectNode(pre);
         window.getSelection().removeAllRanges();
