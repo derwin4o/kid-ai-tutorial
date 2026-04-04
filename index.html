@@ -549,6 +549,7 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
             </div>
             <p>Run it with <code>python3 hello.py</code>. Enter your name when it asks.
             See your message? Come back and mark it done.</p>
+            <button class="mark-done-btn" onclick="markDone('m2')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               To create the file, open a text editor:<br><br>
@@ -603,6 +604,7 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
               <button class="copy-btn" onclick="copyCode(this)">copy</button>
             </div>
             <p>Read the answer. Does it make sense? When you're done, come back and mark it done.</p>
+            <button class="mark-done-btn" onclick="markDone('m3')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               Open Firefox, go to claude.ai or chat.openai.com.
@@ -674,6 +676,7 @@ print(message.content[0].text)</pre>
             3. Create ask_claude.py and run it — you should see Claude's answer in the terminal.<br>
             4. Change the prompt to your own question and run it again.</p>
             <p>When Claude answers your custom question, come back and mark it done.</p>
+            <button class="mark-done-btn" onclick="markDone('m4')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               If you get an error like <em>ModuleNotFoundError: No module named 'anthropic'</em>,
@@ -742,6 +745,7 @@ print("Claude says:", response)</pre>
             <div class="challenge-title">⚡ Mission 5 Challenge</div>
             <p>Build the tool dad describes. Make it run without errors.
             Show dad it works. Come back and mark it done.</p>
+            <button class="mark-done-btn" onclick="markDone('m5')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               Start simple. Get it working with one hard-coded prompt first,
@@ -812,6 +816,7 @@ git init</pre>
             4. Run <code>git add .</code> then <code>git commit -m "my first AI tool"</code>.<br>
             5. Run <code>git log --oneline</code> — you should see your commit.</p>
             <p>When you see your commit in the log, you're a real engineer. Mark it done.</p>
+            <button class="mark-done-btn" onclick="markDone('m6')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               If git is not installed: <code style="color:var(--green)">sudo apt install git</code><br><br>
@@ -870,6 +875,7 @@ git push -u origin main</pre>
             2. Create a new repo called <strong>ai-lab</strong>.<br>
             3. Push your local ai-lab folder to it.<br>
             4. Open the GitHub page and see your code online.</p>
+            <button class="mark-done-btn" onclick="markDone('m7')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               Make sure you're inside the ai-lab folder first:<br>
@@ -933,6 +939,7 @@ Now translate this: What time is it?
             1. A vague version (short, no context)<br>
             2. A specific version (role + audience + format)<br>
             Run both with your script and compare the answers.</p>
+            <button class="mark-done-btn" onclick="markDone('m8')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               Vague: <code style="color:var(--green)">"What is a variable?"</code><br><br>
@@ -1005,6 +1012,7 @@ with open("notes.txt", "r") as f:
             <p>1. Create a file called <strong>facts.txt</strong> with 3 interesting facts (one per line).<br>
             2. Write a Python script that reads each line and asks Claude to give it a fun emoji.<br>
             3. Print the original fact + the emoji Claude chose.</p>
+            <button class="mark-done-btn" onclick="markDone('m9')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               Create facts.txt with nano:<br>
@@ -1082,6 +1090,7 @@ while True:
             2. Run it and have a 5-message conversation with Claude.<br>
             3. In message 5, ask Claude something that requires it to remember message 1.<br>
             4. Does it remember?</p>
+            <button class="mark-done-btn" onclick="markDone('m10')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
               Try telling Claude your name in the first message, then asking
