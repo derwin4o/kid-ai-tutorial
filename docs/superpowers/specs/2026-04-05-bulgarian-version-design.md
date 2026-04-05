@@ -71,6 +71,11 @@ Throughout the Bulgarian text, key words appear with their English equivalent in
 
 The goal is that the son naturally learns the English programming vocabulary while reading in Bulgarian. Apply this consistently throughout all 10 missions.
 
+This applies broadly — not just to technical terms, but also to common action words and everyday words used in instructions:
+- Action verbs: *"Отвори [open]"*, *"Запази [save]"*, *"Натисни [press]"*, *"Стартирай [run]"*, *"Копирай [copy]"*, *"Виж [see]"*, *"Излез [exit]"*, *"Замени [replace]"*, *"Провери [check]"*
+- Nouns: *"прозорец [window]"*, *"бутон [button]"*, *"акаунт [account]"*, *"страница [page]"*, *"отговор [answer]"*, *"грешка [error]"*
+- The more brackets, the better — treat every Bulgarian sentence as a learning opportunity
+
 ---
 
 ## Tone Guidelines
