@@ -63,6 +63,14 @@ On first use of a technical term, add a short Bulgarian gloss in parentheses. Ex
 - *API — начин да говориш с друга програма в интернет*
 - *Git — програма, която помни всяка промяна в кода ти*
 
+### Inline bilingual dictionary
+Throughout the Bulgarian text, key words appear with their English equivalent in square brackets immediately after, acting as a mini-dictionary for the reader. This applies to:
+- Technical terms: *"командата [command] се изпълнява веднага"*
+- Action words: *"запази [save] файла"*, *"стартирай [run] програмата"*
+- Concept words: *"грешка [error]"*, *"променлива [variable]"*, *"цикъл [loop]"*
+
+The goal is that the son naturally learns the English programming vocabulary while reading in Bulgarian. Apply this consistently throughout all 10 missions.
+
 ---
 
 ## Tone Guidelines
