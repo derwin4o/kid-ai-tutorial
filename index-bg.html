@@ -618,6 +618,148 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           { q: 'Какво предсказват [predict] LLM-ите?', options: ['Времето [weather]', 'Цени [prices] на акции [stocks]', 'Най-полезната [most helpful] следваща дума [next word] или изречение [sentence]', 'Паролата [password] ти'], answer: 2 }
         ]
       }
+      ,{
+        id: 'm4',
+        title: 'Your first API call',
+        content: `
+          <p>Това е голямото [this is the big one]. Ще напишеш [write] Python скрипт [script], който говори [talks] директно [directly] с
+          Claude — без браузър [browser], само код [code].</p>
+
+          <h3>Стъпка [step] 1: Вземи [get] API ключ [key]</h3>
+          <p>Помоли [ask] татко за Anthropic API ключ [key]. Изглежда [looks] така:
+          <code style="color:var(--green)">sk-ant-...</code>
+          Пази го в тайна [keep it secret] — никога [never] не го споделяй [share] или слагай [put] в интернет [internet].</p>
+
+          <h3>Стъпка [step] 2: Инсталирай [install] библиотеката [library]</h3>
+          <p>В terminal-а:</p>
+          <div class="code-block">
+            <pre>pip3 install anthropic</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Стъпка [step] 3: Напиши [write] скрипта [script]</h3>
+          <p>Създай [create] файл [file] с имe <code style="color:var(--green)">ask_claude.py</code>
+          в папката [folder] ai-lab:</p>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+message = client.messages.create(
+    model="claude-haiku-4-5-20251001",
+    max_tokens=256,
+    messages=[
+        {"role": "user", "content": "Tell me one cool fact about computers."}
+    ]
+)
+
+print(message.content[0].text)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <p>Замени [replace] <code style="color:var(--green)">YOUR_API_KEY_HERE</code> с
+          ключа [key], който татко ти даде [gave you]. После стартирай [run]:</p>
+          <div class="code-block">
+            <pre>python3 ask_claude.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Стъпка [step] 4: Персонализирай [customize] prompt-а</h3>
+          <p>Промени [change] текста на съобщението [message text] на каквото [anything] искаш да питаш [ask]. Опитай [try]:
+          <em>"Explain loops in Python in one sentence."</em></p>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 4 Предизвикателство [Challenge]</div>
+            <p>1. Вземи [get] API ключа [key] от татко.<br>
+            2. Инсталирай [install] библиотеката [library] с pip3.<br>
+            3. Създай [create] ask_claude.py и го стартирай [run] — трябва да видиш [see] отговора [answer] на Claude в terminal-а.<br>
+            4. Промени [change] prompt-а с твой въпрос [question] и го стартирай [run] отново [again].</p>
+            <p>Когато Claude отговори [answers] на твоя въпрос [question], върни се [come back] и го отбележи [mark it].</p>
+            <button class="mark-done-btn" onclick="markDone('m4')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Ако получиш [get] грешка [error] като <em>ModuleNotFoundError: No module named 'anthropic'</em>,
+              изпълни [run] <code style="color:var(--green)">pip3 install anthropic</code> отново [again] и се увери [make sure],
+              че пише [says] "Successfully installed".<br><br>
+              Ако pip каже [says] <em>"externally-managed-environment"</em>, опитай [try]:
+              <code style="color:var(--green)">pip3 install --user anthropic</code><br><br>
+              Ако получиш [get] <em>AuthenticationError</em>, провери [check] API ключа [key] — увери се [make sure], че си
+              копирал [copied] целия [the whole thing], включително [including] частта [part] <code>sk-ant-</code>.
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Коя Python библиотека [library] инсталираш [install] за Claude?', options: ['openai', 'anthropic', 'claude', 'requests'], answer: 1 },
+          { q: 'Какво контролира [controls] max_tokens?', options: ['Скоростта [speed] на отговора [response]', 'Колко дълъг [how long] може да е отговорът [response]', 'Цената [cost] на API', 'Версията [version] на модела [model]'], answer: 1 },
+          { q: 'Къде НИКОГА [never] не трябва да слагаш [put] реалния [real] API ключ [key]?', options: ['В скрипт [script], който commit-ваш в Git', 'В .env файл [file]', 'В паметта [memory] си', 'В конфигурационен [config] файл [file], пазен [kept] в тайна [private]'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm5',
+        title: 'Build something real',
+        content: `
+          <p>Имаш всички части [all the pieces]. Сега ще построиш [build] нещо, което наистина [actually]
+          помага [helps] на проекта [project] на татко за AI.</p>
+
+          <h3>Какво научи [what you learned]</h3>
+          <p>✓ Навигация [navigate] в terminal<br>
+          ✓ Писане [write] на Python (променливи [variables], функции [functions], цикли [loops], input)<br>
+          ✓ Разбиране [understand] какво са AI и API<br>
+          ✓ Извикване [call] на Claude от Python код [code]</p>
+
+          <h3>Твоята мисия [your mission]</h3>
+          <p>Татко ще ти даде [give] конкретна задача [specific task] за проекта [project]. Ако нямаш [don't have] такава още [yet],
+          построи [build] това: скрипт [script], с който можеш [can] да напишеш [type] всякакъв въпрос [any question] и Claude да го отговори [answers]. Може да е:</p>
+          <ul style="margin: 0.5rem 0 0.5rem 1.5rem; line-height: 2;">
+            <li>Скрипт [script], който резюмира [summarizes] текст [text] с Claude</li>
+            <li>Малък инструмент [small tool], който отговаря [answers] на въпроси [questions] по дадена тема [topic]</li>
+            <li>Автоматизиране [automating] на нещо повтарящо се [repetitive] с AI</li>
+          </ul>
+          <p>Използвай [use] <code style="color:var(--green)">ask_claude.py</code> като начална точка [starting point].
+          Промени [modify] prompt-а, добави [add] <code>input()</code> за да могат потребителите [users] да пишат [type] въпроси [questions],
+          или обходи [loop through] списък [list] от неща.</p>
+
+          <h3>Шаблон [template] за начало [to start from]</h3>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+def ask(prompt):
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=512,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return message.content[0].text
+
+# Your code here
+user_input = input("Ask something: ")
+response = ask(user_input)
+print("Claude says:", response)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 5 Предизвикателство [Challenge]</div>
+            <p>Построй [build] инструмента [tool], описан [described] от татко. Накарай [make] го да работи [work] без грешки [errors].
+            Покажи [show] на татко, че работи [works]. Върни се [come back] и го отбележи [mark it].</p>
+            <button class="mark-done-btn" onclick="markDone('m5')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Започни [start] просто [simple]. Накарай [make] го да работи [work] с един твърдо написан [hard-coded] prompt първо [first],
+              после добави [add] <code>input()</code>, за да стане интерактивен [interactive].
+              Ако си заседнал [stuck], постни [paste] грешката [error message] в Claude и го попитай [ask]
+              да обясни [explain] какво не е наред [what's wrong].
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'В шаблона [template], коя функция [function] обвива [wraps] Claude API извикването [call]?', options: ['call()', 'ask()', 'claude()', 'query()'], answer: 1 },
+          { q: 'Коя Python функция [function] получава [gets] вход [input] от потребителя [user]?', options: ['read()', 'scan()', 'input()', 'get()'], answer: 2 },
+          { q: 'Какво трябва да правиш [do], ако скриптът [script] дава грешка [error]?', options: ['Изтрий [delete] го и започни отново [start over]', 'Постни [paste] грешката [error] в Claude и попитай [ask] какво означава [means]', 'Се откажи [give up]', 'Игнорирай [ignore] я'], answer: 1 }
+        ]
+      }
     ];
 
     // ── Idea box ──────────────────────────────────────────────────────
