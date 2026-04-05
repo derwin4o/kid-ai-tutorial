@@ -760,6 +760,135 @@ print("Claude says:", response)</pre>
           { q: 'Какво трябва да правиш [do], ако скриптът [script] дава грешка [error]?', options: ['Изтрий [delete] го и започни отново [start over]', 'Постни [paste] грешката [error] в Claude и попитай [ask] какво означава [means]', 'Се откажи [give up]', 'Игнорирай [ignore] я'], answer: 1 }
         ]
       }
+      ,{
+        id: 'm6',
+        title: 'Save your work with Git',
+        content: `
+          <p>Всеки инженер [engineer] запазва [saves] работата [work] си с Git. То е като машина на времето [time machine] за кода [code] ти —
+          можеш [can] винаги [always] да се върнеш [go back] към всяка запазена версия [saved version]. Нека го настроим [set it up].</p>
+
+          <h3>Какво е Git?</h3>
+          <p>Git следи [tracks] промените [changes] в твоите файлове [files]. Всеки път [every time], когато запазиш [save] "commit", Git
+          помни [remembers] точно [exactly] как е изглеждал [looked] кодът [code] ти в този момент [at that moment]. Ако счупиш [break] нещо, можеш [can] да се върнеш [go back].</p>
+
+          <h3>Настрой [set up] Git (само при първи път [first time only])</h3>
+          <div class="code-block">
+            <pre>git config --global user.name "Your Name"
+git config --global user.email "your@email.com"</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Инициализирай [initialize] repo в проекта [project] си</h3>
+          <div class="code-block">
+            <pre>cd ~/ai-lab
+git init</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Запази [save] работата [work] си</h3>
+          <p>Кажи [tell] на Git кои файлове [files] да включи [include]:</p>
+          <div class="code-block">
+            <pre>git add .</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+          <p>Запази [save] снимка [snapshot] с описание [message] какво си направил [what you did]:</p>
+          <div class="code-block">
+            <pre>git commit -m "my first AI tool"</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+          <p>Виж [see] историята [history] си:</p>
+          <div class="code-block">
+            <pre>git log --oneline</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 6 Предизвикателство [Challenge]</div>
+            <p style="color:#ff8844;border:1px solid #ff8844;border-radius:4px;padding:0.4rem 0.6rem;font-size:0.85rem;">
+              ⚠️ Преди [before] да направиш [make] commit: отвори [open] Python файловете [files] и замени [replace] реалния [real] API ключ [key] с текста [text]
+              <code>YOUR_API_KEY_HERE</code> отново [again]. Никога [never] не commit-вай реален [real] API ключ [key] в Git.
+            </p>
+            <p>1. Влез [go] в папката [folder] <strong>ai-lab</strong> в terminal-а.<br>
+            2. Изпълни [run] <code>git init</code>.<br>
+            3. Отвори [open] Python файловете [files] и замени [replace] API ключа [key] с <code>YOUR_API_KEY_HERE</code>.<br>
+            4. Изпълни [run] <code>git add .</code> после <code>git commit -m "my first AI tool"</code>.<br>
+            5. Изпълни [run] <code>git log --oneline</code> — трябва да видиш [see] commit-а си.</p>
+            <p>Когато видиш [see] commit-а в историята [log], ти си истински инженер [real engineer]. Отбележи [mark] го.</p>
+            <button class="mark-done-btn" onclick="markDone('m6')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Ако git не е инсталиран [installed]: <code style="color:var(--green)">sudo apt install git</code><br><br>
+              Ако git се оплаква [complains] за твоето [name/email], изпълни [run] config командите [commands] горе [above] първо [first],
+              замествайки [replacing] "Your Name" и "your@email.com" с твоите данни [details].<br><br>
+              <code style="color:var(--green)">git config --global user.name "Ada"</code><br>
+              <code style="color:var(--green)">git config --global user.email "ada@example.com"</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Коя команда [command] създава [creates] нов git репозитори [repository]?', options: ['git start', 'git create', 'git init', 'git new'], answer: 2 },
+          { q: 'Коя команда [command] добавя [stages] всички файлове [files] за commit?', options: ['git save .', 'git add .', 'git stage .', 'git push .'], answer: 1 },
+          { q: 'Какво показва [shows] git log?', options: ['Текущите [current] ти файлове [files]', 'Историята [history] на commit-ите ти', 'Git настройките [settings]', 'Отдалечени репозитории [remote repositories]'], answer: 1 }
+        ]
+      },
+      {
+        id: 'm7',
+        title: 'GitHub — Put Your Code Online',
+        content: `
+          <p>Git запазва [saves] кода [code] ти локално [locally]. GitHub го качва [puts it] в интернет [internet] — backup, споделен [shareable] и в безопасност [safe].
+          Всеки [every] истински [real] проект [project] живее [lives] в GitHub.</p>
+
+          <h3>Какво е GitHub?</h3>
+          <p>GitHub е уебсайт [website], който съхранява [stores] Git репозитории [repositories]. Мисли [think] за него като Google Drive
+          за код [code] — но по-умен [smarter], защото разбира [understands] commit-и и история [history].</p>
+
+          <h3>Стъпка [step] 1: Създай [create] акаунт [account]</h3>
+          <p>Отиди [go] на <strong>github.com</strong> и създай [create] безплатен [free] акаунт [account].
+          Помоли [ask] татко да помогне [help] ако имаш нужда [need].</p>
+
+          <h3>Стъпка [step] 2: Създай [create] нов репозитори [repository]</h3>
+          <p>Натисни [click] бутона [button] <strong>+</strong> → "New repository". Назови [name] го <code style="color:var(--green)">ai-lab</code>.
+          Остави [leave] го публичен [public]. НЕ добавяй [add] README (вече имаш [already have] файловете [files] си). Натисни [click] "Create repository".</p>
+
+          <h3>Стъпка [step] 3: Свържи [connect] и качи [push]</h3>
+          <p>GitHub ще ти покаже [show] команди [commands]. Копирай [copy] тези, започващи [starting] с <code style="color:var(--green)">git remote add</code>.
+          Изглеждат [look] така:</p>
+          <div class="code-block">
+            <pre>git remote add origin https://github.com/YOUR_USERNAME/ai-lab.git
+git branch -M main
+git push -u origin main</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Стъпка [step] 4: Pull — вземи [get] последните промени [latest changes]</h3>
+          <p>Ако някой друг [someone else] промени [changes] кода [code] ти (или ти редактираш [edit] директно [directly] в GitHub), използвай [use]:</p>
+          <div class="code-block">
+            <pre>git pull</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 7 Предизвикателство [Challenge]</div>
+            <p>1. Създай [create] GitHub акаунт [account] (или използвай [use] на татко).<br>
+            2. Създай [create] нов repo с имe <strong>ai-lab</strong>.<br>
+            3. Качи [push] локалната [local] папка [folder] ai-lab в него.<br>
+            4. Отвори [open] GitHub страницата [page] и виж [see] кода [code] си онлайн [online].</p>
+            <button class="mark-done-btn" onclick="markDone('m7')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Увери се [make sure], че си в папката [folder] ai-lab първо [first]:<br>
+              <code style="color:var(--green)">cd ~/ai-lab</code><br><br>
+              После изпълни [run] трите команди [three commands], показани [shown] от GitHub след [after] създаването [creating] на repo.
+              Първата [first] е <code style="color:var(--green)">git remote add origin ...</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Коя команда [command] свързва [connects] локалния [local] repo с GitHub?', options: ['git connect', 'git remote add origin', 'git link', 'git attach'], answer: 1 },
+          { q: 'Коя команда [command] качва [uploads] commit-ите ти в GitHub?', options: ['git upload', 'git send', 'git push', 'git sync'], answer: 2 },
+          { q: 'Коя команда [command] изтегля [downloads] последните промени [latest changes] от GitHub?', options: ['git download', 'git fetch', 'git pull', 'git get'], answer: 2 }
+        ]
+      }
     ];
 
     // ── Idea box ──────────────────────────────────────────────────────
