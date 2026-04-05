@@ -889,6 +889,220 @@ git push -u origin main</pre>
           { q: 'Коя команда [command] изтегля [downloads] последните промени [latest changes] от GitHub?', options: ['git download', 'git fetch', 'git pull', 'git get'], answer: 2 }
         ]
       }
+      ,{
+        id: 'm8',
+        title: 'Prompt Engineering',
+        content: `
+          <p>Можеш [can] да получиш [get] драматично [dramatically] по-добри [better] отговори [answers] от Claude само като промениш [change] начина [the way], по който питаш [ask].
+          Това умение [skill] — писане [writing] на добри prompt-и — се казва [is called] <strong style="color:var(--green)">prompt engineering</strong>.</p>
+
+          <h3>Бъди конкретен [be specific]</h3>
+          <p>Лошо [bad]: <em>"Tell me about dogs."</em><br>
+          Добро [good]: <em>"In 3 bullet points, explain what makes dogs good pets for families with young children."</em></p>
+
+          <h3>Дай [give] на Claude роля [role] (system prompt)</h3>
+          <p>Можеш [can] да зададеш [set] <strong style="color:var(--green)">system prompt</strong>, за да кажеш [tell] на Claude кой [who] да бъде [to be]:</p>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+message = client.messages.create(
+    model="claude-haiku-4-5-20251001",
+    max_tokens=256,
+    system="You are a friendly Python teacher for beginners.",
+    messages=[
+        {"role": "user", "content": "What is a for loop?"}
+    ]
+)
+print(message.content[0].text)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Few-shot примери [examples]</h3>
+          <p>Покажи [show] на Claude какво искаш [want], като дадеш [give] примери [examples] преди [before] въпроса [question] си:</p>
+          <div class="code-block">
+            <pre>prompt = """
+Translate these sentences to pirate speak:
+Hello → Ahoy!
+How are you? → How be ye?
+Now translate this: What time is it?
+"""</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 8 Предизвикателство [Challenge]</div>
+            <p>Напиши [write] две версии [two versions] на prompt, питащ [asking] Claude да обясни [explain] какво е променлива [variable]:<br>
+            1. Неясна версия [vague version] (кратка [short], без контекст [no context])<br>
+            2. Конкретна версия [specific version] (роля [role] + аудитория [audience] + формат [format])<br>
+            Стартирай [run] и двете с твоя скрипт [script] и сравни [compare] отговорите [answers].</p>
+            <button class="mark-done-btn" onclick="markDone('m8')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Неясно [vague]: <code style="color:var(--green)">"What is a variable?"</code><br><br>
+              Конкретно [specific]: <code style="color:var(--green)">"You are a teacher for 13-year-olds.
+              Explain what a variable is in Python using one real-world analogy. Keep it under 3 sentences."</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Какво е system prompt?', options: ['Съобщение за грешка [error message] от terminal', 'Инструкции [instructions], казващи [telling] на AI как да се държи [behave] преди [before] разговора [conversation] започне [starts]', 'Вид [type of] Python функция [function]', 'Първото съобщение [first message] на потребителя [user]'], answer: 1 },
+          { q: 'Какво е few-shot prompting?', options: ['Използване [using] на малък [small] AI модел [model]', 'Даване [giving] на AI примери [examples] от това [of what], което искаш [want], преди [before] въпроса [question] си', 'Бърз [fast] начин [way] за стартиране [run] на код [code]', 'Изпращане [sending] на кратки [short] съобщения [messages]'], answer: 1 },
+          { q: 'Кой prompt ще получи [get] по-добър [better] отговор [answer]?', options: ['Tell me about loops', 'In 2 sentences for a beginner, explain what a Python for loop does', 'loops?', 'loop info'], answer: 1 }
+        ]
+      },
+      {
+        id: 'm9',
+        title: 'Python + Files',
+        content: `
+          <p>Истинските програми [real programs] четат [read] и пишат [write] файлове [files] — логове [logs], данни [data], резултати [results]. Нека научим [learn] как
+          Python борави [handles] с файлове [files], после ще подаваме [feed] съдържание [content] на Claude.</p>
+
+          <h3>Запис [writing] на файл [file]</h3>
+          <div class="code-block">
+            <pre>with open("notes.txt", "w") as f:
+    f.write("Line one\\n")
+    f.write("Line two\\n")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Четене [reading] на файл [file]</h3>
+          <div class="code-block">
+            <pre>with open("notes.txt", "r") as f:
+    content = f.read()
+    print(content)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Четене [reading] ред по ред [line by line]</h3>
+          <div class="code-block">
+            <pre>with open("notes.txt", "r") as f:
+    for line in f.readlines():
+        print(line.strip())</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Изпращане [send] на всеки ред [each line] към Claude</h3>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+
+with open("notes.txt", "r") as f:
+    for line in f.readlines():
+        line = line.strip()
+        if not line:
+            continue
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=64,
+            messages=[{"role": "user", "content": f"Summarize in 5 words: {line}"}]
+        )
+        print(f"Original: {line}")
+        print(f"Summary:  {message.content[0].text}")
+        print()</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 9 Предизвикателство [Challenge]</div>
+            <p>1. Създай [create] файл [file] с имe <strong>facts.txt</strong> с 3 интересни факта [interesting facts] (по един на ред [one per line]).<br>
+            2. Напиши [write] Python скрипт [script], който чете [reads] всеки ред [each line] и пита [asks] Claude за подходящ [matching] emoji.<br>
+            3. Отпечатай [print] оригиналния факт [original fact] + emoji-то, избрано [chosen] от Claude.</p>
+            <button class="mark-done-btn" onclick="markDone('m9')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Създай [create] facts.txt с nano:<br>
+              <code style="color:var(--green)">nano facts.txt</code><br><br>
+              Твоят prompt към Claude може да е:<br>
+              <code style="color:var(--green)">f"Give exactly one emoji that matches this fact: {line}"</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Коя Python функция [function] отваря [opens] файл [file]?', options: ['read()', 'file()', 'open()', 'load()'], answer: 2 },
+          { q: 'Какво прави [does] "with open(filename) as f:"?', options: ['Създава [creates] нов файл [new file]', 'Отваря [opens] файл [file] и автоматично [automatically] го затваря [closes] когато свърши [done]', 'Изтрива [deletes] файл [file]', 'Отпечатва [prints] файл [file]'], answer: 1 },
+          { q: 'Как четеш [read] всички редове [all lines] на файл [file] в списък [list]?', options: ['f.read()', 'f.lines()', 'f.readlines()', 'f.all()'], answer: 2 }
+        ]
+      },
+      {
+        id: 'm10',
+        title: 'Multi-turn Chat',
+        content: `
+          <p>Засега [so far] всеки скрипт [script] изпраща [sends] едно съобщение [one message] и получава [receives] един отговор [one answer]. Истинските чат-ботове [real chatbots]
+          помнят [remember] какво [what] си казал [said] преди [before]. Нека построим [build] такъв.</p>
+
+          <h3>Как работи [works] историята на разговора [conversation history]</h3>
+          <p>Anthropic API не запомня [remembers] автоматично [automatically] предишни [previous] съобщения [messages].
+          Пазиш [keep] списък [list] с имe <code style="color:var(--green)">messages</code> и
+          добавяш [add] към него всеки ход [every turn]:</p>
+          <div class="code-block">
+            <pre>messages = []
+
+# Turn 1
+messages.append({"role": "user", "content": "My name is Ada."})
+# ... get response, add it too ...
+messages.append({"role": "assistant", "content": "Nice to meet you, Ada!"})
+
+# Turn 2 — Claude now knows your name
+messages.append({"role": "user", "content": "What's my name?"})</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Пълен [full] чат-бот [chatbot] цикъл [loop]</h3>
+          <div class="code-block">
+            <pre>import anthropic
+
+client = anthropic.Anthropic(api_key="YOUR_API_KEY_HERE")
+messages = []
+MAX_HISTORY = 6  # keep last 3 exchanges (6 messages)
+
+print("Chat with Claude. Type 'quit' to exit.")
+
+while True:
+    user_input = input("You: ")
+    if user_input.lower() == "quit":
+        break
+
+    messages.append({"role": "user", "content": user_input})
+
+    # Keep history to last MAX_HISTORY messages
+    if len(messages) > MAX_HISTORY:
+        messages = messages[-MAX_HISTORY:]
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=256,
+        messages=messages
+    )
+    reply = response.content[0].text
+    messages.append({"role": "assistant", "content": reply})
+    print(f"Claude: {reply}\\n")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 10 Предизвикателство [Challenge]</div>
+            <p>1. Копирай [copy] скрипта за чат-бот [chatbot script] горе в файл [file] с имe <strong>chatbot.py</strong>.<br>
+            2. Стартирай [run] го и проведи [have] разговор [conversation] от 5 съобщения [messages] с Claude.<br>
+            3. В съобщение [message] 5, попитай [ask] Claude нещо, което изисква [requires] да помни [remember] съобщение [message] 1.<br>
+            4. Помни ли [does it remember]?</p>
+            <button class="mark-done-btn" onclick="markDone('m10')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Опитай [try] да кажеш [tell] на Claude името [name] си в първото съобщение [first message], после да питаш [ask]
+              "What's my name?" по-късно [later]. Ако историята [history] работи [works], ще знае [will know].<br><br>
+              Ако получиш [get] грешка [error] за token лимит [token limit], намали [reduce] MAX_HISTORY на 4.
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'В Anthropic API, кой списък [list] пази [stores] историята на разговора [conversation history]?', options: ['history', 'chat', 'messages', 'conversation'], answer: 2 },
+          { q: 'Каква роля [role] получава [gets] отговорът [response] на AI в списъка [list] messages?', options: ['ai', 'bot', 'assistant', 'claude'], answer: 2 },
+          { q: 'Защо ограничаваме [limit] дължината [length] на историята [history] на разговора [conversation]?', options: ['Изисква се [required] от API', 'За да спестим [save] API токени [tokens] и намалим [reduce] разходите [cost]', 'Защото Claude забравя [forgets] така или иначе [anyway]', 'За да ускорим [speed up] отговорите [responses]'], answer: 1 }
+        ]
+      }
     ];
 
     // ── Idea box ──────────────────────────────────────────────────────
