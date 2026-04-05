@@ -338,12 +338,23 @@
     .ask-error { color: var(--warn); font-size: 0.8rem; margin-top: 0.3rem; }
     /* padding so content doesn't hide behind fixed bar */
     body.ask-bar-visible { padding-bottom: 120px; }
+    /* ── Bug report ─────────────────────────────────────────────── */
+    .bug-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--grey);
+      text-decoration: none;
+      font-family: var(--font);
+    }
+    .bug-link:hover { color: var(--warn); }
   </style>
 </head>
 <body>
   <header>
     <h1>&gt; Обучение за AI инженер</h1>
     <p class="subtitle">10 мисии [missions]. Изпълнявай [complete] ги по ред [in order]. Без прескачане [no skipping].</p>
+    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Грешка+%5Bbug%5D+в+мисия&body=**Мисия+%5BMission%5D:**+%28напр.+Мисия+3%29%0A**Какво+правех+%5BWhat+I+was+doing%5D:**+%0A**Какво+се+случи+%5BWhat+happened%5D:**+" target="_blank">🐛 Намерих грешка [Found a bug]</a>
   </header>
   <div class="ls-warning" id="ls-warning">
     Внимание [warning]: прогресът [progress] няма да се запази [save] в режим инкогнито [private/incognito].
