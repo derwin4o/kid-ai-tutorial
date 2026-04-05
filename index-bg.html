@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Обучение за AI инженер</title>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg2: #1a1a1a;
+      --green: #00ff88;
+      --green-dim: #00cc66;
+      --grey: #444;
+      --text: #cccccc;
+      --font: 'Courier New', Courier, monospace;
+      --code-bg: #111;
+      --code-border: #333;
+      --challenge-bg: #111a11;
+      --hint-text: #aaa;
+      --warn: #ff8844;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    h1 {
+      color: var(--green);
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: var(--grey);
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+    }
+    /* Progress bar */
+    .progress-wrap {
+      margin-bottom: 2.5rem;
+    }
+    .progress-label {
+      color: var(--green-dim);
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+    .progress-bar-bg {
+      background: var(--bg2);
+      border: 1px solid var(--grey);
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      background: var(--green);
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    /* Module cards */
+    .module {
+      background: var(--bg2);
+      border: 1px solid var(--grey);
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .module.unlocked {
+      border-color: var(--green-dim);
+    }
+    .module.locked {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .module-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.2rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .module-title {
+      color: var(--green);
+      font-size: 1rem;
+    }
+    .module-status {
+      font-size: 0.8rem;
+      color: var(--grey);
+    }
+    .module.done .module-status { color: var(--green); }
+    .module-body {
+      padding: 0 1.2rem 1.2rem;
+      display: none;
+    }
+    .module.open .module-body { display: block; }
+    p { margin: 0.8rem 0; line-height: 1.6; font-size: 0.9rem; }
+    h3 { color: var(--green-dim); margin: 1.2rem 0 0.5rem; font-size: 0.95rem; }
+    /* Code blocks */
+    .code-block {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 4px;
+      margin: 0.8rem 0;
+    }
+    .code-block pre {
+      padding: 0.8rem 1rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      color: var(--green);
+      line-height: 1.5;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--grey);
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .copy-btn:hover { background: var(--green-dim); color: #000; }
+    /* Challenge section */
+    .challenge {
+      background: var(--challenge-bg);
+      border-left: 3px solid var(--green);
+      border-radius: 0 4px 4px 0;
+      padding: 0.8rem 1rem;
+      margin: 1rem 0;
+    }
+    .challenge-title {
+      color: var(--green);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+    }
+    /* Hint */
+    .hint-toggle {
+      background: none;
+      border: 1px solid var(--grey);
+      color: var(--grey);
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: var(--font);
+      margin-top: 0.6rem;
+    }
+    .hint-toggle:hover { border-color: var(--green-dim); color: var(--green-dim); }
+    .hint-body {
+      display: none;
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--hint-text);
+      line-height: 1.6;
+    }
+    .hint-body.visible { display: block; }
+    /* Mark done button */
+    .mark-done-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.2rem;
+      padding: 0.7rem;
+      background: none;
+      border: 2px solid var(--green);
+      color: var(--green);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background 0.2s, color 0.2s;
+    }
+    .mark-done-btn:hover { background: var(--green); color: #000; }
+    .mark-done-btn:disabled {
+      border-color: var(--grey);
+      color: var(--grey);
+      cursor: default;
+      background: none;
+    }
+    /* localStorage warning */
+    .ls-warning {
+      color: var(--warn);
+      font-size: 0.75rem;
+      padding: 0.5rem;
+      border: 1px solid var(--warn);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    /* ── Quiz ─────────────────────────────────────────────────────── */
+    .quiz-section { margin-top: 1.2rem; }
+    .quiz-question { color: var(--text); font-size: 0.9rem; margin-bottom: 0.8rem; line-height: 1.6; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option {
+      background: none;
+      border: 1px solid var(--grey);
+      color: var(--text);
+      border-radius: 4px;
+      padding: 0.5rem 0.8rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: var(--font);
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .quiz-option:hover { border-color: var(--green-dim); color: var(--green-dim); }
+    .quiz-option.correct {
+      border-color: var(--green);
+      background: rgba(0,255,136,0.1);
+      color: var(--green);
+      animation: flashGreen 0.4s ease;
+    }
+    .quiz-option.wrong {
+      border-color: var(--warn);
+      background: rgba(255,136,68,0.1);
+      color: var(--warn);
+      animation: flashRed 0.4s ease;
+    }
+    @keyframes flashGreen {
+      0% { background: rgba(0,255,136,0.4); }
+      100% { background: rgba(0,255,136,0.1); }
+    }
+    @keyframes flashRed {
+      0% { background: rgba(255,136,68,0.4); }
+      100% { background: rgba(255,136,68,0.1); }
+    }
+    .quiz-passed {
+      color: var(--green);
+      font-size: 0.85rem;
+      padding: 0.4rem 0;
+    }
+    .quiz-progress { color: var(--grey); font-size: 0.75rem; margin-bottom: 0.6rem; }
+    /* ── Idea box ──────────────────────────────────────────────────── */
+    .idea-box {
+      margin-top: 1.2rem;
+      border-top: 1px solid var(--grey);
+      padding-top: 1rem;
+    }
+    .idea-prompt { color: var(--green-dim); font-size: 0.85rem; margin-bottom: 0.6rem; }
+    .idea-textarea {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.6rem 0.8rem;
+      resize: vertical;
+      min-height: 60px;
+    }
+    .idea-textarea:focus { outline: none; border-color: var(--green-dim); }
+    .idea-send-btn {
+      margin-top: 0.5rem;
+      background: none;
+      border: 1px solid var(--green-dim);
+      color: var(--green-dim);
+      border-radius: 4px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .idea-send-btn:hover { background: var(--green-dim); color: #000; }
+    .idea-response {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--hint-text);
+      line-height: 1.6;
+      font-style: italic;
+      display: none;
+    }
+    .idea-locked { color: var(--grey); font-size: 0.8rem; margin-top: 0.5rem; }
+    /* ── Ask bar ───────────────────────────────────────────────────── */
+    .ask-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--code-bg);
+      border-top: 1px solid var(--green-dim);
+      padding: 0.6rem 1rem;
+      z-index: 100;
+    }
+    .ask-bar-inner { max-width: 800px; margin: 0 auto; }
+    .ask-bar-label { color: var(--green-dim); font-size: 0.7rem; margin-bottom: 0.4rem; }
+    .ask-bar-row { display: flex; gap: 0.5rem; }
+    .ask-bar-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.4rem 0.7rem;
+    }
+    .ask-bar-input:focus { outline: none; border-color: var(--green-dim); }
+    .ask-bar-btn {
+      background: none;
+      border: 1px solid var(--green);
+      color: var(--green);
+      border-radius: 4px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: var(--font);
+      white-space: nowrap;
+    }
+    .ask-bar-btn:hover { background: var(--green); color: #000; }
+    .ask-bar-btn:disabled { border-color: var(--grey); color: var(--grey); cursor: default; }
+    .ask-responses {
+      max-width: 800px;
+      margin: 0 auto 0.5rem;
+    }
+    .ask-response-item {
+      background: var(--bg2);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .ask-response-q { color: var(--green-dim); font-size: 0.75rem; margin-bottom: 0.3rem; }
+    .ask-error { color: var(--warn); font-size: 0.8rem; margin-top: 0.3rem; }
+    /* padding so content doesn't hide behind fixed bar */
+    body.ask-bar-visible { padding-bottom: 120px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>&gt; Обучение за AI инженер</h1>
+    <p class="subtitle">10 мисии [missions]. Изпълнявай [complete] ги по ред [in order]. Без прескачане [no skipping].</p>
+  </header>
+  <div class="ls-warning" id="ls-warning">
+    Внимание [warning]: прогресът [progress] няма да се запази [save] в режим инкогнито [private/incognito].
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label" id="progress-label">0 от 0 мисии завършени</div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Прогрес на обучението"></div>
+    </div>
+  </div>
+  <div id="modules-container"></div>
+  <div class="ask-bar" id="ask-bar" style="display:none" aria-label="Попитай [ask] Claude нещо">
+    <div class="ask-responses" id="ask-responses"></div>
+    <div class="ask-bar-inner">
+      <div class="ask-bar-label" id="ask-bar-label">Попитай [ask] Claude нещо за наученото [what you learned] →</div>
+      <div class="ask-bar-row">
+        <input class="ask-bar-input" id="ask-bar-input" type="text"
+          placeholder="Напиши [type] въпрос [question]..." autocomplete="off" />
+        <button class="ask-bar-btn" id="ask-bar-btn" onclick="handleAskBar()">Питай [ask] →</button>
+      </div>
+      <div class="ask-error" id="ask-error" style="display:none"></div>
+    </div>
+  </div>
+  <script>
+    // ── Storage ──────────────────────────────────────────────────────
+    let lsAvailable = true;
+    try { localStorage.setItem('_test', '1'); localStorage.removeItem('_test'); }
+    catch(e) { lsAvailable = false; document.getElementById('ls-warning').style.display = 'block'; }
+
+    function getProgress() {
+      if (!lsAvailable) return {};
+      try { return JSON.parse(localStorage.getItem('tutorialProgress') || '{}'); }
+      catch(e) { return {}; }
+    }
+    function saveProgress(moduleId) {
+      if (!lsAvailable) return;
+      const p = getProgress();
+      p[moduleId] = true;
+      localStorage.setItem('tutorialProgress', JSON.stringify(p));
+    }
+
+    // ── Quiz state (in-memory, resets on page refresh) ────────────────
+    const quizState = {}; // { moduleId: currentQuestionIndex }
+
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ── Claude API utility ────────────────────────────────────────────
+    async function callClaude(userMessage, systemPrompt, maxTokens) {
+      const apiKey = localStorage.getItem('anthropicKey'); // gitleaks:allow
+      if (!apiKey) throw new Error('no-key');
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey, // gitleaks:allow
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userMessage }]
+        })
+      });
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(`api-error-${response.status}`);
+      }
+      const data = await response.json();
+      const text = data?.content?.[0]?.text;
+      if (typeof text !== 'string') throw new Error('api-error:unexpected-response');
+      return text;
+    }
+
+    // ── Module definitions (content added in Tasks 3-7) ──────────────
+    const MODULES = [];
+
+    // ── Idea box ──────────────────────────────────────────────────────
+    function hasApiKey() {
+      return !!localStorage.getItem('anthropicKey');
+    }
+
+    function m4Complete() {
+      return !!getProgress()['m4'];
+    }
+
+    function renderIdeaBox(moduleId) {
+      if (!m4Complete()) {
+        return `<div class="idea-box"><p class="idea-locked">Завърши [complete] Мисия [mission] 4 първо, за да отключиш [unlock] Claude чат [chat].</p></div>`;
+      }
+      if (!hasApiKey()) {
+        return `<div class="idea-box"><p class="idea-locked">Въведи [enter] API ключа [key] си в лентата [bar] долу на страницата [page].</p></div>`;
+      }
+      return `
+        <div class="idea-box">
+          <p class="idea-prompt">💡 Какво би добавил [add] ТИ към тази мисия [mission]? Кажи идеята [idea] си на Claude.</p>
+          <textarea class="idea-textarea" id="idea-input-${moduleId}"
+            placeholder="напр. Бих добавил [add] мисия [mission] за правене на уебсайт [website] с AI..."></textarea>
+          <button class="idea-send-btn" id="idea-send-btn-${moduleId}" onclick="submitIdea('${moduleId}')">Изпрати [send] идея [idea] →</button>
+          <div class="idea-response" id="idea-response-${moduleId}"></div>
+        </div>
+      `;
+    }
+
+    async function submitIdea(moduleId) {
+      const textarea = document.getElementById(`idea-input-${moduleId}`);
+      const responseEl = document.getElementById(`idea-response-${moduleId}`);
+      if (!textarea || !responseEl) return;
+      const btn = document.getElementById(`idea-send-btn-${moduleId}`);
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      btn.textContent = 'Изпращане [sending]...';
+      btn.disabled = true;
+      responseEl.style.display = 'none';
+
+      try {
+        const reply = await callClaude(
+          text,
+          'You are encouraging a 13-year-old learning to code. They just finished a programming lesson and shared an idea. Respond warmly in 2 sentences max. Always respond in Bulgarian.',
+          128
+        );
+        responseEl.textContent = reply;
+        responseEl.style.display = 'block';
+      } catch(e) {
+        let msg;
+        if (e.message === 'no-key') {
+          msg = 'Въведи [enter] API ключа [key] си в лентата [bar] долу първо [first].';
+        } else if (e.message && e.message.includes('429')) {
+          msg = 'Забави [slow down] — изпращаш [sending] твърде много [too many] заявки [requests]. Изчакай [wait] малко и опитай [try] отново [again].';
+        } else {
+          msg = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
+        }
+        responseEl.textContent = msg;
+        responseEl.style.color = 'var(--warn)';
+        responseEl.style.display = 'block';
+      } finally {
+        btn.textContent = 'Изпрати [send] идея [idea] →';
+        btn.disabled = false;
+      }
+    }
+
+    // ── Quiz engine ───────────────────────────────────────────────────
+    function renderQuizQuestion(moduleId, quiz) {
+      const currentQ = quizState[moduleId] || 0;
+      if (!quiz || quiz.length === 0) return '<div class="quiz-passed">✓ Завършено [complete]</div>';
+      if (currentQ >= quiz.length) return '<div class="quiz-passed">✓ Завършено [complete]</div>';
+      const q = quiz[currentQ];
+      return `
+        <div class="quiz-progress">Въпрос [question] ${currentQ + 1} от [of] ${quiz.length}</div>
+        <div class="quiz-question">${esc(q.q)}</div>
+        <div class="quiz-options">
+          ${q.options.map((opt, i) =>
+            `<button class="quiz-option" id="qopt-${esc(moduleId)}-${i}"
+              onclick="submitQuizAnswer(${JSON.stringify(moduleId)}, ${currentQ}, ${i})">${esc(opt)}</button>`
+          ).join('')}
+        </div>
+      `;
+    }
+
+    function submitQuizAnswer(moduleId, questionIndex, selectedIndex) {
+      const mod = MODULES.find(m => m.id === moduleId);
+      if (!mod || !mod.quiz || !mod.quiz[questionIndex]) return;
+      const correct = mod.quiz[questionIndex].answer;
+      const btn = document.getElementById(`qopt-${moduleId}-${selectedIndex}`);
+
+      if (selectedIndex !== correct) {
+        btn.classList.add('wrong');
+        const allBtns = btn.closest('.quiz-options').querySelectorAll('.quiz-option');
+        allBtns.forEach(b => b.disabled = true);
+        setTimeout(() => {
+          btn.classList.remove('wrong');
+          allBtns.forEach(b => b.disabled = false);
+        }, 600);
+        return;
+      }
+
+      btn.classList.add('correct');
+      const allBtns = btn.closest('.quiz-options').querySelectorAll('.quiz-option');
+      allBtns.forEach(b => b.disabled = true);
+
+      setTimeout(() => {
+        const nextQ = questionIndex + 1;
+        if (nextQ < mod.quiz.length) {
+          quizState[moduleId] = nextQ;
+          document.getElementById(`quiz-${moduleId}`).innerHTML = renderQuizQuestion(moduleId, mod.quiz);
+        } else {
+          saveProgress(moduleId);
+          renderModules();
+          const idx = MODULES.findIndex(m => m.id === moduleId);
+          if (idx < MODULES.length - 1) {
+            setTimeout(() => {
+              const next = document.querySelectorAll('.module')[idx + 1];
+              if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+          }
+        }
+      }, 500);
+    }
+
+    // ── Render ───────────────────────────────────────────────────────
+    function renderModules() {
+      const progress = getProgress();
+      const container = document.getElementById('modules-container');
+      container.innerHTML = '';
+      let completedCount = 0;
+
+      MODULES.forEach((mod, i) => {
+        const isDone = !!progress[mod.id];
+        const prevDone = i === 0 || !!progress[MODULES[i-1].id];
+        const isUnlocked = prevDone;
+        if (isDone) completedCount++;
+
+        const el = document.createElement('div');
+        el.className = 'module' +
+          (isDone ? ' done' : '') +
+          (isUnlocked ? ' unlocked' : ' locked');
+
+        // Auto-open the first unlocked incomplete module
+        const isCurrentModule = isUnlocked && !isDone;
+
+        el.innerHTML = `
+          <div class="module-header" onclick="toggleModule('mod-${mod.id}')">
+            <span class="module-title">Mission ${i+1}: ${mod.title}</span>
+            <span class="module-status">${isDone ? '✓ завършено [complete]' : isUnlocked ? 'отключено [unlocked]' : '🔒 заключено [locked]'}</span>
+          </div>
+          <div class="module-body" id="mod-${mod.id}">
+            ${mod.content}
+            <div class="quiz-section" id="quiz-${mod.id}">
+              ${isDone
+                ? '<div class="quiz-passed">✓ Тестът [quiz] е минат [passed]</div>'
+                : renderQuizQuestion(mod.id, mod.quiz || [])}
+            </div>
+            ${isDone ? renderIdeaBox(mod.id) : ''}
+          </div>
+        `;
+
+        if (isCurrentModule || isDone) {
+          el.classList.add('open');
+        }
+
+        // Keyboard accessibility: disable tabindex on locked module interactive children
+        if (!isUnlocked) {
+          el.querySelectorAll('button, a, input, select, textarea, [tabindex]').forEach(child => {
+            child.setAttribute('tabindex', '-1');
+          });
+        }
+
+        container.appendChild(el);
+      });
+
+      // Update progress bar
+      const pct = MODULES.length ? (completedCount / MODULES.length) * 100 : 0;
+      const bar = document.getElementById('progress-bar');
+      bar.style.width = pct + '%';
+      bar.setAttribute('aria-valuenow', Math.round(pct));
+      document.getElementById('progress-label').textContent =
+        completedCount + ' от [of] ' + MODULES.length + ' мисии [missions] завършени [complete]';
+      updateAskBarVisibility();
+    }
+
+    function toggleModule(bodyId) {
+      const body = document.getElementById(bodyId);
+      const card = body.closest('.module');
+      if (card.classList.contains('locked')) return;
+      card.classList.toggle('open');
+    }
+
+    function markDone(moduleId) {
+      saveProgress(moduleId);
+      renderModules();
+      // Scroll to next module
+      const idx = MODULES.findIndex(m => m.id === moduleId);
+      if (idx < MODULES.length - 1) {
+        setTimeout(() => {
+          const next = document.querySelectorAll('.module')[idx + 1];
+          if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }
+    }
+
+    function copyCode(btn) {
+      const pre = btn.closest('.code-block').querySelector('pre');
+      const text = pre.innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          btn.textContent = 'копирано [copied]!';
+          setTimeout(() => btn.textContent = 'копирай [copy]', 1500);
+        }).catch(() => {
+          // Fallback: select text
+          const range = document.createRange();
+          range.selectNode(pre);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+          btn.textContent = 'избрано [selected]!';
+          setTimeout(() => btn.textContent = 'копирай [copy]', 1500);
+        });
+      } else {
+        const range = document.createRange();
+        range.selectNode(pre);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        btn.textContent = 'избрано [selected]!';
+        setTimeout(() => btn.textContent = 'копирай [copy]', 1500);
+      }
+    }
+
+    function toggleHint(btn) {
+      const hint = btn.nextElementSibling;
+      hint.classList.toggle('visible');
+      btn.textContent = hint.classList.contains('visible') ? 'скрий [hide] подсказка [hint]' : 'покажи [show] подсказка [hint]';
+    }
+
+    // ── Ask-me-anything bar ────────────────────────────────────────────
+    let askBarMode = 'question'; // 'key' | 'question'
+
+    function updateAskBarVisibility() {
+      const bar = document.getElementById('ask-bar');
+      if (!m4Complete()) { bar.style.display = 'none'; document.body.classList.remove('ask-bar-visible'); return; }
+      bar.style.display = 'block';
+      document.body.classList.add('ask-bar-visible');
+      if (!hasApiKey()) {
+        askBarMode = 'key';
+        document.getElementById('ask-bar-label').textContent = 'Въведи [enter] Anthropic API ключа [key] си, за да отключиш [unlock] Claude чат [chat]:';
+        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...'; // gitleaks:allow
+        document.getElementById('ask-bar-input').type = 'password';
+        document.getElementById('ask-bar-btn').textContent = 'Запази [save] →';
+      } else {
+        askBarMode = 'question';
+        document.getElementById('ask-bar-label').textContent = 'Попитай [ask] Claude нещо за наученото [what you learned] →';
+        document.getElementById('ask-bar-input').placeholder = 'Напиши [type] въпрос [question]...';
+        document.getElementById('ask-bar-input').type = 'text';
+        document.getElementById('ask-bar-btn').textContent = 'Питай [ask] →';
+      }
+    }
+
+    async function handleAskBar() {
+      const input = document.getElementById('ask-bar-input');
+      const btn = document.getElementById('ask-bar-btn');
+      const errorEl = document.getElementById('ask-error');
+      const val = input.value.trim();
+      if (!val) return;
+      errorEl.style.display = 'none';
+
+      if (askBarMode === 'key') {
+        localStorage.setItem('anthropicKey', val);
+        input.value = '';
+        updateAskBarVisibility();
+        renderModules(); // re-render to update idea boxes
+        return;
+      }
+
+      // Ask mode
+      btn.textContent = 'мисля [thinking]...';
+      btn.disabled = true;
+      input.disabled = true;
+
+      try {
+        const answer = await callClaude(
+          val,
+          'You are helping a 13-year-old learn programming and AI. Answer clearly in plain language, maximum 3 sentences. Always respond in Bulgarian.',
+          256
+        );
+        addAskResponse(val, answer);
+        input.value = '';
+      } catch(e) {
+        errorEl.textContent = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
+        errorEl.style.display = 'block';
+      } finally {
+        btn.textContent = 'Питай [ask] →';
+        btn.disabled = false;
+        input.disabled = false;
+        input.focus();
+      }
+    }
+
+    function addAskResponse(question, answer) {
+      const container = document.getElementById('ask-responses');
+      const item = document.createElement('div');
+      item.className = 'ask-response-item';
+      const qLine = document.createElement('div');
+      qLine.className = 'ask-response-q';
+      qLine.textContent = 'Ти попита [you asked]: ' + question;
+      const aLine = document.createElement('div');
+      aLine.textContent = answer;
+      item.appendChild(qLine);
+      item.appendChild(aLine);
+      container.insertBefore(item, container.firstChild);
+      // Keep max 3 responses
+      while (container.children.length > 3) container.removeChild(container.lastChild);
+    }
+
+    // Allow Enter key in ask bar (ask-bar-input is already in DOM since HTML is before this script)
+    document.getElementById('ask-bar-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleAskBar();
+    });
+
+    // Initial render
+    renderModules();
+  </script>
+</body>
+</html>
