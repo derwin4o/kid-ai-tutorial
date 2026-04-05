@@ -427,7 +427,198 @@
     }
 
     // ── Module definitions (content added in Tasks 3-7) ──────────────
-    const MODULES = [];
+    const MODULES = [
+      {
+        id: 'm1',
+        title: 'The Terminal',
+        content: `
+          <p>Terminal [терминал] е начинът [the way], по който говориш [talk] директно [directly] с компютъра [computer] — без бутони [buttons], само с текст [text].
+          Всеки [every] AI инженер [engineer] го използва [uses] всеки ден [every day]. Нека научим [learn] основите [the basics].</p>
+
+          <h3>Отвори [open] terminal</h3>
+          <p>В Ubuntu: натисни [press] <strong style="color:var(--green)">Ctrl + Alt + T</strong>.
+          Появява се [appears] черен прозорец [black window] с мигащ курсор [blinking cursor]. Това е твоят terminal.</p>
+
+          <h3>Команди [commands] за учене [to learn]</h3>
+          <p><code style="color:var(--green)">pwd</code> — показва [shows] текущата ти папка [current folder]</p>
+          <div class="code-block">
+            <pre>pwd</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+          <p><code style="color:var(--green)">ls</code> — показва [lists] всичко [everything] в текущата папка [current folder]</p>
+          <div class="code-block">
+            <pre>ls</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+          <p><code style="color:var(--green)">mkdir</code> — прави [makes] нова папка [new folder]</p>
+          <div class="code-block">
+            <pre>mkdir ai-lab</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+          <p><code style="color:var(--green)">cd</code> — влиза [moves you] в папка [folder]</p>
+          <div class="code-block">
+            <pre>cd ai-lab</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+          <p>Стартирай [run] първия си Python ред [line]:</p>
+          <div class="code-block">
+            <pre>python3 -c "print('hello world')"</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 1 Предизвикателство [Challenge]</div>
+            <p>1. Отвори [open] terminal.<br>
+            2. Създай [create] папка [folder] с ime <strong>ai-lab</strong>.<br>
+            3. Влез [go] в нея с <code>cd ai-lab</code>.<br>
+            4. Изпълни [run] <code>ls</code> — трябва да е празно [empty] (празна папка [empty folder]).<br>
+            5. Изпълни [run] <code>python3 -c "print('I am an AI engineer')"</code></p>
+            <p>Когато видиш [see] съобщението [message] отпечатано [printed], върни се [come back] тук и го отбележи [mark it].</p>
+            <button class="mark-done-btn" onclick="markDone('m1')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Отвори [open] terminal с Ctrl+Alt+T, после напиши [type] всяка команда [command] и натисни [press] Enter:<br><br>
+              <code style="color:var(--green)">mkdir ai-lab</code><br>
+              <code style="color:var(--green)">cd ai-lab</code><br>
+              <code style="color:var(--green)">ls</code><br>
+              <code style="color:var(--green)">python3 -c "print('I am an AI engineer')"</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Коя команда [command] показва [shows] текущата ти папка [current folder]?', options: ['ls', 'pwd', 'cd', 'mkdir'], answer: 1 },
+          { q: 'Коя команда [command] създава [creates] нова папка [new folder] ai-lab?', options: ['pwd ai-lab', 'cd ai-lab', 'mkdir ai-lab', 'touch ai-lab'], answer: 2 },
+          { q: 'Как стартираш [run] Python скрипт [script] hello.py?', options: ['run hello.py', 'python3 hello.py', 'start hello.py', 'execute hello.py'], answer: 1 }
+        ]
+      },
+      {
+        id: 'm2',
+        title: 'Python in 30 min',
+        content: `
+          <p>Python е езикът [the language] на AI. Чете се [reads] почти [almost] като английски [English]. Нека научим [learn] само
+          толкова, колкото ни трябва [just enough] за истински неща [real things].</p>
+
+          <h3>Променливи [variables] — запазване [storing] на информация [information]</h3>
+          <div class="code-block">
+            <pre>name = "Ada"
+age = 13
+print(name, "is", age, "years old")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Функции [functions] — блокове код [code blocks] за многократно използване [reuse]</h3>
+          <div class="code-block">
+            <pre>def greet(name):
+    print("Hello,", name)
+
+greet("Ada")
+greet("World")</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Цикли [loops] — правене [doing] на нещо много пъти [many times]</h3>
+          <div class="code-block">
+            <pre>for i in range(5):
+    print("Line", i)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Input [вход] — питане [asking] на потребителя [user] за нещо</h3>
+          <div class="code-block">
+            <pre>name = input("What is your name? ")
+print("Welcome,", name)</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <h3>Как да стартираш [run] Python файл [file]</h3>
+          <p>Запази [save] кода [code] в файл [file] с имe <code style="color:var(--green)">hello.py</code>,
+          после стартирай [run] го:</p>
+          <div class="code-block">
+            <pre>python3 hello.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+          </div>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 2 Предизвикателство [Challenge]</div>
+            <p>В папката [folder] <strong>ai-lab</strong>, създай [create] файл [file] с имe
+            <strong>hello.py</strong> с този код [code]:</p>
+            <div class="code-block">
+              <pre>name = input("What is your name? ")
+print("Hello,", name + "! You are training to be an AI engineer.")</pre>
+              <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            </div>
+            <p>Стартирай [run] го с <code>python3 hello.py</code>. Въведи [enter] името [name] си когато поиска [asks].
+            Видя ли съобщението [message]? Върни се [come back] и го отбележи [mark it].</p>
+            <button class="mark-done-btn" onclick="markDone('m2')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              За да създадеш [create] файла [file], отвори [open] текстов редактор [text editor]:<br><br>
+              <code style="color:var(--green)">cd ai-lab</code><br>
+              <code style="color:var(--green)">nano hello.py</code><br><br>
+              Напиши [type] или постни [paste] кода [code]. Запази [save] с Ctrl+O, Enter, после излез [exit] с Ctrl+X.<br>
+              После стартирай [run]: <code style="color:var(--green)">python3 hello.py</code>
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Коя ключова дума [keyword] дефинира [defines] функция [function] в Python?', options: ['func', 'define', 'def', 'function'], answer: 2 },
+          { q: 'Какво прави [does] input()?', options: ['Отпечатва [prints] текст [text] на екрана [screen]', 'Пита [asks] потребителя [user] да напише [type] нещо', 'Създава [creates] променлива [variable]', 'Цикли [loops] завинаги [forever]'], answer: 1 },
+          { q: 'Какъв е изходът [output] от: print(2 + 3)?', options: ['23', '2+3', '5', 'Error'], answer: 2 }
+        ]
+      },
+      {
+        id: 'm3',
+        title: 'What is AI?',
+        content: `
+          <p>Преди да говорим [talk] с AI с код [code], нека разберем [understand] какво всъщност [actually] е AI.
+          Спойлер [spoiler]: не е магия [magic] и не е роботски мозък [robot brain].</p>
+
+          <h3>Аналогията [analogy] с автодовършването [autocomplete]</h3>
+          <p>Знаеш ли как телефонът [phone] ти предлага [suggests] следващата дума [next word] когато пишеш [type] съобщение [message]?
+          AI езиковите модели [language models] (като Claude или ChatGPT) са като това, но обучени [trained] на почти [almost]
+          всяка книга [book], статия [article] и уебсайт [website] писани [written] някога. Те стават [become] много добри [very good] в предсказването [predicting]
+          как изглежда [looks like] полезен [helpful], умен отговор [smart answer].</p>
+
+          <h3>Какво е prompt [запитване]?</h3>
+          <p>Един <strong style="color:var(--green)">prompt</strong> е съобщението [message], което изпращаш [send] на AI.
+          AI чете [reads] твоя prompt и генерира [generates] отговор [response]. Колкото по-добър [better] е prompt-ът ти,
+          толкова по-добър [better] е отговорът [response]. Това умение [skill] се казва [is called] <em>prompt engineering</em>.</p>
+
+          <h3>Какво е API?</h3>
+          <p>Един <strong style="color:var(--green)">API</strong> (Application Programming Interface)
+          е начин [a way] програмите [programs] да говорят [talk] помежду си [to each other]. Вместо да отваряш [open] прозорец [window] за чат [chat],
+          изпращаш [send] съобщение [message] от твоя Python код [code] и получаваш [receive] отговора [response] на AI обратно [back] като текст [text],
+          който програмата [program] ти може да използва [use].</p>
+
+          <h3>Какво можеш да строиш [build] с него?</h3>
+          <p>Чат-ботове [chatbots], писателски асистенти [writing assistants], ревизори [reviewers] на код [code], анализатори [analyzers] на данни [data], игрови герои [game characters]
+          — всичко [anything], което се нуждае [needs] от разбиране на език [language understanding]. Точно това [exactly this] ще помагаш [help] на татко да строи [build].</p>
+
+          <div class="challenge">
+            <div class="challenge-title">⚡ Мисия 3 Предизвикателство [Challenge]</div>
+            <p>Отвори [open] браузър [browser] и отиди [go] на <strong>claude.ai</strong> (или попитай [ask] татко кой AI чат [chat] да използваш [use]).
+            Напиши [type] този prompt:</p>
+            <div class="code-block">
+              <pre>Explain what a Python function is in 2 sentences, for a 13-year-old.</pre>
+              <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            </div>
+            <p>Прочети [read] отговора [answer]. Разбра ли го [did you understand it]? Когато си готов [ready], върни се [come back] и го отбележи [mark it].</p>
+            <button class="mark-done-btn" onclick="markDone('m3')">Отбележи като готово [mark done] ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="hint-body">
+              Отвори [open] Firefox, отиди [go] на claude.ai или chat.openai.com.
+              И двата изискват [require] акаунт [account] — помоли [ask] татко да влезе [log in], или създайте [create] акаунт [account] заедно [together].
+              Попитай [ask] татко ако не си сигурен [sure] кой да използваш [use].
+            </div>
+          </div>
+        `,
+        quiz: [
+          { q: 'Какво е prompt?', options: ['Вид [type of] Python грешка [error]', 'Съобщението [message], което изпращаш [send] на AI', 'Компютърна програма [computer program]', 'Заявка [query] към база данни [database]'], answer: 1 },
+          { q: 'Какво означава [stands for] API?', options: ['Artificial Programming Intelligence', 'Application Programming Interface', 'Automated Process Integration', 'Advanced Python Interface'], answer: 1 },
+          { q: 'Какво предсказват [predict] LLM-ите?', options: ['Времето [weather]', 'Цени [prices] на акции [stocks]', 'Най-полезната [most helpful] следваща дума [next word] или изречение [sentence]', 'Паролата [password] ти'], answer: 2 }
+        ]
+      }
+    ];
 
     // ── Idea box ──────────────────────────────────────────────────────
     function hasApiKey() {
