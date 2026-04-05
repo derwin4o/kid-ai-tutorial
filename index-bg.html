@@ -575,7 +575,7 @@
 
         el.innerHTML = `
           <div class="module-header" onclick="toggleModule('mod-${mod.id}')">
-            <span class="module-title">Mission ${i+1}: ${mod.title}</span>
+            <span class="module-title">Мисия [Mission] ${i+1}: ${mod.title}</span>
             <span class="module-status">${isDone ? '✓ завършено [complete]' : isUnlocked ? 'отключено [unlocked]' : '🔒 заключено [locked]'}</span>
           </div>
           <div class="module-body" id="mod-${mod.id}">
