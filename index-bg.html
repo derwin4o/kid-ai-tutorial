@@ -506,7 +506,7 @@
         <div class="quiz-options">
           ${q.options.map((opt, i) =>
             `<button class="quiz-option" id="qopt-${esc(moduleId)}-${i}"
-              onclick="submitQuizAnswer(${JSON.stringify(moduleId)}, ${currentQ}, ${i})">${esc(opt)}</button>`
+              onclick="submitQuizAnswer('${moduleId}', ${currentQ}, ${i})">${esc(opt)}</button>`
           ).join('')}
         </div>
       `;
