@@ -338,24 +338,103 @@
     .ask-error { color: var(--warn); font-size: 0.8rem; margin-top: 0.3rem; }
     /* padding so content doesn't hide behind fixed bar */
     body.ask-bar-visible { padding-bottom: 120px; }
-    /* ── Bug report ─────────────────────────────────────────────── */
-    .bug-link {
+    /* ── Feedback panel ─────────────────────────────────────────── */
+    .feedback-panel {
+      background: var(--bg2);
+      border: 1px solid var(--green-dim);
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      margin: 0.8rem 0 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+    .feedback-label { color: var(--green-dim); font-size: 0.8rem; }
+    .feedback-btn {
       display: inline-block;
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--grey);
+      border: 1px solid var(--green-dim);
+      color: var(--green-dim);
+      background: none;
       text-decoration: none;
+      border-radius: 4px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      font-family: var(--font);
+      transition: background 0.15s, color 0.15s;
+    }
+    .feedback-btn:hover { background: var(--green-dim); color: #000; }
+    /* ── Command explainer ──────────────────────────────────────── */
+    .concept-box {
+      background: var(--code-bg);
+      border: 1px dashed var(--green-dim);
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      margin: 0.8rem 0 1.2rem;
+    }
+    .concept-box h3 { margin-top: 0; }
+    .concept-box ul { margin: 0.4rem 0 0.6rem 1.4rem; line-height: 1.7; }
+    .concept-box .tip {
+      color: var(--hint-text);
+      font-size: 0.82rem;
+      margin-top: 0.6rem;
+      border-top: 1px dotted var(--code-border);
+      padding-top: 0.5rem;
+    }
+    /* ── Prompt playground ──────────────────────────────────────── */
+    .prompt-playground {
+      background: var(--code-bg);
+      border: 1px solid var(--green-dim);
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      margin: 0.8rem 0 1.2rem;
+    }
+    .prompt-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.6rem 0.8rem;
+      resize: vertical;
+      min-height: 100px;
+    }
+    .prompt-textarea:focus { outline: none; border-color: var(--green-dim); }
+    .prompt-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .prompt-counter { color: var(--hint-text); font-size: 0.75rem; }
+    .prompt-template-btn {
+      background: none;
+      border: 1px solid var(--green-dim);
+      color: var(--green-dim);
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
       font-family: var(--font);
     }
-    .bug-link:hover { color: var(--warn); }
+    .prompt-template-btn:hover { background: var(--green-dim); color: #000; }
   </style>
 </head>
 <body>
   <header>
     <h1>&gt; Обучение за AI инженер</h1>
     <p class="subtitle">10 мисии [missions]. Изпълнявай [complete] ги по ред [in order]. Без прескачане [no skipping].</p>
-    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Грешка+%5Bbug%5D+в+мисия&body=**Мисия+%5BMission%5D:**+%28напр.+Мисия+3%29%0A**Какво+правех+%5BWhat+I+was+doing%5D:**+%0A**Какво+се+случи+%5BWhat+happened%5D:**+" target="_blank">🐛 Намерих грешка [Found a bug]</a>
   </header>
+  <div class="feedback-panel" role="region" aria-label="Обратна връзка [feedback]">
+    <span class="feedback-label">Обратна връзка [feedback]:</span>
+    <a class="feedback-btn" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Грешка+%5Bbug%5D+в+мисия&body=**Мисия+%5BMission%5D:**+%28напр.+Мисия+3%29%0A**Какво+правех+%5BWhat+I+was+doing%5D:**+%0A**Какво+се+случи+%5BWhat+happened%5D:**+%0A**Какво+очаквах+%5BWhat+I+expected%5D:**+" target="_blank" rel="noopener">🐛 Докладвай грешка [report a bug]</a>
+    <a class="feedback-btn" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Предложение+за+подобрение+%5BImprovement+suggestion%5D&body=**Мисия+или+раздел+%5BMission+or+section%5D:**+%0A**Какво+може+да+е+по-добре+%5BWhat+could+be+better%5D:**+%0A**Идея+%5BIdea%5D:**+" target="_blank" rel="noopener">💡 Предложи подобрение [suggest an improvement]</a>
+  </div>
   <div class="ls-warning" id="ls-warning">
     Внимание [warning]: прогресът [progress] няма да се запази [save] в режим инкогнито [private/incognito].
   </div>
@@ -445,6 +524,36 @@
         content: `
           <p>Terminal [терминал] е начинът [the way], по който говориш [talk] директно [directly] с компютъра [computer] — без бутони [buttons], само с текст [text].
           Всеки [every] AI инженер [engineer] го използва [uses] всеки ден [every day]. Нека научим [learn] основите [the basics].</p>
+
+          <div class="concept-box">
+            <h3>Какво е команда [command]?</h3>
+            <p>Една <strong style="color:var(--green)">команда [command]</strong> е инструкция [instruction]
+            на един ред [one line], която пишеш [type] в terminal-а и после натискаш [press]
+            <strong>Enter</strong>, за да я изпълниш [run]. Повечето [most] команди имат две части [two parts]:</p>
+            <ul>
+              <li><strong>Името на командата [command name]</strong> — действието [the action]
+              (напр. <code style="color:var(--green)">mkdir</code>, <code style="color:var(--green)">cd</code>, <code style="color:var(--green)">ls</code>)</li>
+              <li><strong>Аргументи [arguments]</strong> — входните данни [the input], които ѝ даваш,
+              например името на папка [folder name]</li>
+            </ul>
+            <p>Пример [example] — създай папка с име <em>ai-lab</em>:</p>
+            <div class="code-block">
+              <pre>mkdir ai-lab</pre>
+              <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            </div>
+            <p>Тук <code style="color:var(--green)">mkdir</code> е командата
+            (съкращение [short for] от "make directory" — направи папка),
+            a <code style="color:var(--green)">ai-lab</code> е <em>аргументът [argument]</em> —
+            частта [the part], която се променя [changes]. Може да я замениш с
+            <code>mkdir games</code> или <code>mkdir my-stuff</code> — същата команда, различен аргумент.</p>
+            <p>Някои команди имат и флагове [flags] — допълнителни опции [options], които започват с
+            <code style="color:var(--green)">-</code> или <code style="color:var(--green)">--</code>.
+            Например <code style="color:var(--green)">ls -l</code> показва файловете в <em>дълъг [long] формат</em>
+            с повече детайли [details].</p>
+            <p class="tip">💡 Ако команда [command] не успее [fails], terminal-ът отпечатва [prints] грешка [error].
+            Прочети я внимателно [read it carefully] — повечето грешки казват точно [exactly] какво е сбъркано
+            (правописна грешка [typo], липсваща папка [missing folder] и т.н.).</p>
+          </div>
 
           <h3>Отвори [open] terminal</h3>
           <p>В Ubuntu: натисни [press] <strong style="color:var(--green)">Ctrl + Alt + T</strong>.
@@ -541,9 +650,40 @@ print("Welcome,", name)</pre>
             <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
           </div>
 
+          <div class="concept-box">
+            <h3>Как се създава [create] файл [file]?</h3>
+            <p>Преди [before] да можеш да стартираш [run] <code style="color:var(--green)">python3 hello.py</code>,
+            трябва [need] да <em>създадеш [create]</em> файла. Ето три често срещани начина [common ways]:</p>
+
+            <p><strong>1. С nano (вграден [built-in] terminal редактор [editor]):</strong></p>
+            <div class="code-block">
+              <pre>nano hello.py</pre>
+              <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            </div>
+            <p>Това отваря [opens] редактор вътре в terminal-а. Напиши [type] или постни [paste] кода [code],
+            после натисни [press] <strong>Ctrl+O</strong> → <strong>Enter</strong> за запазване [save],
+            и <strong>Ctrl+X</strong> за изход [exit].</p>
+
+            <p><strong>2. С touch (създава [creates] празен файл [empty file]):</strong></p>
+            <div class="code-block">
+              <pre>touch hello.py</pre>
+              <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            </div>
+            <p>Това прави празен файл [empty file]. Отвори [open] го по-късно [later] в който и да е редактор [editor]
+            (nano, VS Code и т.н.), за да добавиш [add] код.</p>
+
+            <p><strong>3. С графичен редактор [graphical editor] като VS Code:</strong></p>
+            <p>Отвори [open] VS Code, кликни [click] <strong>File → New File</strong>, постни [paste] кода [code]
+            и запази [save] като <code style="color:var(--green)">hello.py</code> вътре в папката [folder]
+            <code style="color:var(--green)">ai-lab</code>.</p>
+
+            <p class="tip">💡 Увери се [make sure], че файлът [file] е в същата папка [same folder],
+            от която стартираш [run] <code>python3</code> — иначе Python ще каже
+            "No such file or directory" [няма такъв файл или папка].</p>
+          </div>
+
           <h3>Как да стартираш [run] Python файл [file]</h3>
-          <p>Запази [save] кода [code] в файл [file] с имe <code style="color:var(--green)">hello.py</code>,
-          после стартирай [run] го:</p>
+          <p>След като файлът [file] съществува [exists], стартирай [run] го с:</p>
           <div class="code-block">
             <pre>python3 hello.py</pre>
             <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
@@ -604,6 +744,25 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           <h3>Какво можеш да строиш [build] с него?</h3>
           <p>Чат-ботове [chatbots], писателски асистенти [writing assistants], ревизори [reviewers] на код [code], анализатори [analyzers] на данни [data], игрови герои [game characters]
           — всичко [anything], което се нуждае [needs] от разбиране на език [language understanding]. Точно това [exactly this] ще помагаш [help] на татко да строи [build].</p>
+
+          <h3>Опитай [try] да напишеш [write] prompt</h3>
+          <p>Използвай [use] полето [field] долу, за да съчиниш [draft] prompt, преди [before] да го изпратиш [send] на истински [real] AI.
+          Добре структуриран [well-structured] prompt обикновено [usually] има четири части [four parts]:</p>
+          <ul style="margin:0.5rem 0 0.6rem 1.5rem;line-height:1.9;">
+            <li><strong style="color:var(--green-dim)">Роля [role]</strong> — кой [who] трябва [should] да е AI ("Ти си Python учител [teacher]…")</li>
+            <li><strong style="color:var(--green-dim)">Задача [task]</strong> — какво [what] искаш да направи [to do] ("Обясни [explain] какво е променлива [variable]…")</li>
+            <li><strong style="color:var(--green-dim)">Контекст [context]</strong> — за кого [for whom] или в каква ситуация ("…на 13-годишен [13-year-old] начинаещ [beginner]")</li>
+            <li><strong style="color:var(--green-dim)">Формат [format]</strong> — как [how] трябва да изглежда отговорът [the answer] ("…в 2 изречения [sentences] с пример [example]")</li>
+          </ul>
+          <div class="prompt-playground">
+            <textarea class="prompt-textarea" id="prompt-playground-input"
+              placeholder="Ти си ...&#10;Твоята задача е да ...&#10;Аудиторията е ...&#10;Отговори в ..."
+              oninput="updatePromptCounter()"></textarea>
+            <div class="prompt-meta">
+              <span class="prompt-counter" id="prompt-playground-counter">0 символа [characters] · 0 думи [words]</span>
+              <button class="prompt-template-btn" type="button" onclick="loadPromptTemplate()">Зареди [load] шаблон [template] →</button>
+            </div>
+          </div>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Мисия 3 Предизвикателство [Challenge]</div>
@@ -1350,6 +1509,28 @@ while True:
       const hint = btn.nextElementSibling;
       hint.classList.toggle('visible');
       btn.textContent = hint.classList.contains('visible') ? 'скрий [hide] подсказка [hint]' : 'покажи [show] подсказка [hint]';
+    }
+
+    // ── Prompt playground (Мисия 3) ────────────────────────────────
+    function updatePromptCounter() {
+      const ta = document.getElementById('prompt-playground-input');
+      const counter = document.getElementById('prompt-playground-counter');
+      if (!ta || !counter) return;
+      const val = ta.value;
+      const chars = val.length;
+      const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+      counter.textContent = chars + ' символа [characters] · ' + words + ' думи [words]';
+    }
+    function loadPromptTemplate() {
+      const ta = document.getElementById('prompt-playground-input');
+      if (!ta) return;
+      ta.value =
+        'Ти си приятелски Python учител.\n' +
+        'Твоята задача е да обясниш какво е променлива.\n' +
+        'Аудиторията е 13-годишен, който никога не е писал код.\n' +
+        'Отговори в 2 кратки изречения и включи един пример от реалния живот.';
+      updatePromptCounter();
+      ta.focus();
     }
 
     // ── Ask-me-anything bar ────────────────────────────────────────────

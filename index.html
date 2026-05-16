@@ -338,24 +338,103 @@
     .ask-error { color: var(--warn); font-size: 0.8rem; margin-top: 0.3rem; }
     /* padding so content doesn't hide behind fixed bar */
     body.ask-bar-visible { padding-bottom: 120px; }
-    /* ── Bug report ─────────────────────────────────────────────── */
-    .bug-link {
+    /* ── Feedback panel ─────────────────────────────────────────── */
+    .feedback-panel {
+      background: var(--bg2);
+      border: 1px solid var(--green-dim);
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      margin: 0.8rem 0 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+    .feedback-label { color: var(--green-dim); font-size: 0.8rem; }
+    .feedback-btn {
       display: inline-block;
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--grey);
+      border: 1px solid var(--green-dim);
+      color: var(--green-dim);
+      background: none;
       text-decoration: none;
+      border-radius: 4px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      font-family: var(--font);
+      transition: background 0.15s, color 0.15s;
+    }
+    .feedback-btn:hover { background: var(--green-dim); color: #000; }
+    /* ── Command explainer ──────────────────────────────────────── */
+    .concept-box {
+      background: var(--code-bg);
+      border: 1px dashed var(--green-dim);
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      margin: 0.8rem 0 1.2rem;
+    }
+    .concept-box h3 { margin-top: 0; }
+    .concept-box ul { margin: 0.4rem 0 0.6rem 1.4rem; line-height: 1.7; }
+    .concept-box .tip {
+      color: var(--hint-text);
+      font-size: 0.82rem;
+      margin-top: 0.6rem;
+      border-top: 1px dotted var(--code-border);
+      padding-top: 0.5rem;
+    }
+    /* ── Prompt playground ──────────────────────────────────────── */
+    .prompt-playground {
+      background: var(--code-bg);
+      border: 1px solid var(--green-dim);
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      margin: 0.8rem 0 1.2rem;
+    }
+    .prompt-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.6rem 0.8rem;
+      resize: vertical;
+      min-height: 100px;
+    }
+    .prompt-textarea:focus { outline: none; border-color: var(--green-dim); }
+    .prompt-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .prompt-counter { color: var(--hint-text); font-size: 0.75rem; }
+    .prompt-template-btn {
+      background: none;
+      border: 1px solid var(--green-dim);
+      color: var(--green-dim);
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
       font-family: var(--font);
     }
-    .bug-link:hover { color: var(--warn); }
+    .prompt-template-btn:hover { background: var(--green-dim); color: #000; }
   </style>
 </head>
 <body>
   <header>
     <h1>&gt; AI Engineer Training</h1>
     <p class="subtitle">10 missions. Complete them in order. No skipping.</p>
-    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+" target="_blank">🐛 Found a bug? Report it</a>
   </header>
+  <div class="feedback-panel" role="region" aria-label="Feedback">
+    <span class="feedback-label">Feedback:</span>
+    <a class="feedback-btn" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+%0A**What+I+expected:**+" target="_blank" rel="noopener">🐛 Report a bug</a>
+    <a class="feedback-btn" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Improvement+suggestion&body=**Mission+or+section:**+%0A**What+could+be+better:**+%0A**Idea:**+" target="_blank" rel="noopener">💡 Suggest an improvement</a>
+  </div>
   <div class="ls-warning" id="ls-warning">
     Warning: progress won't be saved in private/incognito mode.
   </div>
@@ -445,6 +524,31 @@
         content: `
           <p>The terminal is how you talk directly to your computer — no buttons, just text.
           Every AI engineer uses it every day. Let's learn the basics.</p>
+
+          <div class="concept-box">
+            <h3>What is a command?</h3>
+            <p>A <strong style="color:var(--green)">command</strong> is a one-line instruction
+            you type into the terminal, then press <strong>Enter</strong> to run it. Most commands
+            have two parts:</p>
+            <ul>
+              <li><strong>The command name</strong> — the action (e.g. <code style="color:var(--green)">mkdir</code>, <code style="color:var(--green)">cd</code>, <code style="color:var(--green)">ls</code>)</li>
+              <li><strong>The argument(s)</strong> — the input you give it, like a folder name</li>
+            </ul>
+            <p>Example — make a folder called <em>ai-lab</em>:</p>
+            <div class="code-block">
+              <pre>mkdir ai-lab</pre>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <p>Here <code style="color:var(--green)">mkdir</code> is the command
+            (short for "make directory") and <code style="color:var(--green)">ai-lab</code> is
+            the <em>argument</em> — the part that changes. You could swap it for
+            <code>mkdir games</code> or <code>mkdir my-stuff</code> — same command, different argument.</p>
+            <p>Some commands have flags too — extra options that start with <code style="color:var(--green)">-</code>
+            or <code style="color:var(--green)">--</code>. For example
+            <code style="color:var(--green)">ls -l</code> lists files in <em>long</em> format with extra detail.</p>
+            <p class="tip">💡 If a command fails, the terminal prints an error. Read it carefully —
+            most errors tell you exactly what's wrong (a typo, missing folder, etc.).</p>
+          </div>
 
           <h3>Open a terminal</h3>
           <p>On Ubuntu: press <strong style="color:var(--green)">Ctrl + Alt + T</strong>.
@@ -541,9 +645,37 @@ print("Welcome,", name)</pre>
             <button class="copy-btn" onclick="copyCode(this)">copy</button>
           </div>
 
+          <div class="concept-box">
+            <h3>How to create a file</h3>
+            <p>Before you can run <code style="color:var(--green)">python3 hello.py</code>,
+            you have to actually <em>create</em> the file. Here are three common ways:</p>
+
+            <p><strong>1. Using nano (a built-in terminal editor):</strong></p>
+            <div class="code-block">
+              <pre>nano hello.py</pre>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <p>This opens an editor inside the terminal. Type or paste your code, then press
+            <strong>Ctrl+O</strong> → <strong>Enter</strong> to save, and <strong>Ctrl+X</strong> to exit.</p>
+
+            <p><strong>2. Using touch (creates an empty file):</strong></p>
+            <div class="code-block">
+              <pre>touch hello.py</pre>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <p>This makes an empty file. Open it later in any editor (nano, VS Code, etc.) to add code.</p>
+
+            <p><strong>3. Using a graphical editor like VS Code:</strong></p>
+            <p>Open VS Code, click <strong>File → New File</strong>, paste your code,
+            and save it as <code style="color:var(--green)">hello.py</code> inside your
+            <code style="color:var(--green)">ai-lab</code> folder.</p>
+
+            <p class="tip">💡 Make sure the file is inside the same folder you're running
+            <code>python3</code> from — otherwise Python will say "No such file or directory".</p>
+          </div>
+
           <h3>How to run a Python file</h3>
-          <p>Save your code in a file called <code style="color:var(--green)">hello.py</code>,
-          then run it:</p>
+          <p>Once your file exists, run it with:</p>
           <div class="code-block">
             <pre>python3 hello.py</pre>
             <button class="copy-btn" onclick="copyCode(this)">copy</button>
@@ -605,6 +737,25 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           <p>Chatbots, writing assistants, code reviewers, data analyzers, game characters
           that can talk — anything that needs language understanding. That's what you're
           going to help dad build.</p>
+
+          <h3>Try writing a prompt</h3>
+          <p>Use the playground below to draft a prompt before sending it to a real AI.
+          A well-structured prompt usually has four parts:</p>
+          <ul style="margin:0.5rem 0 0.6rem 1.5rem;line-height:1.9;">
+            <li><strong style="color:var(--green-dim)">Role</strong> — who the AI should act as ("You are a Python teacher…")</li>
+            <li><strong style="color:var(--green-dim)">Task</strong> — what you want it to do ("Explain what a variable is…")</li>
+            <li><strong style="color:var(--green-dim)">Context</strong> — for whom or in what situation ("…to a 13-year-old beginner")</li>
+            <li><strong style="color:var(--green-dim)">Format</strong> — how the answer should look ("…in 2 sentences with an example")</li>
+          </ul>
+          <div class="prompt-playground">
+            <textarea class="prompt-textarea" id="prompt-playground-input"
+              placeholder="You are a ...&#10;Your task is to ...&#10;The audience is ...&#10;Answer in ..."
+              oninput="updatePromptCounter()"></textarea>
+            <div class="prompt-meta">
+              <span class="prompt-counter" id="prompt-playground-counter">0 characters · 0 words</span>
+              <button class="prompt-template-btn" type="button" onclick="loadPromptTemplate()">Load a template →</button>
+            </div>
+          </div>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Mission 3 Challenge</div>
@@ -1352,6 +1503,29 @@ while True:
       const hint = btn.nextElementSibling;
       hint.classList.toggle('visible');
       btn.textContent = hint.classList.contains('visible') ? 'hide hint' : 'show hint';
+    }
+
+    // ── Prompt playground (Mission 3) ──────────────────────────────
+    function updatePromptCounter() {
+      const ta = document.getElementById('prompt-playground-input');
+      const counter = document.getElementById('prompt-playground-counter');
+      if (!ta || !counter) return;
+      const val = ta.value;
+      const chars = val.length;
+      const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+      counter.textContent = chars + ' character' + (chars === 1 ? '' : 's') +
+        ' · ' + words + ' word' + (words === 1 ? '' : 's');
+    }
+    function loadPromptTemplate() {
+      const ta = document.getElementById('prompt-playground-input');
+      if (!ta) return;
+      ta.value =
+        'You are a friendly Python teacher.\n' +
+        'Your task is to explain what a variable is.\n' +
+        'The audience is a 13-year-old who has never coded before.\n' +
+        'Answer in 2 short sentences and include one real-world example.';
+      updatePromptCounter();
+      ta.focus();
     }
 
     // ── Ask-me-anything bar ────────────────────────────────────────────
