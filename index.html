@@ -348,6 +348,211 @@
       font-family: var(--font);
     }
     .bug-link:hover { color: var(--warn); }
+    /* ── Command reference panel ──────────────────────────────── */
+    .cmd-ref {
+      margin: 1rem 0;
+      border: 1px solid var(--green-dim);
+      border-radius: 6px;
+      background: rgba(0,255,136,0.04);
+    }
+    .cmd-ref-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--green);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      text-align: left;
+      padding: 0.7rem 0.9rem;
+      cursor: pointer;
+    }
+    .cmd-ref-toggle:hover { background: rgba(0,255,136,0.08); }
+    .cmd-ref-body {
+      display: none;
+      padding: 0 0.9rem 0.9rem;
+      border-top: 1px solid var(--code-border);
+    }
+    .cmd-ref-body.visible { display: block; }
+    .cmd-ref-item {
+      margin: 0.8rem 0;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px dashed var(--code-border);
+    }
+    .cmd-ref-item:last-child { border-bottom: none; }
+    .cmd-ref-name {
+      color: var(--green);
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .cmd-ref-desc {
+      color: var(--text);
+      font-size: 0.82rem;
+      margin: 0.3rem 0;
+      line-height: 1.5;
+    }
+    .cmd-ref-example {
+      display: block;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 3px;
+      padding: 0.3rem 0.6rem;
+      margin: 0.25rem 0;
+      font-size: 0.8rem;
+      color: var(--green);
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .var-sidebar {
+      background: var(--code-bg);
+      border-left: 3px solid var(--green-dim);
+      border-radius: 0 4px 4px 0;
+      padding: 0.7rem 1rem;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .var-sidebar strong { color: var(--green-dim); }
+    /* ── Try-AI box (Mission 3) ───────────────────────────────── */
+    .try-ai-box {
+      background: var(--challenge-bg);
+      border: 1px solid var(--green-dim);
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+      margin: 1rem 0;
+    }
+    .try-ai-title {
+      color: var(--green);
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    .try-ai-textarea {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.5rem 0.7rem;
+      min-height: 60px;
+      resize: vertical;
+    }
+    .try-ai-textarea:focus { outline: none; border-color: var(--green-dim); }
+    .try-ai-btn {
+      margin-top: 0.5rem;
+      background: none;
+      border: 1px solid var(--green);
+      color: var(--green);
+      border-radius: 4px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .try-ai-btn:hover { background: var(--green); color: #000; }
+    .try-ai-btn:disabled { border-color: var(--grey); color: var(--grey); cursor: default; }
+    .try-ai-response {
+      margin-top: 0.7rem;
+      padding: 0.6rem 0.8rem;
+      background: var(--bg2);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      display: none;
+    }
+    .try-ai-locked {
+      color: var(--grey);
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+    /* ── Floating feedback widget ─────────────────────────────── */
+    .feedback-fab {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 200;
+      background: var(--green);
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      font-family: var(--font);
+    }
+    .feedback-fab:hover { background: var(--green-dim); }
+    body.ask-bar-visible .feedback-fab { bottom: 130px; }
+    .feedback-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .feedback-overlay.visible { display: flex; }
+    .feedback-modal {
+      background: var(--bg2);
+      border: 1px solid var(--green-dim);
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      max-width: 460px;
+      width: 100%;
+      color: var(--text);
+      font-family: var(--font);
+    }
+    .feedback-modal h3 {
+      color: var(--green);
+      margin-bottom: 0.6rem;
+      font-size: 1rem;
+    }
+    .feedback-modal p {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin: 0.4rem 0 0.7rem;
+    }
+    .feedback-modal textarea {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.5rem 0.7rem;
+      min-height: 100px;
+      resize: vertical;
+    }
+    .feedback-modal textarea:focus { outline: none; border-color: var(--green-dim); }
+    .feedback-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+    }
+    .feedback-actions button {
+      background: none;
+      border: 1px solid var(--grey);
+      color: var(--text);
+      border-radius: 4px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .feedback-actions .send {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .feedback-actions .send:hover { background: var(--green); color: #000; }
+    .feedback-actions button:hover { border-color: var(--green-dim); }
   </style>
 </head>
 <body>
@@ -366,6 +571,18 @@
     </div>
   </div>
   <div id="modules-container"></div>
+  <button class="feedback-fab" id="feedback-fab" onclick="openFeedback()" aria-label="Send feedback" title="Send feedback">💬</button>
+  <div class="feedback-overlay" id="feedback-overlay" onclick="if(event.target===this) closeFeedback()">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+      <h3 id="feedback-title">💬 Send feedback</h3>
+      <p>What didn't work? What was confusing? What do you want us to add? Write it here — it goes straight to dad on GitHub.</p>
+      <textarea id="feedback-text" placeholder="e.g. I didn't understand what a variable is in Mission 2..."></textarea>
+      <div class="feedback-actions">
+        <button onclick="closeFeedback()">Cancel</button>
+        <button class="send" onclick="sendFeedback()">Send →</button>
+      </div>
+    </div>
+  </div>
   <div class="ask-bar" id="ask-bar" style="display:none" aria-label="Ask Claude anything">
     <div class="ask-responses" id="ask-responses"></div>
     <div class="ask-bar-inner">
@@ -475,6 +692,99 @@
           <div class="code-block">
             <pre>python3 -c "print('hello world')"</pre>
             <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <div class="var-sidebar">
+            <strong>What is a "command"?</strong><br>
+            A command is a word you tell the computer to do something. You type it into the terminal and press <strong>Enter</strong>. After the command name you can add <strong>arguments</strong> — extra words that tell the command WHERE or WHAT to act on. For example, in <code style="color:var(--green)">mkdir ai-lab</code>, <code>mkdir</code> is the command and <code>ai-lab</code> is the argument (the name of the new folder).
+          </div>
+
+          <div class="cmd-ref">
+            <button class="cmd-ref-toggle" onclick="toggleCmdRef(this)">📖 Help terminal — open commands reference ▾</button>
+            <div class="cmd-ref-body">
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">pwd</div>
+                <div class="cmd-ref-desc">"print working directory" — prints the full path of the folder you are in right now.</div>
+                <code class="cmd-ref-example">pwd</code>
+                <code class="cmd-ref-example">pwd        # → /home/ada/ai-lab</code>
+              </div>
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">ls</div>
+                <div class="cmd-ref-desc">"list" — shows every file and folder in the current folder. The argument <code>-l</code> shows details.</div>
+                <code class="cmd-ref-example">ls</code>
+                <code class="cmd-ref-example">ls -l      # detailed listing</code>
+              </div>
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">cd FOLDER_NAME</div>
+                <div class="cmd-ref-desc">"change directory" — moves you into a folder. The argument is the folder name. <code>cd ..</code> goes one step back up.</div>
+                <code class="cmd-ref-example">cd ai-lab  # enter ai-lab</code>
+                <code class="cmd-ref-example">cd ..      # go back one folder</code>
+              </div>
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">mkdir FOLDER_NAME</div>
+                <div class="cmd-ref-desc">"make directory" — creates a new folder. The argument is the new folder's name.</div>
+                <code class="cmd-ref-example">mkdir ai-lab</code>
+                <code class="cmd-ref-example">mkdir notes</code>
+              </div>
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">touch FILE_NAME</div>
+                <div class="cmd-ref-desc">Creates a new empty file. The argument is the file's name.</div>
+                <code class="cmd-ref-example">touch hello.py</code>
+                <code class="cmd-ref-example">touch notes.txt</code>
+              </div>
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">echo "TEXT"</div>
+                <div class="cmd-ref-desc">Prints text to the screen. With <code>&gt;</code> it writes into a file instead of printing.</div>
+                <code class="cmd-ref-example">echo "hello"           # → hello</code>
+                <code class="cmd-ref-example">echo "hi" &gt; bye.txt    # writes into bye.txt</code>
+              </div>
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">cat FILE_NAME</div>
+                <div class="cmd-ref-desc">Shows the contents of a file. The argument is the file's name.</div>
+                <code class="cmd-ref-example">cat hello.py</code>
+                <code class="cmd-ref-example">cat notes.txt</code>
+              </div>
+              <div class="cmd-ref-item">
+                <div class="cmd-ref-name">python3 FILE.py</div>
+                <div class="cmd-ref-desc">Runs a Python file. With <code>-c</code> it runs a short snippet directly.</div>
+                <code class="cmd-ref-example">python3 hello.py</code>
+                <code class="cmd-ref-example">python3 -c "print(2+2)"  # → 4</code>
+              </div>
+            </div>
+          </div>
+
+          <h3>How to create a file</h3>
+          <p>There are three easy ways to create a file from the terminal. Try all three:</p>
+
+          <p><strong>1) With <code style="color:var(--green)">touch</code></strong> — creates an empty file:</p>
+          <div class="code-block">
+            <pre>touch hello.py
+ls           # you should see hello.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+
+          <p><strong>2) With <code style="color:var(--green)">echo</code> and <code style="color:var(--green)">&gt;</code></strong> — creates a file with text inside. The <code>&gt;</code> symbol tells the computer: "put the output into a file instead of on the screen."</p>
+          <div class="code-block">
+            <pre>echo "print('hello from echo')" &gt; hello.py
+cat hello.py   # show what's inside
+python3 hello.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p>Expected output of <code>python3 hello.py</code>: <code style="color:var(--green)">hello from echo</code></p>
+
+          <p><strong>3) With Python — <code style="color:var(--green)">open()</code> in "write" mode</strong> — creates a file from Python code. <code>"w"</code> means "write". If the file already exists it will be overwritten.</p>
+          <div class="code-block">
+            <pre>python3 -c "open('greeting.txt', 'w').write('Hello, Ada!\\n')"
+cat greeting.txt   # → Hello, Ada!</pre>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <p>Expected output of <code>cat greeting.txt</code>: <code style="color:var(--green)">Hello, Ada!</code></p>
+
+          <div class="var-sidebar">
+            <strong>Heads up:</strong> A single <code>&gt;</code> overwrites the file. A double <code>&gt;&gt;</code> appends to it without erasing what's there. Try:<br>
+            <code style="color:var(--green)">echo "line 1" &gt; demo.txt</code><br>
+            <code style="color:var(--green)">echo "line 2" &gt;&gt; demo.txt</code><br>
+            <code style="color:var(--green)">cat demo.txt</code> → you will see both lines.
           </div>
 
           <div class="challenge">
@@ -605,6 +915,13 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           <p>Chatbots, writing assistants, code reviewers, data analyzers, game characters
           that can talk — anything that needs language understanding. That's what you're
           going to help dad build.</p>
+
+          <div class="try-ai-box">
+            <div class="try-ai-title">🤖 Try it yourself — type a prompt and see how Claude answers:</div>
+            <div id="try-ai-content-m3">
+              <p class="try-ai-locked">Finish Mission 4 and enter your API key to unlock this field. Until then you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>
+            </div>
+          </div>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Mission 3 Challenge</div>
@@ -1300,6 +1617,7 @@ while True:
       document.getElementById('progress-label').textContent =
         completedCount + ' of ' + MODULES.length + ' modules complete';
       updateAskBarVisibility();
+      renderTryAi();
     }
 
     function toggleModule(bodyId) {
@@ -1353,6 +1671,100 @@ while True:
       hint.classList.toggle('visible');
       btn.textContent = hint.classList.contains('visible') ? 'hide hint' : 'show hint';
     }
+
+    // ── Command-reference panel toggle (Mission 1) ─────────────────────
+    function toggleCmdRef(btn) {
+      const body = btn.nextElementSibling;
+      const open = body.classList.toggle('visible');
+      btn.textContent = open
+        ? '📖 Help terminal — close reference ▴'
+        : '📖 Help terminal — open commands reference ▾';
+    }
+
+    // ── Try-AI inline prompt (Mission 3) ───────────────────────────────
+    function renderTryAi() {
+      const slot = document.getElementById('try-ai-content-m3');
+      if (!slot) return;
+      if (!m4Complete() || !hasApiKey()) {
+        slot.innerHTML = `<p class="try-ai-locked">Finish Mission 4 and enter your API key to unlock this field. Until then you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>`;
+        return;
+      }
+      slot.innerHTML = `
+        <textarea class="try-ai-textarea" id="try-ai-input-m3"
+          placeholder="e.g. Explain what a variable is in one sentence"></textarea>
+        <button class="try-ai-btn" id="try-ai-btn-m3" onclick="submitTryAi()">Send →</button>
+        <div class="try-ai-response" id="try-ai-response-m3"></div>
+      `;
+    }
+
+    async function submitTryAi() {
+      const input = document.getElementById('try-ai-input-m3');
+      const btn = document.getElementById('try-ai-btn-m3');
+      const responseEl = document.getElementById('try-ai-response-m3');
+      if (!input || !btn || !responseEl) return;
+      const text = input.value.trim();
+      if (!text) return;
+      btn.textContent = 'thinking...';
+      btn.disabled = true;
+      responseEl.style.display = 'none';
+      responseEl.style.color = '';
+      try {
+        const reply = await callClaude(
+          text,
+          'You are helping a 13-year-old learn about AI and programming. Keep your answer simple, friendly, and under 4 sentences.',
+          256
+        );
+        responseEl.textContent = reply;
+        responseEl.style.display = 'block';
+      } catch(e) {
+        let msg;
+        if (e.message === 'no-key') {
+          msg = 'Enter your API key in the bar at the bottom first.';
+        } else if (e.message && e.message.includes('429')) {
+          msg = 'Slow down — too many requests. Wait a bit and try again.';
+        } else {
+          msg = 'Something went wrong — check your API key.';
+        }
+        responseEl.textContent = msg;
+        responseEl.style.color = 'var(--warn)';
+        responseEl.style.display = 'block';
+      } finally {
+        btn.textContent = 'Send →';
+        btn.disabled = false;
+      }
+    }
+
+    // ── Feedback widget ────────────────────────────────────────────────
+    function openFeedback() {
+      const overlay = document.getElementById('feedback-overlay');
+      overlay.classList.add('visible');
+      const ta = document.getElementById('feedback-text');
+      if (ta) setTimeout(() => ta.focus(), 50);
+    }
+    function closeFeedback() {
+      document.getElementById('feedback-overlay').classList.remove('visible');
+    }
+    function sendFeedback() {
+      const ta = document.getElementById('feedback-text');
+      const text = (ta && ta.value || '').trim();
+      const title = 'Feedback from the tutorial';
+      const body =
+        '**What happened / what I want:**\n\n' +
+        (text || '(describe here)') +
+        '\n\n---\n_Sent from the embedded feedback button._';
+      const url = 'https://github.com/derwin4o/kid-ai-tutorial/issues/new'
+        + '?title=' + encodeURIComponent(title)
+        + '&body=' + encodeURIComponent(body);
+      window.open(url, '_blank', 'noopener');
+      if (ta) ta.value = '';
+      closeFeedback();
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('feedback-overlay');
+        if (overlay && overlay.classList.contains('visible')) closeFeedback();
+      }
+    });
 
     // ── Ask-me-anything bar ────────────────────────────────────────────
     let askBarMode = 'question'; // 'key' | 'question'
