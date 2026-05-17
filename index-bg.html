@@ -474,6 +474,13 @@
       margin-bottom: 0.4rem;
       font-style: italic;
     }
+    .try-ai-note {
+      display: block;
+      color: var(--green-dim);
+      font-size: 0.72rem;
+      margin-bottom: 0.4rem;
+      opacity: 0.85;
+    }
     @keyframes ask-bar-pulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0); }
       50%      { box-shadow: 0 0 0 6px rgba(0, 255, 153, 0.45); }
@@ -693,6 +700,53 @@
       const text = data?.content?.[0]?.text;
       if (typeof text !== 'string') throw new Error('api-error:unexpected-response');
       return text;
+    }
+
+    async function callPollinations(userMessage, systemPrompt, maxTokens) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 30000);
+      let response;
+      try {
+        response = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userMessage }
+            ]
+          }),
+          signal: controller.signal
+        });
+      } catch (e) {
+        clearTimeout(timer);
+        throw new Error('Pollinations недостъпен — опитай отново след малко.');
+      }
+      clearTimeout(timer);
+      if (!response.ok) {
+        throw new Error('Pollinations недостъпен — опитай отново след малко.');
+      }
+      const data = await response.json().catch(() => null);
+      const text = data?.choices?.[0]?.message?.content;
+      if (typeof text !== 'string') {
+        throw new Error('Pollinations недостъпен — опитай отново след малко.');
+      }
+      return text;
+    }
+
+    async function callLLM(userMessage, systemPrompt, maxTokens) {
+      if (hasApiKey()) {
+        try {
+          return await callClaude(userMessage, systemPrompt, maxTokens);
+        } catch (e) {
+          if (e && e.message === 'no-key') {
+            return await callPollinations(userMessage, systemPrompt, maxTokens);
+          }
+          throw e;
+        }
+      }
+      return await callPollinations(userMessage, systemPrompt, maxTokens);
     }
 
     // ── Module definitions (content added in Tasks 3-7) ──────────────
@@ -1753,23 +1807,18 @@ while True:
     function renderTryAi(missionId) {
       const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
-      const locked = !m4Complete() || !hasApiKey();
-      const hint = locked
-        ? `<p class="try-ai-hint">🔒 Въведи API ключ долу, за да активираш (междувременно можеш да опиташ на <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a>).</p>`
-        : '';
+      const note = hasApiKey()
+        ? `<small class="try-ai-note">⚡ Използва твоя Claude ключ.</small>`
+        : `<small class="try-ai-note">💡 Безплатно с Pollinations. Въведи Claude ключ долу за по-добри отговори.</small>`;
       slot.innerHTML = `
-        ${hint}
+        ${note}
         <textarea class="try-ai-textarea" id="try-ai-input-${missionId}"
           placeholder="напр. Обясни какво е променлива в едно изречение"></textarea>
         <span id="try-ai-btnwrap-${missionId}" style="display:inline-block">
-          <button class="try-ai-btn" id="try-ai-btn-${missionId}"${locked ? ' disabled' : ''} onclick="submitTryAi('${missionId}')">Изпрати →</button>
+          <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Изпрати →</button>
         </span>
         <div class="try-ai-response" id="try-ai-response-${missionId}"></div>
       `;
-      if (locked) {
-        const wrap = document.getElementById(`try-ai-btnwrap-${missionId}`);
-        if (wrap) wrap.addEventListener('click', () => focusApiKeyInput(), { once: false });
-      }
     }
 
     function focusApiKeyInput() {
@@ -1809,7 +1858,7 @@ while True:
       responseEl.style.display = 'none';
       responseEl.style.color = '';
       try {
-        const reply = await callClaude(
+        const reply = await callLLM(
           text,
           'You are helping a 13-year-old learn about AI and programming. Keep your answer simple, friendly, and under 4 sentences. Always respond in Bulgarian.',
           256
@@ -1818,12 +1867,12 @@ while True:
         responseEl.style.display = 'block';
       } catch(e) {
         let msg;
-        if (e.message === 'no-key') {
-          msg = 'Въведи API ключа си в лентата долу първо.';
-        } else if (e.message && e.message.includes('429')) {
+        if (e.message && e.message.includes('429')) {
           msg = 'Забави — твърде много заявки. Изчакай малко.';
+        } else if (e.message && e.message.startsWith('Pollinations')) {
+          msg = e.message;
         } else {
-          msg = 'Нещо се обърка — провери API ключа си.';
+          msg = 'Нещо се обърка — опитай отново.';
         }
         responseEl.textContent = msg;
         responseEl.style.color = 'var(--warn)';
@@ -1906,18 +1955,14 @@ while True:
       if (!m4Complete()) { bar.style.display = 'none'; document.body.classList.remove('ask-bar-visible'); return; }
       bar.style.display = 'block';
       document.body.classList.add('ask-bar-visible');
-      if (!hasApiKey()) {
-        askBarMode = 'key';
-        document.getElementById('ask-bar-label').textContent = 'Въведи Anthropic API ключа си, за да отключиш Claude чат:';
-        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...'; // gitleaks:allow
-        document.getElementById('ask-bar-input').type = 'password';
-        document.getElementById('ask-bar-btn').textContent = 'Запази →';
+      askBarMode = 'question';
+      document.getElementById('ask-bar-input').type = 'text';
+      document.getElementById('ask-bar-input').placeholder = 'Напиши въпрос... (или поставяй sk-ant-... ключ, за да активираш Claude)';
+      document.getElementById('ask-bar-btn').textContent = 'Питай →';
+      if (hasApiKey()) {
+        document.getElementById('ask-bar-label').textContent = '⚡ Попитай Claude нещо за наученото →';
       } else {
-        askBarMode = 'question';
-        document.getElementById('ask-bar-label').textContent = 'Попитай Claude нещо за наученото →';
-        document.getElementById('ask-bar-input').placeholder = 'Напиши въпрос...';
-        document.getElementById('ask-bar-input').type = 'text';
-        document.getElementById('ask-bar-btn').textContent = 'Питай →';
+        document.getElementById('ask-bar-label').textContent = '💡 Питай свободно (безплатно с Pollinations). Поставяй sk-ant-... ключ, за да активираш Claude.';
       }
     }
 
@@ -1929,21 +1974,20 @@ while True:
       if (!val) return;
       errorEl.style.display = 'none';
 
-      if (askBarMode === 'key') {
-        localStorage.setItem('anthropicKey', val);
+      if (val.startsWith('sk-ant-')) {
+        localStorage.setItem('anthropicKey', val); // gitleaks:allow
         input.value = '';
         updateAskBarVisibility();
-        renderModules(); // re-render to update idea boxes
+        renderModules();
         return;
       }
 
-      // Ask mode
       btn.textContent = 'мисля...';
       btn.disabled = true;
       input.disabled = true;
 
       try {
-        const answer = await callClaude(
+        const answer = await callLLM(
           val,
           'You are helping a 13-year-old learn programming and AI. Answer clearly in plain language, maximum 3 sentences. Always respond in Bulgarian.',
           256
@@ -1951,7 +1995,10 @@ while True:
         addAskResponse(val, answer);
         input.value = '';
       } catch(e) {
-        errorEl.textContent = 'Нещо се обърка — провери API ключа си.';
+        const msg = (e && e.message && e.message.startsWith('Pollinations'))
+          ? e.message
+          : 'Нещо се обърка — опитай отново.';
+        errorEl.textContent = msg;
         errorEl.style.display = 'block';
       } finally {
         btn.textContent = 'Питай →';
