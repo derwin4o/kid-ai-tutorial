@@ -885,17 +885,18 @@ cat greeting.txt   # → Hello, Ada!</pre>
           <div class="challenge">
             <div class="challenge-title">⚡ Мисия 1 Предизвикателство</div>
             <p>1. Отвори terminal.<br>
-            2. Създай папка с ime <strong>ai-lab</strong>.<br>
-            3. Влез в нея с <code>cd ai-lab</code>.<br>
-            4. Изпълни <code>ls</code> — трябва да е празно (празна папка).<br>
-            5. Изпълни <code>python3 -c "print('I am an AI engineer')"</code></p>
+            2. Избери име за папка [folder], което ТИ измисляш — използвай твоето име или каквото си решиш (например <code>ada-lab</code>, <code>robo-lab</code>, <code>cookie-lab</code>). Не използвай <code>ai-lab</code> — нея вече я имаш от урока!<br>
+            3. Създай папката с <code>mkdir &lt;твоето-име&gt;</code>.<br>
+            4. Влез в нея с <code>cd &lt;твоето-име&gt;</code>.<br>
+            5. Изпълни <code>ls</code> — трябва да е празно (празна папка).<br>
+            6. Изпълни <code>python3 -c "print('I am an AI engineer')"</code></p>
             <p>Когато видиш съобщението отпечатано, върни се тук и го отбележи.</p>
             <button class="mark-done-btn" onclick="markDone('m1')">Отбележи като готово ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Отвори terminal с Ctrl+Alt+T, после напиши всяка команда и натисни Enter:<br><br>
-              <code style="color:var(--green)">mkdir ai-lab</code><br>
-              <code style="color:var(--green)">cd ai-lab</code><br>
+              Отвори terminal с Ctrl+Alt+T. Първо избери име за папка [folder] (опитай твоето име + <code>-lab</code>). После напиши всяка команда и натисни Enter. Пример с <code>ada-lab</code>:<br><br>
+              <code style="color:var(--green)">mkdir ada-lab</code><br>
+              <code style="color:var(--green)">cd ada-lab</code><br>
               <code style="color:var(--green)">ls</code><br>
               <code style="color:var(--green)">python3 -c "print('I am an AI engineer')"</code>
             </div>
@@ -903,7 +904,7 @@ cat greeting.txt   # → Hello, Ada!</pre>
         `,
         quiz: [
           { q: 'Коя команда показва текущата ти папка?', options: ['ls', 'pwd', 'cd', 'mkdir'], answer: 1 },
-          { q: 'Коя команда създава нова папка ai-lab?', options: ['pwd ai-lab', 'cd ai-lab', 'mkdir ai-lab', 'touch ai-lab'], answer: 2 },
+          { q: 'Коя команда създава нова папка my-lab?', options: ['pwd my-lab', 'cd my-lab', 'mkdir my-lab', 'touch my-lab'], answer: 2 },
           { q: 'Как стартираш Python скрипт [script] hello.py?', options: ['run hello.py', 'python3 hello.py', 'start hello.py', 'execute hello.py'], answer: 1 }
         ]
       },
