@@ -884,20 +884,22 @@ cat greeting.txt   # → Hello, Ada!</pre>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Mission 1 Challenge</div>
-            <p>1. Open a terminal.<br>
-            2. Create a folder called <strong>ai-lab</strong>.<br>
-            3. Go inside it with <code>cd ai-lab</code>.<br>
-            4. Run <code>ls</code> — it should show nothing (empty folder).<br>
-            5. Run <code>python3 -c "print('I am an AI engineer')"</code></p>
-            <p>When you see your message printed, come back here and mark it done.</p>
+            <p>1. Open a terminal and invent your own folder name. Rules: <strong>not</strong> <code>ai-lab</code>, only lowercase letters and hyphens, no spaces. Create it with <code>mkdir YOUR-FOLDER</code>, then go inside with <code>cd YOUR-FOLDER</code>.<br>
+            2. Invent a file name (same rules, ending in <code>.txt</code>) and write your own short message into it with <code>echo "your message here" &gt; YOUR-FILE.txt</code>.<br>
+            3. Run <code>ls</code> — you should see your file.<br>
+            4. Run <code>cat YOUR-FILE.txt</code> to read it back.<br>
+            5. Run <code>python3 -c "print('your own message')"</code> — pick any short message you like.</p>
+            <p>When you see your own message printed, come back here and mark it done.</p>
             <button class="mark-done-btn" onclick="markDone('m1')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
-              Open terminal with Ctrl+Alt+T, then type each command and press Enter:<br><br>
-              <code style="color:var(--green)">mkdir ai-lab</code><br>
-              <code style="color:var(--green)">cd ai-lab</code><br>
+              Open terminal with Ctrl+Alt+T. Example with folder <code>my-stuff</code> and file <code>notes.txt</code> — but pick your own:<br><br>
+              <code style="color:var(--green)">mkdir my-stuff</code><br>
+              <code style="color:var(--green)">cd my-stuff</code><br>
+              <code style="color:var(--green)">echo "hello from Ada" &gt; notes.txt</code><br>
               <code style="color:var(--green)">ls</code><br>
-              <code style="color:var(--green)">python3 -c "print('I am an AI engineer')"</code>
+              <code style="color:var(--green)">cat notes.txt</code><br>
+              <code style="color:var(--green)">python3 -c "print('coding is fun')"</code>
             </div>
           </div>
         `,
