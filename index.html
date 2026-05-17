@@ -553,6 +553,36 @@
     }
     .feedback-actions .send:hover { background: var(--green); color: #000; }
     .feedback-actions button:hover { border-color: var(--green-dim); }
+    /* ── Per-module feedback footer ───────────────────────────── */
+    .module-feedback-footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--grey);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+    .module-feedback-footer .mff-label {
+      flex: 1 1 100%;
+      color: var(--grey);
+      font-size: 0.75rem;
+      margin-bottom: 0.2rem;
+    }
+    .module-feedback-btn {
+      background: none;
+      border: 1px solid var(--grey);
+      color: var(--text);
+      border-radius: 4px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .module-feedback-btn.bug { border-color: var(--warn); color: var(--warn); }
+    .module-feedback-btn.bug:hover { background: var(--warn); color: #000; }
+    .module-feedback-btn.idea { border-color: var(--green); color: var(--green); }
+    .module-feedback-btn.idea:hover { background: var(--green); color: #000; }
   </style>
 </head>
 <body>
@@ -575,7 +605,7 @@
   <div class="feedback-overlay" id="feedback-overlay" onclick="if(event.target===this) closeFeedback()">
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
       <h3 id="feedback-title">💬 Send feedback</h3>
-      <p>What didn't work? What was confusing? What do you want us to add? Write it here — it goes straight to dad on GitHub.</p>
+      <p id="feedback-blurb">What didn't work? What was confusing? What do you want us to add? Write it here — it goes straight to dad on GitHub.</p>
       <textarea id="feedback-text" placeholder="e.g. I didn't understand what a variable is in Mission 2..."></textarea>
       <div class="feedback-actions">
         <button onclick="closeFeedback()">Cancel</button>
@@ -915,13 +945,6 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           <p>Chatbots, writing assistants, code reviewers, data analyzers, game characters
           that can talk — anything that needs language understanding. That's what you're
           going to help dad build.</p>
-
-          <div class="try-ai-box">
-            <div class="try-ai-title">🤖 Try it yourself — type a prompt and see how Claude answers:</div>
-            <div id="try-ai-content-m3">
-              <p class="try-ai-locked">Finish Mission 4 and enter your API key to unlock this field. Until then you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>
-            </div>
-          </div>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Mission 3 Challenge</div>
@@ -1617,7 +1640,7 @@ while True:
       document.getElementById('progress-label').textContent =
         completedCount + ' of ' + MODULES.length + ' modules complete';
       updateAskBarVisibility();
-      renderTryAi();
+      injectModuleExtras();
     }
 
     function toggleModule(bodyId) {
@@ -1681,26 +1704,62 @@ while True:
         : '📖 Help terminal — open commands reference ▾';
     }
 
-    // ── Try-AI inline prompt (Mission 3) ───────────────────────────────
-    function renderTryAi() {
-      const slot = document.getElementById('try-ai-content-m3');
+    // ── Try-AI inline prompt (every mission) ───────────────────────────
+    function injectModuleExtras() {
+      MODULES.forEach((mod, i) => {
+        const body = document.getElementById(`mod-${mod.id}`);
+        if (!body) return;
+        const missionLabel = `Mission ${i + 1} — ${mod.title}`;
+
+        // 1) Insert Try-AI box BEFORE the challenge block (lesson → Try-AI → challenge → quiz)
+        if (!body.querySelector(`#try-ai-box-${mod.id}`)) {
+          const challenge = body.querySelector('.challenge');
+          const box = document.createElement('div');
+          box.className = 'try-ai-box';
+          box.id = `try-ai-box-${mod.id}`;
+          box.innerHTML = `
+            <div class="try-ai-title">🤖 Try it yourself — type a prompt and see how Claude answers:</div>
+            <div id="try-ai-content-${mod.id}"></div>
+          `;
+          if (challenge) body.insertBefore(box, challenge); else body.appendChild(box);
+        }
+        renderTryAi(mod.id);
+
+        // 2) Append per-module feedback footer at the very bottom of the module body
+        if (!body.querySelector(`#mff-${mod.id}`)) {
+          const footer = document.createElement('div');
+          footer.className = 'module-feedback-footer';
+          footer.id = `mff-${mod.id}`;
+          const labelJs = JSON.stringify(missionLabel);
+          footer.innerHTML = `
+            <div class="mff-label">Something off in this mission?</div>
+            <button class="module-feedback-btn bug" onclick='openModuleFeedback(${labelJs}, "bug")'>🐞 Report a bug</button>
+            <button class="module-feedback-btn idea" onclick='openModuleFeedback(${labelJs}, "idea")'>💡 Suggest improvement</button>
+          `;
+          body.appendChild(footer);
+        }
+      });
+    }
+
+    function renderTryAi(missionId) {
+      const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
       if (!m4Complete() || !hasApiKey()) {
         slot.innerHTML = `<p class="try-ai-locked">Finish Mission 4 and enter your API key to unlock this field. Until then you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>`;
         return;
       }
       slot.innerHTML = `
-        <textarea class="try-ai-textarea" id="try-ai-input-m3"
+        <textarea class="try-ai-textarea" id="try-ai-input-${missionId}"
           placeholder="e.g. Explain what a variable is in one sentence"></textarea>
-        <button class="try-ai-btn" id="try-ai-btn-m3" onclick="submitTryAi()">Send →</button>
-        <div class="try-ai-response" id="try-ai-response-m3"></div>
+        <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Send →</button>
+        <div class="try-ai-response" id="try-ai-response-${missionId}"></div>
       `;
     }
 
-    async function submitTryAi() {
-      const input = document.getElementById('try-ai-input-m3');
-      const btn = document.getElementById('try-ai-btn-m3');
-      const responseEl = document.getElementById('try-ai-response-m3');
+    async function submitTryAi(missionId) {
+      const input = document.getElementById(`try-ai-input-${missionId}`);
+      const btn = document.getElementById(`try-ai-btn-${missionId}`);
+      const responseEl = document.getElementById(`try-ai-response-${missionId}`);
       if (!input || !btn || !responseEl) return;
       const text = input.value.trim();
       if (!text) return;
@@ -1735,8 +1794,31 @@ while True:
     }
 
     // ── Feedback widget ────────────────────────────────────────────────
+    let feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '' };
+
     function openFeedback() {
+      feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '' };
+      _showFeedbackModal('💬 Send feedback', "What didn't work? What was confusing? What do you want us to add? Write it here — it goes straight to dad on GitHub.");
+    }
+    function openModuleFeedback(missionLabel, type) {
+      const isBug = type === 'bug';
+      feedbackContext = {
+        title: `[${missionLabel}] ${isBug ? 'Bug report' : 'Suggestion'}`,
+        bodyPrefix: `Mission: ${missionLabel}\n\n`
+      };
+      _showFeedbackModal(
+        isBug ? `🐞 Report a bug — ${missionLabel}` : `💡 Suggest improvement — ${missionLabel}`,
+        isBug
+          ? "What broke or confused you in this mission? The mission name is included automatically."
+          : "What would make this mission better? The mission name is included automatically."
+      );
+    }
+    function _showFeedbackModal(heading, blurb) {
       const overlay = document.getElementById('feedback-overlay');
+      const h = document.getElementById('feedback-title');
+      const blurbEl = document.getElementById('feedback-blurb');
+      if (h) h.textContent = heading;
+      if (blurbEl) blurbEl.textContent = blurb;
       overlay.classList.add('visible');
       const ta = document.getElementById('feedback-text');
       if (ta) setTimeout(() => ta.focus(), 50);
@@ -1747,8 +1829,9 @@ while True:
     function sendFeedback() {
       const ta = document.getElementById('feedback-text');
       const text = (ta && ta.value || '').trim();
-      const title = 'Feedback from the tutorial';
+      const title = feedbackContext.title;
       const body =
+        (feedbackContext.bodyPrefix || '') +
         '**What happened / what I want:**\n\n' +
         (text || '(describe here)') +
         '\n\n---\n_Sent from the embedded feedback button._';

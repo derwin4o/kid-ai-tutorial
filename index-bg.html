@@ -553,6 +553,36 @@
     }
     .feedback-actions .send:hover { background: var(--green); color: #000; }
     .feedback-actions button:hover { border-color: var(--green-dim); }
+    /* ── Per-module feedback footer ───────────────────────────── */
+    .module-feedback-footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--grey);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+    .module-feedback-footer .mff-label {
+      flex: 1 1 100%;
+      color: var(--grey);
+      font-size: 0.75rem;
+      margin-bottom: 0.2rem;
+    }
+    .module-feedback-btn {
+      background: none;
+      border: 1px solid var(--grey);
+      color: var(--text);
+      border-radius: 4px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .module-feedback-btn.bug { border-color: var(--warn); color: var(--warn); }
+    .module-feedback-btn.bug:hover { background: var(--warn); color: #000; }
+    .module-feedback-btn.idea { border-color: var(--green); color: var(--green); }
+    .module-feedback-btn.idea:hover { background: var(--green); color: #000; }
   </style>
 </head>
 <body>
@@ -575,7 +605,7 @@
   <div class="feedback-overlay" id="feedback-overlay" onclick="if(event.target===this) closeFeedback()">
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
       <h3 id="feedback-title">💬 Изпрати обратна връзка [send feedback]</h3>
-      <p>Какво не работи [doesn't work]? Какво те обърква [confuses you]? Какво искаш [you want] да добавим [to add]? Напиши [type] го тук — отива [it goes] директно [directly] на татко в GitHub.</p>
+      <p id="feedback-blurb">Какво не работи [doesn't work]? Какво те обърква [confuses you]? Какво искаш [you want] да добавим [to add]? Напиши [type] го тук — отива [it goes] директно [directly] на татко в GitHub.</p>
       <textarea id="feedback-text" placeholder="напр. [e.g.] Не разбрах [didn't understand] какво е променлива в Мисия 2..."></textarea>
       <div class="feedback-actions">
         <button onclick="closeFeedback()">Отказ [cancel]</button>
@@ -914,13 +944,6 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
           <h3>Какво можеш да строиш [build] с него?</h3>
           <p>Чат-ботове [chatbots], писателски асистенти [writing assistants], ревизори [reviewers] на код [code], анализатори [analyzers] на данни [data], игрови герои [game characters]
           — всичко [anything], което се нуждае [needs] от разбиране на език [language understanding]. Точно това [exactly this] ще помагаш [help] на татко да строи [build].</p>
-
-          <div class="try-ai-box">
-            <div class="try-ai-title">🤖 Опитай сам [try it yourself] — напиши [type] prompt и виж [see] какво отговаря [answers] Claude:</div>
-            <div id="try-ai-content-m3">
-              <p class="try-ai-locked">Завърши [complete] Мисия [Mission] 4 и въведи [enter] API ключа [key] си, за да отключиш [unlock] този [this] полето [field]. Дотогава [until then] можеш [you can] да опиташ [try] на <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> в браузъра [browser] си.</p>
-            </div>
-          </div>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Мисия 3 Предизвикателство [Challenge]</div>
@@ -1615,7 +1638,7 @@ while True:
       document.getElementById('progress-label').textContent =
         completedCount + ' от [of] ' + MODULES.length + ' мисии [missions] завършени [complete]';
       updateAskBarVisibility();
-      renderTryAi();
+      injectModuleExtras();
     }
 
     function toggleModule(bodyId) {
@@ -1679,26 +1702,62 @@ while True:
         : '📖 Помощен терминал [help terminal] — отвори [open] справочник [reference] на команди [commands] ▾';
     }
 
-    // ── Try-AI inline prompt (Mission 3) ───────────────────────────────
-    function renderTryAi() {
-      const slot = document.getElementById('try-ai-content-m3');
+    // ── Try-AI inline prompt (every mission) ───────────────────────────
+    function injectModuleExtras() {
+      MODULES.forEach((mod, i) => {
+        const body = document.getElementById(`mod-${mod.id}`);
+        if (!body) return;
+        const missionLabel = `Мисия ${i + 1} — ${mod.title}`;
+
+        // 1) Try-AI box BEFORE the challenge (lesson → Try-AI → challenge → quiz)
+        if (!body.querySelector(`#try-ai-box-${mod.id}`)) {
+          const challenge = body.querySelector('.challenge');
+          const box = document.createElement('div');
+          box.className = 'try-ai-box';
+          box.id = `try-ai-box-${mod.id}`;
+          box.innerHTML = `
+            <div class="try-ai-title">🤖 Опитай сам [try it yourself] — напиши [type] prompt и виж [see] какво отговаря [answers] Claude:</div>
+            <div id="try-ai-content-${mod.id}"></div>
+          `;
+          if (challenge) body.insertBefore(box, challenge); else body.appendChild(box);
+        }
+        renderTryAi(mod.id);
+
+        // 2) Per-module feedback footer at the bottom of the module body
+        if (!body.querySelector(`#mff-${mod.id}`)) {
+          const footer = document.createElement('div');
+          footer.className = 'module-feedback-footer';
+          footer.id = `mff-${mod.id}`;
+          const labelJs = JSON.stringify(missionLabel);
+          footer.innerHTML = `
+            <div class="mff-label">Нещо не е наред [something off] в тази мисия [in this mission]?</div>
+            <button class="module-feedback-btn bug" onclick='openModuleFeedback(${labelJs}, "bug")'>🐞 Докладвай грешка [report a bug]</button>
+            <button class="module-feedback-btn idea" onclick='openModuleFeedback(${labelJs}, "idea")'>💡 Предложи подобрение [suggest improvement]</button>
+          `;
+          body.appendChild(footer);
+        }
+      });
+    }
+
+    function renderTryAi(missionId) {
+      const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
       if (!m4Complete() || !hasApiKey()) {
         slot.innerHTML = `<p class="try-ai-locked">Завърши [complete] Мисия [Mission] 4 и въведи [enter] API ключа [key] си, за да отключиш [unlock] този полето [this field]. Дотогава [until then] можеш [you can] да опиташ [try] на <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> в браузъра [browser] си.</p>`;
         return;
       }
       slot.innerHTML = `
-        <textarea class="try-ai-textarea" id="try-ai-input-m3"
+        <textarea class="try-ai-textarea" id="try-ai-input-${missionId}"
           placeholder="напр. [e.g.] Обясни [explain] какво е променлива [variable] в едно изречение [in one sentence]"></textarea>
-        <button class="try-ai-btn" id="try-ai-btn-m3" onclick="submitTryAi()">Изпрати [send] →</button>
-        <div class="try-ai-response" id="try-ai-response-m3"></div>
+        <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Изпрати [send] →</button>
+        <div class="try-ai-response" id="try-ai-response-${missionId}"></div>
       `;
     }
 
-    async function submitTryAi() {
-      const input = document.getElementById('try-ai-input-m3');
-      const btn = document.getElementById('try-ai-btn-m3');
-      const responseEl = document.getElementById('try-ai-response-m3');
+    async function submitTryAi(missionId) {
+      const input = document.getElementById(`try-ai-input-${missionId}`);
+      const btn = document.getElementById(`try-ai-btn-${missionId}`);
+      const responseEl = document.getElementById(`try-ai-response-${missionId}`);
       if (!input || !btn || !responseEl) return;
       const text = input.value.trim();
       if (!text) return;
@@ -1733,8 +1792,36 @@ while True:
     }
 
     // ── Feedback widget ────────────────────────────────────────────────
+    let feedbackContext = { title: 'Обратна връзка [feedback] от обучението', bodyPrefix: '' };
+
     function openFeedback() {
+      feedbackContext = { title: 'Обратна връзка [feedback] от обучението', bodyPrefix: '' };
+      _showFeedbackModal(
+        '💬 Изпрати обратна връзка [send feedback]',
+        "Какво не работи [doesn't work]? Какво те обърква [confuses you]? Какво искаш [you want] да добавим [to add]? Напиши [type] го тук — отива [it goes] директно [directly] на татко в GitHub."
+      );
+    }
+    function openModuleFeedback(missionLabel, type) {
+      const isBug = type === 'bug';
+      feedbackContext = {
+        title: `[${missionLabel}] ${isBug ? 'Грешка [bug report]' : 'Предложение [suggestion]'}`,
+        bodyPrefix: `Мисия [mission]: ${missionLabel}\n\n`
+      };
+      _showFeedbackModal(
+        isBug
+          ? `🐞 Докладвай грешка [report a bug] — ${missionLabel}`
+          : `💡 Предложи подобрение [suggest improvement] — ${missionLabel}`,
+        isBug
+          ? 'Какво не работи [doesn\'t work] или те обърква [confuses] в тази мисия [in this mission]? Името [name] на мисията [mission] се добавя [is added] автоматично [automatically].'
+          : 'Какво би направило [would make] тази мисия [this mission] по-добра [better]? Името [name] на мисията [mission] се добавя [is added] автоматично [automatically].'
+      );
+    }
+    function _showFeedbackModal(heading, blurb) {
       const overlay = document.getElementById('feedback-overlay');
+      const h = document.getElementById('feedback-title');
+      const blurbEl = document.getElementById('feedback-blurb');
+      if (h) h.textContent = heading;
+      if (blurbEl) blurbEl.textContent = blurb;
       overlay.classList.add('visible');
       const ta = document.getElementById('feedback-text');
       if (ta) setTimeout(() => ta.focus(), 50);
@@ -1745,8 +1832,9 @@ while True:
     function sendFeedback() {
       const ta = document.getElementById('feedback-text');
       const text = (ta && ta.value || '').trim();
-      const title = 'Обратна връзка [feedback] от обучението';
+      const title = feedbackContext.title;
       const body =
+        (feedbackContext.bodyPrefix || '') +
         '**Какво се случи [what happened] / какво искам [what I want]:**\n\n' +
         (text || '(опиши [describe] тук)') +
         '\n\n---\n_Изпратено от вградения [embedded] feedback бутон [button]._';
