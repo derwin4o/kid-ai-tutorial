@@ -336,6 +336,35 @@
     }
     .ask-response-q { color: var(--green-dim); font-size: 0.75rem; margin-bottom: 0.3rem; }
     .ask-error { color: var(--warn); font-size: 0.8rem; margin-top: 0.3rem; }
+    .ask-bar-ollama { margin-top: 0.4rem; }
+    .ask-bar-ollama-btn {
+      background: none;
+      border: none;
+      color: var(--green-dim);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .ask-bar-ollama-btn:hover { color: var(--green); }
+    .ask-bar-ollama-help {
+      margin-top: 0.4rem;
+      padding: 0.5rem 0.7rem;
+      background: var(--bg2);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 0.75rem;
+      line-height: 1.55;
+    }
+    .ask-bar-ollama-help code {
+      background: var(--bg);
+      padding: 0.05rem 0.3rem;
+      border-radius: 3px;
+      color: var(--green);
+    }
+    .ask-bar-ollama-help a { color: var(--green); }
     /* padding so content doesn't hide behind fixed bar */
     body.ask-bar-visible { padding-bottom: 120px; }
     /* ── Bug report ─────────────────────────────────────────────── */
@@ -622,6 +651,15 @@
           placeholder="Напиши [type] въпрос [question]..." autocomplete="off" />
         <button class="ask-bar-btn" id="ask-bar-btn" onclick="handleAskBar()">Питай [ask] →</button>
       </div>
+      <div class="ask-bar-ollama" id="ask-bar-ollama" style="display:none">
+        <button class="ask-bar-ollama-btn" id="ask-bar-ollama-btn" onclick="toggleOllamaMode()"></button>
+        <div class="ask-bar-ollama-help" id="ask-bar-ollama-help" style="display:none">
+          Инсталирай [install] <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> на твоя компютър [computer], след това отвори [open] терминал и стартирай [run]:
+          <div style="margin:0.3rem 0"><code>OLLAMA_ORIGINS="*" ollama serve</code></div>
+          <div style="margin:0.3rem 0"><code>ollama pull llama3.2</code></div>
+          Остави първата команда [first command] да работи. После презареди [reload] страницата [page] — Питай + Опитай AI ще работят без API ключ [key] и без пари [no cost].
+        </div>
+      </div>
       <div class="ask-error" id="ask-error" style="display:none"></div>
     </div>
   </div>
@@ -655,10 +693,49 @@
         .replace(/'/g, '&#39;');
     }
 
-    // ── Claude API utility ────────────────────────────────────────────
+    // ── AI provider utilities (Anthropic + local Ollama) ──────────────
+    const OLLAMA_BASE = 'http://localhost:11434';
+    const OLLAMA_DEFAULT_MODEL = 'llama3.2';
+
+    function ollamaModel() {
+      return localStorage.getItem('ollamaModel') || OLLAMA_DEFAULT_MODEL;
+    }
+
+    async function callOllama(userMessage, systemPrompt, maxTokens) {
+      let response;
+      try {
+        response = await fetch(OLLAMA_BASE + '/api/chat', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            model: ollamaModel(),
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userMessage }
+            ],
+            stream: false,
+            options: { num_predict: maxTokens }
+          })
+        });
+      } catch (e) {
+        throw new Error('ollama-unreachable');
+      }
+      if (!response.ok) {
+        if (response.status === 404) throw new Error('ollama-model-missing');
+        throw new Error(`ollama-error-${response.status}`);
+      }
+      const data = await response.json();
+      const text = data && data.message && data.message.content;
+      if (typeof text !== 'string') throw new Error('ollama-unexpected-response');
+      return text;
+    }
+
     async function callClaude(userMessage, systemPrompt, maxTokens) {
       const apiKey = localStorage.getItem('anthropicKey'); // gitleaks:allow
-      if (!apiKey) throw new Error('no-key');
+      if (!apiKey) {
+        if (isOllamaEnabled()) return callOllama(userMessage, systemPrompt, maxTokens);
+        throw new Error('no-key');
+      }
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -682,6 +759,17 @@
       const text = data?.content?.[0]?.text;
       if (typeof text !== 'string') throw new Error('api-error:unexpected-response');
       return text;
+    }
+
+    function aiErrorMessage(e) {
+      const msg = e && e.message || '';
+      if (msg === 'no-key') return 'Въведи [enter] API ключа [key] в лентата [bar] долу, или цъкни „Използвай безплатен локален модел" [use a free local model] за да стартираш Ollama на компютъра си.';
+      if (msg === 'ollama-unreachable') return 'Локалната Ollama не е достъпна [unreachable]. Стартирай [start]: OLLAMA_ORIGINS="*" ollama serve — после опитай пак [try again].';
+      if (msg === 'ollama-model-missing') return 'Моделът [model] на Ollama не е намерен [not found]. В терминал [terminal] стартирай: ollama pull ' + ollamaModel();
+      if (msg.indexOf('ollama-error') === 0) return 'Ollama върна грешка [error] (' + msg + '). Виж терминала, в който върви Ollama.';
+      if (msg.indexOf('429') !== -1) return 'По-бавно [slow down] — твърде много заявки. Изчакай малко [wait] и опитай пак.';
+      if (msg.indexOf('api-error-401') === 0 || msg.indexOf('api-error-403') === 0) return 'API ключът [key] не беше приет [rejected]. Провери го и опитай пак.';
+      return 'Нещо се обърка [something went wrong]. Ако ползваш ключ [key] — провери го. Ако ползваш Ollama — виж терминала.';
     }
 
     // ── Module definitions (content added in Tasks 3-7) ──────────────
@@ -1461,16 +1549,28 @@ while True:
       return !!localStorage.getItem('anthropicKey');
     }
 
+    function isOllamaEnabled() {
+      return localStorage.getItem('useOllama') === '1';
+    }
+
+    function canUseAI() {
+      return hasApiKey() || isOllamaEnabled();
+    }
+
     function m4Complete() {
       return !!getProgress()['m4'];
     }
 
+    // AI се отключва когато ИЛИ:
+    //   - Anthropic пътят е напълно настроен (мисия 4 завършена + API ключ), ИЛИ
+    //   - потребителят е избрал локална Ollama (без ключ, без мисия 4 ограничение)
+    function aiUnlocked() {
+      return isOllamaEnabled() || (m4Complete() && hasApiKey());
+    }
+
     function renderIdeaBox(moduleId) {
-      if (!m4Complete()) {
-        return `<div class="idea-box"><p class="idea-locked">Завърши [complete] Мисия [mission] 4 първо, за да отключиш [unlock] Claude чат [chat].</p></div>`;
-      }
-      if (!hasApiKey()) {
-        return `<div class="idea-box"><p class="idea-locked">Въведи [enter] API ключа [key] си в лентата [bar] долу на страницата [page].</p></div>`;
+      if (!aiUnlocked()) {
+        return `<div class="idea-box"><p class="idea-locked">Отключи [unlock] Claude чат [chat]: завърши Мисия 4 и въведи [enter] API ключа [key] в лентата [bar] долу, ИЛИ цъкни „Използвай безплатен локален модел" [use a free local model] в същата лента, за да пуснеш Ollama на компютъра си (без ключ).</p></div>`;
       }
       return `
         <div class="idea-box">
@@ -1504,15 +1604,7 @@ while True:
         responseEl.textContent = reply;
         responseEl.style.display = 'block';
       } catch(e) {
-        let msg;
-        if (e.message === 'no-key') {
-          msg = 'Въведи [enter] API ключа [key] си в лентата [bar] долу първо [first].';
-        } else if (e.message && e.message.includes('429')) {
-          msg = 'Забави [slow down] — изпращаш [sending] твърде много [too many] заявки [requests]. Изчакай [wait] малко и опитай [try] отново [again].';
-        } else {
-          msg = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
-        }
-        responseEl.textContent = msg;
+        responseEl.textContent = aiErrorMessage(e);
         responseEl.style.color = 'var(--warn)';
         responseEl.style.display = 'block';
       } finally {
@@ -1742,8 +1834,8 @@ while True:
     function renderTryAi(missionId) {
       const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
-      if (!m4Complete() || !hasApiKey()) {
-        slot.innerHTML = `<p class="try-ai-locked">Завърши [complete] Мисия [Mission] 4 и въведи [enter] API ключа [key] си, за да отключиш [unlock] този полето [this field]. Дотогава [until then] можеш [you can] да опиташ [try] на <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> в браузъра [browser] си.</p>`;
+      if (!aiUnlocked()) {
+        slot.innerHTML = `<p class="try-ai-locked">За да отключиш [unlock] това поле [this field]: завърши Мисия 4 и въведи API ключа [key] в лентата [bar] долу, ИЛИ цъкни „Използвай безплатен локален модел" [use a free local model] в същата лента, за да пуснеш Ollama на твоя компютър (без ключ, без пари [no cost]). Дотогава [until then] можеш и да опиташ на <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> в браузъра [browser] си.</p>`;
         return;
       }
       slot.innerHTML = `
@@ -1774,15 +1866,7 @@ while True:
         responseEl.textContent = reply;
         responseEl.style.display = 'block';
       } catch(e) {
-        let msg;
-        if (e.message === 'no-key') {
-          msg = 'Въведи [enter] API ключа [key] си в лентата [bar] долу първо [first].';
-        } else if (e.message && e.message.includes('429')) {
-          msg = 'Забави [slow down] — твърде много [too many] заявки [requests]. Изчакай [wait] малко.';
-        } else {
-          msg = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
-        }
-        responseEl.textContent = msg;
+        responseEl.textContent = aiErrorMessage(e);
         responseEl.style.color = 'var(--warn)';
         responseEl.style.display = 'block';
       } finally {
@@ -1857,22 +1941,53 @@ while True:
 
     function updateAskBarVisibility() {
       const bar = document.getElementById('ask-bar');
-      if (!m4Complete()) { bar.style.display = 'none'; document.body.classList.remove('ask-bar-visible'); return; }
+      // Лентата винаги е достъпна, за да могат хората от Мисия 1 да открият безплатната Ollama опция.
       bar.style.display = 'block';
       document.body.classList.add('ask-bar-visible');
-      if (!hasApiKey()) {
-        askBarMode = 'key';
-        document.getElementById('ask-bar-label').textContent = 'Въведи [enter] Anthropic API ключа [key] си, за да отключиш [unlock] Claude чат [chat]:';
-        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...'; // gitleaks:allow
-        document.getElementById('ask-bar-input').type = 'password';
-        document.getElementById('ask-bar-btn').textContent = 'Запази [save] →';
-      } else {
+
+      const ollamaRow = document.getElementById('ask-bar-ollama');
+      const ollamaBtn = document.getElementById('ask-bar-ollama-btn');
+      const ollamaHelp = document.getElementById('ask-bar-ollama-help');
+
+      if (isOllamaEnabled()) {
+        askBarMode = 'question';
+        document.getElementById('ask-bar-label').textContent = 'Питай [ask] локалния Ollama модел нещо (безплатно [free], без ключ [key]) →';
+        document.getElementById('ask-bar-input').placeholder = 'Напиши [type] въпрос [question]...';
+        document.getElementById('ask-bar-input').type = 'text';
+        document.getElementById('ask-bar-btn').textContent = 'Питай [ask] →';
+        ollamaRow.style.display = 'block';
+        ollamaBtn.textContent = 'Върни се на API ключ [switch back to API key]';
+        ollamaHelp.style.display = 'block';
+      } else if (hasApiKey()) {
         askBarMode = 'question';
         document.getElementById('ask-bar-label').textContent = 'Попитай [ask] Claude нещо за наученото [what you learned] →';
         document.getElementById('ask-bar-input').placeholder = 'Напиши [type] въпрос [question]...';
         document.getElementById('ask-bar-input').type = 'text';
         document.getElementById('ask-bar-btn').textContent = 'Питай [ask] →';
+        ollamaRow.style.display = 'none';
+        ollamaHelp.style.display = 'none';
+      } else {
+        askBarMode = 'key';
+        document.getElementById('ask-bar-label').textContent = 'Въведи [enter] Anthropic API ключа [key] си, за да отключиш [unlock] Claude чат [chat]:';
+        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...'; // gitleaks:allow
+        document.getElementById('ask-bar-input').type = 'password';
+        document.getElementById('ask-bar-btn').textContent = 'Запази [save] →';
+        ollamaRow.style.display = 'block';
+        ollamaBtn.textContent = '🦙 Или използвай безплатен локален модел (Ollama) — без ключ';
+        ollamaHelp.style.display = 'none';
       }
+    }
+
+    function toggleOllamaMode() {
+      if (isOllamaEnabled()) {
+        localStorage.removeItem('useOllama');
+      } else {
+        localStorage.setItem('useOllama', '1');
+      }
+      const errorEl = document.getElementById('ask-error');
+      if (errorEl) errorEl.style.display = 'none';
+      updateAskBarVisibility();
+      renderModules();
     }
 
     async function handleAskBar() {
@@ -1905,7 +2020,7 @@ while True:
         addAskResponse(val, answer);
         input.value = '';
       } catch(e) {
-        errorEl.textContent = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
+        errorEl.textContent = aiErrorMessage(e);
         errorEl.style.display = 'block';
       } finally {
         btn.textContent = 'Питай [ask] →';

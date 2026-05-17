@@ -336,6 +336,35 @@
     }
     .ask-response-q { color: var(--green-dim); font-size: 0.75rem; margin-bottom: 0.3rem; }
     .ask-error { color: var(--warn); font-size: 0.8rem; margin-top: 0.3rem; }
+    .ask-bar-ollama { margin-top: 0.4rem; }
+    .ask-bar-ollama-btn {
+      background: none;
+      border: none;
+      color: var(--green-dim);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .ask-bar-ollama-btn:hover { color: var(--green); }
+    .ask-bar-ollama-help {
+      margin-top: 0.4rem;
+      padding: 0.5rem 0.7rem;
+      background: var(--bg2);
+      border: 1px solid var(--grey);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 0.75rem;
+      line-height: 1.55;
+    }
+    .ask-bar-ollama-help code {
+      background: var(--bg);
+      padding: 0.05rem 0.3rem;
+      border-radius: 3px;
+      color: var(--green);
+    }
+    .ask-bar-ollama-help a { color: var(--green); }
     /* padding so content doesn't hide behind fixed bar */
     body.ask-bar-visible { padding-bottom: 120px; }
     /* ── Bug report ─────────────────────────────────────────────── */
@@ -622,6 +651,15 @@
           placeholder="Type a question..." autocomplete="off" />
         <button class="ask-bar-btn" id="ask-bar-btn" onclick="handleAskBar()">Ask →</button>
       </div>
+      <div class="ask-bar-ollama" id="ask-bar-ollama" style="display:none">
+        <button class="ask-bar-ollama-btn" id="ask-bar-ollama-btn" onclick="toggleOllamaMode()"></button>
+        <div class="ask-bar-ollama-help" id="ask-bar-ollama-help" style="display:none">
+          Install <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> on your computer, then open a terminal and run:
+          <div style="margin:0.3rem 0"><code>OLLAMA_ORIGINS="*" ollama serve</code></div>
+          <div style="margin:0.3rem 0"><code>ollama pull llama3.2</code></div>
+          Keep the first command running. Then reload this page — Ask + Try-AI will work with no API key and no cost.
+        </div>
+      </div>
       <div class="ask-error" id="ask-error" style="display:none"></div>
     </div>
   </div>
@@ -655,10 +693,49 @@
         .replace(/'/g, '&#39;');
     }
 
-    // ── Claude API utility ────────────────────────────────────────────
+    // ── AI provider utilities (Anthropic + local Ollama) ──────────────
+    const OLLAMA_BASE = 'http://localhost:11434';
+    const OLLAMA_DEFAULT_MODEL = 'llama3.2';
+
+    function ollamaModel() {
+      return localStorage.getItem('ollamaModel') || OLLAMA_DEFAULT_MODEL;
+    }
+
+    async function callOllama(userMessage, systemPrompt, maxTokens) {
+      let response;
+      try {
+        response = await fetch(OLLAMA_BASE + '/api/chat', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            model: ollamaModel(),
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userMessage }
+            ],
+            stream: false,
+            options: { num_predict: maxTokens }
+          })
+        });
+      } catch (e) {
+        throw new Error('ollama-unreachable');
+      }
+      if (!response.ok) {
+        if (response.status === 404) throw new Error('ollama-model-missing');
+        throw new Error(`ollama-error-${response.status}`);
+      }
+      const data = await response.json();
+      const text = data && data.message && data.message.content;
+      if (typeof text !== 'string') throw new Error('ollama-unexpected-response');
+      return text;
+    }
+
     async function callClaude(userMessage, systemPrompt, maxTokens) {
       const apiKey = localStorage.getItem('anthropicKey');
-      if (!apiKey) throw new Error('no-key');
+      if (!apiKey) {
+        if (isOllamaEnabled()) return callOllama(userMessage, systemPrompt, maxTokens);
+        throw new Error('no-key');
+      }
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -682,6 +759,17 @@
       const text = data?.content?.[0]?.text;
       if (typeof text !== 'string') throw new Error('api-error:unexpected-response');
       return text;
+    }
+
+    function aiErrorMessage(e) {
+      const msg = e && e.message || '';
+      if (msg === 'no-key') return 'Enter your API key in the bar below, or click "Use a free local model" to run Ollama on your computer.';
+      if (msg === 'ollama-unreachable') return 'Local Ollama isn\'t reachable. Start it with: OLLAMA_ORIGINS="*" ollama serve — then try again.';
+      if (msg === 'ollama-model-missing') return 'Ollama model not found. In a terminal run: ollama pull ' + ollamaModel();
+      if (msg.indexOf('ollama-error') === 0) return 'Ollama returned an error (' + msg + '). Check the terminal where Ollama is running.';
+      if (msg.indexOf('429') !== -1) return 'Slow down — too many requests. Wait a moment and try again.';
+      if (msg.indexOf('api-error-401') === 0 || msg.indexOf('api-error-403') === 0) return 'Your API key was rejected. Check it and try again.';
+      return 'Something went wrong. If you\'re using a key, check it. If you\'re using Ollama, check the terminal.';
     }
 
     // ── Module definitions (content added in Tasks 3-7) ──────────────
@@ -1463,16 +1551,28 @@ while True:
       return !!localStorage.getItem('anthropicKey');
     }
 
+    function isOllamaEnabled() {
+      return localStorage.getItem('useOllama') === '1';
+    }
+
+    function canUseAI() {
+      return hasApiKey() || isOllamaEnabled();
+    }
+
     function m4Complete() {
       return !!getProgress()['m4'];
     }
 
+    // AI features unlock when EITHER:
+    //   - the Anthropic path is fully set up (mission 4 done + API key), OR
+    //   - the user has opted into local Ollama (no key, no mission gate)
+    function aiUnlocked() {
+      return isOllamaEnabled() || (m4Complete() && hasApiKey());
+    }
+
     function renderIdeaBox(moduleId) {
-      if (!m4Complete()) {
-        return `<div class="idea-box"><p class="idea-locked">Complete Mission 4 first to unlock Claude chat.</p></div>`;
-      }
-      if (!hasApiKey()) {
-        return `<div class="idea-box"><p class="idea-locked">Enter your API key in the bar at the bottom of the page.</p></div>`;
+      if (!aiUnlocked()) {
+        return `<div class="idea-box"><p class="idea-locked">Unlock Claude chat: finish Mission 4 and enter your API key in the bar below, OR click "Use a free local model" in that same bar to run Ollama on your computer (no key needed).</p></div>`;
       }
       return `
         <div class="idea-box">
@@ -1506,15 +1606,7 @@ while True:
         responseEl.textContent = reply;
         responseEl.style.display = 'block';
       } catch(e) {
-        let msg;
-        if (e.message === 'no-key') {
-          msg = 'Enter your API key in the bar below first.';
-        } else if (e.message && e.message.includes('429')) {
-          msg = 'Slow down — you\'re sending too many requests. Wait a moment and try again.';
-        } else {
-          msg = 'Something went wrong — check your API key.';
-        }
-        responseEl.textContent = msg;
+        responseEl.textContent = aiErrorMessage(e);
         responseEl.style.color = 'var(--warn)';
         responseEl.style.display = 'block';
       } finally {
@@ -1744,8 +1836,8 @@ while True:
     function renderTryAi(missionId) {
       const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
-      if (!m4Complete() || !hasApiKey()) {
-        slot.innerHTML = `<p class="try-ai-locked">Finish Mission 4 and enter your API key to unlock this field. Until then you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>`;
+      if (!aiUnlocked()) {
+        slot.innerHTML = `<p class="try-ai-locked">To unlock this field: finish Mission 4 and enter your API key in the bar at the bottom, OR click "Use a free local model" in that bar to run Ollama on your own computer (no key, no cost). Until then you can also try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>`;
         return;
       }
       slot.innerHTML = `
@@ -1776,15 +1868,7 @@ while True:
         responseEl.textContent = reply;
         responseEl.style.display = 'block';
       } catch(e) {
-        let msg;
-        if (e.message === 'no-key') {
-          msg = 'Enter your API key in the bar at the bottom first.';
-        } else if (e.message && e.message.includes('429')) {
-          msg = 'Slow down — too many requests. Wait a bit and try again.';
-        } else {
-          msg = 'Something went wrong — check your API key.';
-        }
-        responseEl.textContent = msg;
+        responseEl.textContent = aiErrorMessage(e);
         responseEl.style.color = 'var(--warn)';
         responseEl.style.display = 'block';
       } finally {
@@ -1854,22 +1938,56 @@ while True:
 
     function updateAskBarVisibility() {
       const bar = document.getElementById('ask-bar');
-      if (!m4Complete()) { bar.style.display = 'none'; document.body.classList.remove('ask-bar-visible'); return; }
+      // Bar is always available so users can discover the free Ollama option from Mission 1.
       bar.style.display = 'block';
       document.body.classList.add('ask-bar-visible');
-      if (!hasApiKey()) {
-        askBarMode = 'key';
-        document.getElementById('ask-bar-label').textContent = 'Enter your Anthropic API key to unlock Claude chat:';
-        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...';
-        document.getElementById('ask-bar-input').type = 'password';
-        document.getElementById('ask-bar-btn').textContent = 'Save →';
-      } else {
+
+      const ollamaRow = document.getElementById('ask-bar-ollama');
+      const ollamaBtn = document.getElementById('ask-bar-ollama-btn');
+      const ollamaHelp = document.getElementById('ask-bar-ollama-help');
+
+      if (isOllamaEnabled()) {
+        // User has opted into local Ollama — ask mode, no key required.
+        askBarMode = 'question';
+        document.getElementById('ask-bar-label').textContent = 'Ask the local Ollama model anything (free, no key) →';
+        document.getElementById('ask-bar-input').placeholder = 'Type a question...';
+        document.getElementById('ask-bar-input').type = 'text';
+        document.getElementById('ask-bar-btn').textContent = 'Ask →';
+        ollamaRow.style.display = 'block';
+        ollamaBtn.textContent = 'Switch back to API key';
+        // Show help by default — it has the install instructions the user just opted in for.
+        ollamaHelp.style.display = 'block';
+      } else if (hasApiKey()) {
         askBarMode = 'question';
         document.getElementById('ask-bar-label').textContent = 'Ask Claude anything about what you learned →';
         document.getElementById('ask-bar-input').placeholder = 'Type a question...';
         document.getElementById('ask-bar-input').type = 'text';
         document.getElementById('ask-bar-btn').textContent = 'Ask →';
+        ollamaRow.style.display = 'none';
+        ollamaHelp.style.display = 'none';
+      } else {
+        askBarMode = 'key';
+        document.getElementById('ask-bar-label').textContent = 'Enter your Anthropic API key to unlock Claude chat:';
+        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...';
+        document.getElementById('ask-bar-input').type = 'password';
+        document.getElementById('ask-bar-btn').textContent = 'Save →';
+        ollamaRow.style.display = 'block';
+        ollamaBtn.textContent = '🦙 Or use a free local model (Ollama) — no key needed';
+        ollamaHelp.style.display = 'none';
       }
+    }
+
+    function toggleOllamaMode() {
+      if (isOllamaEnabled()) {
+        localStorage.removeItem('useOllama');
+      } else {
+        localStorage.setItem('useOllama', '1');
+      }
+      // Clear any visible error from a previous attempt.
+      const errorEl = document.getElementById('ask-error');
+      if (errorEl) errorEl.style.display = 'none';
+      updateAskBarVisibility();
+      renderModules(); // re-render so try-AI / idea-box gates re-evaluate
     }
 
     async function handleAskBar() {
@@ -1902,7 +2020,7 @@ while True:
         addAskResponse(val, answer);
         input.value = '';
       } catch(e) {
-        errorEl.textContent = 'Something went wrong — check your API key.';
+        errorEl.textContent = aiErrorMessage(e);
         errorEl.style.display = 'block';
       } finally {
         btn.textContent = 'Ask →';
