@@ -468,6 +468,24 @@
       font-size: 0.8rem;
       font-style: italic;
     }
+    .try-ai-hint {
+      color: var(--grey);
+      font-size: 0.75rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    .try-ai-note {
+      display: block;
+      color: var(--green-dim);
+      font-size: 0.72rem;
+      margin-bottom: 0.4rem;
+      opacity: 0.85;
+    }
+    @keyframes ask-bar-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0); }
+      50%      { box-shadow: 0 0 0 6px rgba(0, 255, 153, 0.45); }
+    }
+    .ask-bar-pulse { animation: ask-bar-pulse 0.6s ease-in-out 2; border-color: var(--green) !important; }
     /* ── Floating feedback widget ─────────────────────────────── */
     .feedback-fab {
       position: fixed;
@@ -588,11 +606,11 @@
 <body>
   <header>
     <h1>&gt; Обучение за AI инженер</h1>
-    <p class="subtitle">10 мисии [missions]. Изпълнявай [complete] ги по ред [in order]. Без прескачане [no skipping].</p>
-    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Грешка+%5Bbug%5D+в+мисия&body=**Мисия+%5BMission%5D:**+%28напр.+Мисия+3%29%0A**Какво+правех+%5BWhat+I+was+doing%5D:**+%0A**Какво+се+случи+%5BWhat+happened%5D:**+" target="_blank">🐛 Намерих грешка [Found a bug]</a>
+    <p class="subtitle">10 мисии. Изпълнявай ги по ред. Без прескачане.</p>
+    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Грешка+в+мисия&body=**Мисия:**+%28напр.+Мисия+3%29%0A**Какво+правех:**+%0A**Какво+се+случи:**+&labels=auto,bug" target="_blank">🐛 Намерих грешка</a>
   </header>
   <div class="ls-warning" id="ls-warning">
-    Внимание [warning]: прогресът [progress] няма да се запази [save] в режим инкогнито [private/incognito].
+    Внимание: прогресът няма да се запази в режим инкогнито.
   </div>
   <div class="progress-wrap">
     <div class="progress-label" id="progress-label">0 от 0 мисии завършени</div>
@@ -601,26 +619,26 @@
     </div>
   </div>
   <div id="modules-container"></div>
-  <button class="feedback-fab" id="feedback-fab" onclick="openFeedback()" aria-label="Изпрати [send] обратна връзка [feedback]" title="Изпрати обратна връзка [send feedback]">💬</button>
+  <button class="feedback-fab" id="feedback-fab" onclick="openFeedback()" aria-label="Изпрати обратна връзка" title="Изпрати обратна връзка">💬</button>
   <div class="feedback-overlay" id="feedback-overlay" onclick="if(event.target===this) closeFeedback()">
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
-      <h3 id="feedback-title">💬 Изпрати обратна връзка [send feedback]</h3>
-      <p id="feedback-blurb">Какво не работи [doesn't work]? Какво те обърква [confuses you]? Какво искаш [you want] да добавим [to add]? Напиши [type] го тук — отива [it goes] директно [directly] на татко в GitHub.</p>
-      <textarea id="feedback-text" placeholder="напр. [e.g.] Не разбрах [didn't understand] какво е променлива в Мисия 2..."></textarea>
+      <h3 id="feedback-title">💬 Изпрати обратна връзка</h3>
+      <p id="feedback-blurb">Какво не работи? Какво те обърква? Какво искаш да добавим? Напиши го тук — отива директно на татко в GitHub.</p>
+      <textarea id="feedback-text" placeholder="напр. Не разбрах какво е променлива в Мисия 2..."></textarea>
       <div class="feedback-actions">
-        <button onclick="closeFeedback()">Отказ [cancel]</button>
-        <button class="send" onclick="sendFeedback()">Изпрати [send] →</button>
+        <button onclick="closeFeedback()">Отказ</button>
+        <button class="send" onclick="sendFeedback()">Изпрати →</button>
       </div>
     </div>
   </div>
-  <div class="ask-bar" id="ask-bar" style="display:none" aria-label="Попитай [ask] Claude нещо">
+  <div class="ask-bar" id="ask-bar" style="display:none" aria-label="Попитай Claude нещо">
     <div class="ask-responses" id="ask-responses"></div>
     <div class="ask-bar-inner">
-      <div class="ask-bar-label" id="ask-bar-label">Попитай [ask] Claude нещо за наученото [what you learned] →</div>
+      <div class="ask-bar-label" id="ask-bar-label">Попитай Claude нещо за наученото →</div>
       <div class="ask-bar-row">
         <input class="ask-bar-input" id="ask-bar-input" type="text"
-          placeholder="Напиши [type] въпрос [question]..." autocomplete="off" />
-        <button class="ask-bar-btn" id="ask-bar-btn" onclick="handleAskBar()">Питай [ask] →</button>
+          placeholder="Напиши въпрос..." autocomplete="off" />
+        <button class="ask-bar-btn" id="ask-bar-btn" onclick="handleAskBar()">Питай →</button>
       </div>
       <div class="ask-error" id="ask-error" style="display:none"></div>
     </div>
@@ -684,151 +702,198 @@
       return text;
     }
 
+    async function callPollinations(userMessage, systemPrompt, maxTokens) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 30000);
+      let response;
+      try {
+        response = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userMessage }
+            ]
+          }),
+          signal: controller.signal
+        });
+      } catch (e) {
+        clearTimeout(timer);
+        throw new Error('Pollinations недостъпен — опитай отново след малко.');
+      }
+      clearTimeout(timer);
+      if (!response.ok) {
+        throw new Error('Pollinations недостъпен — опитай отново след малко.');
+      }
+      const data = await response.json().catch(() => null);
+      const text = data?.choices?.[0]?.message?.content;
+      if (typeof text !== 'string') {
+        throw new Error('Pollinations недостъпен — опитай отново след малко.');
+      }
+      return text;
+    }
+
+    async function callLLM(userMessage, systemPrompt, maxTokens) {
+      if (hasApiKey()) {
+        try {
+          return await callClaude(userMessage, systemPrompt, maxTokens);
+        } catch (e) {
+          if (e && e.message === 'no-key') {
+            return await callPollinations(userMessage, systemPrompt, maxTokens);
+          }
+          throw e;
+        }
+      }
+      return await callPollinations(userMessage, systemPrompt, maxTokens);
+    }
+
     // ── Module definitions (content added in Tasks 3-7) ──────────────
     const MODULES = [
       {
         id: 'm1',
         title: 'The Terminal',
         content: `
-          <p>Terminal [терминал] е начинът [the way], по който говориш [talk] директно [directly] с компютъра [computer] — без бутони [buttons], само с текст [text].
-          Всеки [every] AI инженер [engineer] го използва [uses] всеки ден [every day]. Нека научим [learn] основите [the basics].</p>
+          <p>Terminal [терминал] е начинът, по който говориш директно с компютъра — без бутони, само с текст.
+          Всеки AI инженер го използва всеки ден. Нека научим основите.</p>
 
-          <h3>Отвори [open] terminal</h3>
-          <p>В Ubuntu: натисни [press] <strong style="color:var(--green)">Ctrl + Alt + T</strong>.
-          Появява се [appears] черен прозорец [black window] с мигащ курсор [blinking cursor]. Това е твоят terminal.</p>
+          <h3>Отвори terminal</h3>
+          <p>В Ubuntu: натисни <strong style="color:var(--green)">Ctrl + Alt + T</strong>.
+          Появява се черен прозорец с мигащ курсор. Това е твоят terminal.</p>
 
-          <h3>Команди [commands] за учене [to learn]</h3>
-          <p><code style="color:var(--green)">pwd</code> — показва [shows] текущата ти папка [current folder]</p>
+          <h3>Команди [commands] за учене</h3>
+          <p><code style="color:var(--green)">pwd</code> — показва текущата ти папка [folder]</p>
           <div class="code-block">
             <pre>pwd</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p><code style="color:var(--green)">ls</code> — показва [lists] всичко [everything] в текущата папка [current folder]</p>
+          <p><code style="color:var(--green)">ls</code> — показва всичко в текущата папка</p>
           <div class="code-block">
             <pre>ls</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p><code style="color:var(--green)">mkdir</code> — прави [makes] нова папка [new folder]</p>
+          <p><code style="color:var(--green)">mkdir</code> — прави нова папка</p>
           <div class="code-block">
             <pre>mkdir ai-lab</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p><code style="color:var(--green)">cd</code> — влиза [moves you] в папка [folder]</p>
+          <p><code style="color:var(--green)">cd</code> — влиза в папка</p>
           <div class="code-block">
             <pre>cd ai-lab</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p>Стартирай [run] първия си Python ред [line]:</p>
+          <p>Стартирай [run] първия си Python ред:</p>
           <div class="code-block">
             <pre>python3 -c "print('hello world')"</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="var-sidebar">
-            <strong>Какво е "команда" [command]?</strong><br>
-            Команда е дума [a word], която казваш [you tell] на компютъра [computer] да направи [to do] нещо. Пишеш [you type] я в terminal-а и натискаш [press] <strong>Enter</strong>. След името [name] на командата [command] идват <strong>аргументи [arguments]</strong> — допълнителни [extra] думи [words], които казват [tell] на командата [command] КЪДЕ или КАКВО да прави [do]. Например [for example]: в <code style="color:var(--green)">mkdir ai-lab</code>, <code>mkdir</code> е командата [command], а <code>ai-lab</code> е аргументът [argument] (името [name] на новата папка [new folder]).
+            <strong>Какво е "команда"?</strong><br>
+            Команда е дума, която казваш на компютъра да направи нещо. Пишеш я в terminal-а и натискаш <strong>Enter</strong>. След името на командата [command] идват <strong>аргументи [arguments]</strong> — допълнителни думи, които казват на командата КЪДЕ или КАКВО да прави. Например: в <code style="color:var(--green)">mkdir ai-lab</code>, <code>mkdir</code> е командата, а <code>ai-lab</code> е аргументът [argument] (името на новата папка).
           </div>
 
           <div class="cmd-ref">
-            <button class="cmd-ref-toggle" onclick="toggleCmdRef(this)">📖 Помощен терминал [help terminal] — отвори [open] справочник [reference] на команди [commands] ▾</button>
+            <button class="cmd-ref-toggle" onclick="toggleCmdRef(this)">📖 Помощен терминал — отвори справочник на команди ▾</button>
             <div class="cmd-ref-body">
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">pwd</div>
-                <div class="cmd-ref-desc">"print working directory" — показва [prints] пълния път [full path] на папката [folder], в която си сега [you are now].</div>
+                <div class="cmd-ref-desc">"print working directory" — показва пълния път на папката, в която си сега.</div>
                 <code class="cmd-ref-example">pwd</code>
                 <code class="cmd-ref-example">pwd        # → /home/ada/ai-lab</code>
               </div>
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">ls</div>
-                <div class="cmd-ref-desc">"list" — показва [lists] всички файлове [files] и папки [folders] в текущата [current] папка [folder]. С аргумент [argument] <code>-l</code> показва [shows] подробности [details].</div>
+                <div class="cmd-ref-desc">"list" — показва всички файлове [files] и папки в текущата папка. С аргумент <code>-l</code> показва подробности.</div>
                 <code class="cmd-ref-example">ls</code>
-                <code class="cmd-ref-example">ls -l      # подробен [detailed] списък [list]</code>
+                <code class="cmd-ref-example">ls -l      # подробен списък [list]</code>
               </div>
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">cd ИМЕ_НА_ПАПКА</div>
-                <div class="cmd-ref-desc">"change directory" — влиза [moves you] в папка [folder]. Аргументът [argument] е името [name] на папката. <code>cd ..</code> се връща [goes back] една стъпка [step] нагоре [up].</div>
-                <code class="cmd-ref-example">cd ai-lab  # влиза [enter] в ai-lab</code>
-                <code class="cmd-ref-example">cd ..      # излиза [back] една папка [folder]</code>
+                <div class="cmd-ref-desc">"change directory" — влиза в папка. Аргументът е името на папката. <code>cd ..</code> се връща една стъпка нагоре.</div>
+                <code class="cmd-ref-example">cd ai-lab  # влиза в ai-lab</code>
+                <code class="cmd-ref-example">cd ..      # излиза една папка</code>
               </div>
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">mkdir ИМЕ_НА_ПАПКА</div>
-                <div class="cmd-ref-desc">"make directory" — създава [creates] нова папка [new folder]. Аргументът [argument] е името [name] на новата папка.</div>
+                <div class="cmd-ref-desc">"make directory" — създава нова папка. Аргументът е името на новата папка.</div>
                 <code class="cmd-ref-example">mkdir ai-lab</code>
                 <code class="cmd-ref-example">mkdir notes</code>
               </div>
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">touch ИМЕ_НА_ФАЙЛ</div>
-                <div class="cmd-ref-desc">Създава [creates] нов празен [empty] файл [file]. Аргументът [argument] е името [name] на файла.</div>
+                <div class="cmd-ref-desc">Създава нов празен файл [file]. Аргументът е името на файла.</div>
                 <code class="cmd-ref-example">touch hello.py</code>
                 <code class="cmd-ref-example">touch notes.txt</code>
               </div>
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">echo "ТЕКСТ"</div>
-                <div class="cmd-ref-desc">Печата [prints] текст [text] на екрана [screen]. С <code>&gt;</code> записва [writes] в файл [file] вместо [instead of] на екрана.</div>
+                <div class="cmd-ref-desc">Печата текст на екрана. С <code>&gt;</code> записва в файл вместо на екрана.</div>
                 <code class="cmd-ref-example">echo "hello"           # → hello</code>
-                <code class="cmd-ref-example">echo "hi" &gt; bye.txt    # записва [writes] в bye.txt</code>
+                <code class="cmd-ref-example">echo "hi" &gt; bye.txt    # записва в bye.txt</code>
               </div>
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">cat ИМЕ_НА_ФАЙЛ</div>
-                <div class="cmd-ref-desc">Показва [shows] съдържанието [content] на файл [file]. Аргументът [argument] е името [name] на файла.</div>
+                <div class="cmd-ref-desc">Показва съдържанието на файл. Аргументът е името на файла.</div>
                 <code class="cmd-ref-example">cat hello.py</code>
                 <code class="cmd-ref-example">cat notes.txt</code>
               </div>
               <div class="cmd-ref-item">
                 <div class="cmd-ref-name">python3 ФАЙЛ.py</div>
-                <div class="cmd-ref-desc">Стартира [runs] Python файл [file]. С <code>-c</code> стартира [runs] кратък [short] код [code] директно [directly].</div>
+                <div class="cmd-ref-desc">Стартира Python файл. С <code>-c</code> стартира кратък код [code] директно.</div>
                 <code class="cmd-ref-example">python3 hello.py</code>
                 <code class="cmd-ref-example">python3 -c "print(2+2)"  # → 4</code>
               </div>
             </div>
           </div>
 
-          <h3>Как се прави файл [how to create a file]</h3>
-          <p>Има [there are] три лесни начина [easy ways] да създадеш [create] файл [file] от terminal-а. Опитай [try] и трите:</p>
+          <h3>Как се прави файл</h3>
+          <p>Има три лесни начина да създадеш файл от terminal-а. Опитай и трите:</p>
 
-          <p><strong>1) С <code style="color:var(--green)">touch</code></strong> — създава [creates] празен [empty] файл [file]:</p>
+          <p><strong>1) С <code style="color:var(--green)">touch</code></strong> — създава празен файл:</p>
           <div class="code-block">
             <pre>touch hello.py
-ls           # трябва да видиш [should see] hello.py</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+ls           # трябва да видиш hello.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <p><strong>2) С <code style="color:var(--green)">echo</code> и <code style="color:var(--green)">&gt;</code></strong> — създава [creates] файл [file] с текст [text] вътре [inside]. Знакът [the symbol] <code>&gt;</code> казва [tells] на компютъра [computer]: "сложи [put] резултата [the result] във файл [into a file] вместо [instead of] на екрана [screen]".</p>
+          <p><strong>2) С <code style="color:var(--green)">echo</code> и <code style="color:var(--green)">&gt;</code></strong> — създава файл с текст вътре. Знакът <code>&gt;</code> казва на компютъра: "сложи резултата във файл вместо на екрана".</p>
           <div class="code-block">
             <pre>echo "print('hello from echo')" &gt; hello.py
-cat hello.py   # покажи [show] какво има вътре [what's inside]
+cat hello.py   # покажи какво има вътре
 python3 hello.py</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p>Очакван [expected] резултат [output] от <code>python3 hello.py</code>: <code style="color:var(--green)">hello from echo</code></p>
+          <p>Очакван резултат [output] от <code>python3 hello.py</code>: <code style="color:var(--green)">hello from echo</code></p>
 
-          <p><strong>3) С Python — <code style="color:var(--green)">open()</code> в "write" режим [mode]</strong> — създава [creates] файл [file] от Python код [code]. <code>"w"</code> означава [means] "write" (запис). Ако файлът [file] вече [already] съществува [exists], ще го пренапише [will overwrite].</p>
+          <p><strong>3) С Python — <code style="color:var(--green)">open()</code> в "write" режим</strong> — създава файл от Python код. <code>"w"</code> означава "write" (запис). Ако файлът вече съществува, ще го пренапише.</p>
           <div class="code-block">
             <pre>python3 -c "open('greeting.txt', 'w').write('Hello, Ada!\\n')"
 cat greeting.txt   # → Hello, Ada!</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p>Очакван [expected] резултат [output] от <code>cat greeting.txt</code>: <code style="color:var(--green)">Hello, Ada!</code></p>
+          <p>Очакван резултат от <code>cat greeting.txt</code>: <code style="color:var(--green)">Hello, Ada!</code></p>
 
           <div class="var-sidebar">
-            <strong>Внимание [warning]:</strong> Един знак [single] <code>&gt;</code> пренаписва [overwrites] файла [file]. Два знака [double] <code>&gt;&gt;</code> добавят [append] към него без [without] да трият [erasing] старото [the old content]. Опитай [try]:<br>
+            <strong>Внимание:</strong> Един знак <code>&gt;</code> пренаписва файла. Два знака <code>&gt;&gt;</code> добавят към него без да трият старото. Опитай:<br>
             <code style="color:var(--green)">echo "line 1" &gt; demo.txt</code><br>
             <code style="color:var(--green)">echo "line 2" &gt;&gt; demo.txt</code><br>
-            <code style="color:var(--green)">cat demo.txt</code> → ще видиш [you will see] двата реда [both lines].
+            <code style="color:var(--green)">cat demo.txt</code> → ще видиш двата реда.
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 1 Предизвикателство [Challenge]</div>
-            <p>1. Отвори [open] terminal.<br>
-            2. Създай [create] папка [folder] с ime <strong>ai-lab</strong>.<br>
-            3. Влез [go] в нея с <code>cd ai-lab</code>.<br>
-            4. Изпълни [run] <code>ls</code> — трябва да е празно [empty] (празна папка [empty folder]).<br>
-            5. Изпълни [run] <code>python3 -c "print('I am an AI engineer')"</code></p>
-            <p>Когато видиш [see] съобщението [message] отпечатано [printed], върни се [come back] тук и го отбележи [mark it].</p>
-            <button class="mark-done-btn" onclick="markDone('m1')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="challenge-title">⚡ Мисия 1 Предизвикателство</div>
+            <p>1. Отвори terminal.<br>
+            2. Създай папка с ime <strong>ai-lab</strong>.<br>
+            3. Влез в нея с <code>cd ai-lab</code>.<br>
+            4. Изпълни <code>ls</code> — трябва да е празно (празна папка).<br>
+            5. Изпълни <code>python3 -c "print('I am an AI engineer')"</code></p>
+            <p>Когато видиш съобщението отпечатано, върни се тук и го отбележи.</p>
+            <button class="mark-done-btn" onclick="markDone('m1')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Отвори [open] terminal с Ctrl+Alt+T, после напиши [type] всяка команда [command] и натисни [press] Enter:<br><br>
+              Отвори terminal с Ctrl+Alt+T, после напиши всяка команда и натисни Enter:<br><br>
               <code style="color:var(--green)">mkdir ai-lab</code><br>
               <code style="color:var(--green)">cd ai-lab</code><br>
               <code style="color:var(--green)">ls</code><br>
@@ -837,83 +902,83 @@ cat greeting.txt   # → Hello, Ada!</pre>
           </div>
         `,
         quiz: [
-          { q: 'Коя команда [command] показва [shows] текущата ти папка [current folder]?', options: ['ls', 'pwd', 'cd', 'mkdir'], answer: 1 },
-          { q: 'Коя команда [command] създава [creates] нова папка [new folder] ai-lab?', options: ['pwd ai-lab', 'cd ai-lab', 'mkdir ai-lab', 'touch ai-lab'], answer: 2 },
-          { q: 'Как стартираш [run] Python скрипт [script] hello.py?', options: ['run hello.py', 'python3 hello.py', 'start hello.py', 'execute hello.py'], answer: 1 }
+          { q: 'Коя команда показва текущата ти папка?', options: ['ls', 'pwd', 'cd', 'mkdir'], answer: 1 },
+          { q: 'Коя команда създава нова папка ai-lab?', options: ['pwd ai-lab', 'cd ai-lab', 'mkdir ai-lab', 'touch ai-lab'], answer: 2 },
+          { q: 'Как стартираш Python скрипт [script] hello.py?', options: ['run hello.py', 'python3 hello.py', 'start hello.py', 'execute hello.py'], answer: 1 }
         ]
       },
       {
         id: 'm2',
         title: 'Python in 30 min',
         content: `
-          <p>Python е езикът [the language] на AI. Чете се [reads] почти [almost] като английски [English]. Нека научим [learn] само
-          толкова, колкото ни трябва [just enough] за истински неща [real things].</p>
+          <p>Python е езикът на AI. Чете се почти като английски. Нека научим само
+          толкова, колкото ни трябва за истински неща.</p>
 
-          <h3>Променливи [variables] — запазване [storing] на информация [information]</h3>
+          <h3>Променливи [variables] — запазване на информация</h3>
           <div class="code-block">
             <pre>name = "Ada"
 age = 13
 print(name, "is", age, "years old")</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Функции [functions] — блокове код [code blocks] за многократно използване [reuse]</h3>
+          <h3>Функции [functions] — блокове код за многократно използване</h3>
           <div class="code-block">
             <pre>def greet(name):
     print("Hello,", name)
 
 greet("Ada")
 greet("World")</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Цикли [loops] — правене [doing] на нещо много пъти [many times]</h3>
+          <h3>Цикли [loops] — правене на нещо много пъти</h3>
           <div class="code-block">
             <pre>for i in range(5):
     print("Line", i)</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Input [вход] — питане [asking] на потребителя [user] за нещо</h3>
+          <h3>Input [вход] — питане на потребителя за нещо</h3>
           <div class="code-block">
             <pre>name = input("What is your name? ")
 print("Welcome,", name)</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <h3>Как да стартираш [run] Python файл [file]</h3>
-          <p>Запази [save] кода [code] в файл [file] с имe <code style="color:var(--green)">hello.py</code>,
-          после стартирай [run] го:</p>
+          <p>Запази кода [code] в файл с имe <code style="color:var(--green)">hello.py</code>,
+          после стартирай го:</p>
           <div class="code-block">
             <pre>python3 hello.py</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 2 Предизвикателство [Challenge]</div>
-            <p>В папката [folder] <strong>ai-lab</strong>, създай [create] файл [file] с имe
-            <strong>hello.py</strong> с този код [code]:</p>
+            <div class="challenge-title">⚡ Мисия 2 Предизвикателство</div>
+            <p>В папката [folder] <strong>ai-lab</strong>, създай файл с имe
+            <strong>hello.py</strong> с този код:</p>
             <div class="code-block">
               <pre>name = input("What is your name? ")
 print("Hello,", name + "! You are training to be an AI engineer.")</pre>
-              <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+              <button class="copy-btn" onclick="copyCode(this)">копирай</button>
             </div>
-            <p>Стартирай [run] го с <code>python3 hello.py</code>. Въведи [enter] името [name] си когато поиска [asks].
-            Видя ли съобщението [message]? Върни се [come back] и го отбележи [mark it].</p>
-            <button class="mark-done-btn" onclick="markDone('m2')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <p>Стартирай го с <code>python3 hello.py</code>. Въведи името си когато поиска.
+            Видя ли съобщението? Върни се и го отбележи.</p>
+            <button class="mark-done-btn" onclick="markDone('m2')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              За да създадеш [create] файла [file], отвори [open] текстов редактор [text editor]:<br><br>
+              За да създадеш файла, отвори текстов редактор:<br><br>
               <code style="color:var(--green)">cd ai-lab</code><br>
               <code style="color:var(--green)">nano hello.py</code><br><br>
-              Напиши [type] или постни [paste] кода [code]. Запази [save] с Ctrl+O, Enter, после излез [exit] с Ctrl+X.<br>
-              После стартирай [run]: <code style="color:var(--green)">python3 hello.py</code>
+              Напиши или постни кода. Запази с Ctrl+O, Enter, после излез с Ctrl+X.<br>
+              После стартирай: <code style="color:var(--green)">python3 hello.py</code>
             </div>
           </div>
         `,
         quiz: [
-          { q: 'Коя ключова дума [keyword] дефинира [defines] функция [function] в Python?', options: ['func', 'define', 'def', 'function'], answer: 2 },
-          { q: 'Какво прави [does] input()?', options: ['Отпечатва [prints] текст [text] на екрана [screen]', 'Пита [asks] потребителя [user] да напише [type] нещо', 'Създава [creates] променлива [variable]', 'Цикли [loops] завинаги [forever]'], answer: 1 },
+          { q: 'Коя ключова дума дефинира функция [function] в Python?', options: ['func', 'define', 'def', 'function'], answer: 2 },
+          { q: 'Какво прави input()?', options: ['Отпечатва текст на екрана', 'Пита потребителя да напише нещо', 'Създава променлива [variable]', 'Цикли завинаги'], answer: 1 },
           { q: 'Какъв е изходът [output] от: print(2 + 3)?', options: ['23', '2+3', '5', 'Error'], answer: 2 }
         ]
       },
@@ -921,75 +986,75 @@ print("Hello,", name + "! You are training to be an AI engineer.")</pre>
         id: 'm3',
         title: 'What is AI?',
         content: `
-          <p>Преди да говорим [talk] с AI с код [code], нека разберем [understand] какво всъщност [actually] е AI.
-          Спойлер [spoiler]: не е магия [magic] и не е роботски мозък [robot brain].</p>
+          <p>Преди да говорим с AI с код [code], нека разберем какво всъщност е AI.
+          Спойлер: не е магия и не е роботски мозък.</p>
 
-          <h3>Аналогията [analogy] с автодовършването [autocomplete]</h3>
-          <p>Знаеш ли как телефонът [phone] ти предлага [suggests] следващата дума [next word] когато пишеш [type] съобщение [message]?
-          AI езиковите модели [language models] (като Claude или ChatGPT) са като това, но обучени [trained] на почти [almost]
-          всяка книга [book], статия [article] и уебсайт [website] писани [written] някога. Те стават [become] много добри [very good] в предсказването [predicting]
-          как изглежда [looks like] полезен [helpful], умен отговор [smart answer].</p>
+          <h3>Аналогията с автодовършването</h3>
+          <p>Знаеш ли как телефонът ти предлага следващата дума когато пишеш съобщение?
+          AI езиковите модели (като Claude или ChatGPT) са като това, но обучени на почти
+          всяка книга, статия и уебсайт писани някога. Те стават много добри в предсказването
+          как изглежда полезен, умен отговор [response].</p>
 
           <h3>Какво е prompt [запитване]?</h3>
-          <p>Един <strong style="color:var(--green)">prompt</strong> е съобщението [message], което изпращаш [send] на AI.
-          AI чете [reads] твоя prompt и генерира [generates] отговор [response]. Колкото по-добър [better] е prompt-ът ти,
-          толкова по-добър [better] е отговорът [response]. Това умение [skill] се казва [is called] <em>prompt engineering</em>.</p>
+          <p>Един <strong style="color:var(--green)">prompt</strong> е съобщението, което изпращаш на AI.
+          AI чете твоя prompt и генерира отговор. Колкото по-добър е prompt-ът ти,
+          толкова по-добър е отговорът. Това умение се казва <em>prompt engineering</em>.</p>
 
           <h3>Какво е API?</h3>
           <p>Един <strong style="color:var(--green)">API</strong> (Application Programming Interface)
-          е начин [a way] програмите [programs] да говорят [talk] помежду си [to each other]. Вместо да отваряш [open] прозорец [window] за чат [chat],
-          изпращаш [send] съобщение [message] от твоя Python код [code] и получаваш [receive] отговора [response] на AI обратно [back] като текст [text],
-          който програмата [program] ти може да използва [use].</p>
+          е начин програмите да говорят помежду си. Вместо да отваряш прозорец за чат,
+          изпращаш съобщение от твоя Python код и получаваш отговора на AI обратно като текст,
+          който програмата ти може да използва.</p>
 
           <h3>Какво можеш да строиш [build] с него?</h3>
-          <p>Чат-ботове [chatbots], писателски асистенти [writing assistants], ревизори [reviewers] на код [code], анализатори [analyzers] на данни [data], игрови герои [game characters]
-          — всичко [anything], което се нуждае [needs] от разбиране на език [language understanding]. Точно това [exactly this] ще помагаш [help] на татко да строи [build].</p>
+          <p>Чат-ботове, писателски асистенти, ревизори на код, анализатори на данни, игрови герои
+          — всичко, което се нуждае от разбиране на език. Точно това ще помагаш на татко да строи.</p>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 3 Предизвикателство [Challenge]</div>
-            <p>Отвори [open] браузър [browser] и отиди [go] на <strong>claude.ai</strong> (или попитай [ask] татко кой AI чат [chat] да използваш [use]).
-            Напиши [type] този prompt:</p>
+            <div class="challenge-title">⚡ Мисия 3 Предизвикателство</div>
+            <p>Отвори браузър [browser] и отиди на <strong>claude.ai</strong> (или попитай татко кой AI чат да използваш).
+            Напиши този prompt:</p>
             <div class="code-block">
               <pre>Explain what a Python function is in 2 sentences, for a 13-year-old.</pre>
-              <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+              <button class="copy-btn" onclick="copyCode(this)">копирай</button>
             </div>
-            <p>Прочети [read] отговора [answer]. Разбра ли го [did you understand it]? Когато си готов [ready], върни се [come back] и го отбележи [mark it].</p>
-            <button class="mark-done-btn" onclick="markDone('m3')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <p>Прочети отговора. Разбра ли го? Когато си готов, върни се и го отбележи.</p>
+            <button class="mark-done-btn" onclick="markDone('m3')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Отвори [open] Firefox, отиди [go] на claude.ai или chat.openai.com.
-              И двата изискват [require] акаунт [account] — помоли [ask] татко да влезе [log in], или създайте [create] акаунт [account] заедно [together].
-              Попитай [ask] татко ако не си сигурен [sure] кой да използваш [use].
+              Отвори Firefox, отиди на claude.ai или chat.openai.com.
+              И двата изискват акаунт — помоли татко да влезе, или създайте акаунт заедно.
+              Попитай татко ако не си сигурен кой да използваш.
             </div>
           </div>
         `,
         quiz: [
-          { q: 'Какво е prompt?', options: ['Вид [type of] Python грешка [error]', 'Съобщението [message], което изпращаш [send] на AI', 'Компютърна програма [computer program]', 'Заявка [query] към база данни [database]'], answer: 1 },
-          { q: 'Какво означава [stands for] API?', options: ['Artificial Programming Intelligence', 'Application Programming Interface', 'Automated Process Integration', 'Advanced Python Interface'], answer: 1 },
-          { q: 'Какво предсказват [predict] LLM-ите?', options: ['Времето [weather]', 'Цени [prices] на акции [stocks]', 'Най-полезната [most helpful] следваща дума [next word] или изречение [sentence]', 'Паролата [password] ти'], answer: 2 }
+          { q: 'Какво е prompt?', options: ['Вид Python грешка [error]', 'Съобщението, което изпращаш на AI', 'Компютърна програма', 'Заявка към база данни'], answer: 1 },
+          { q: 'Какво означава API?', options: ['Artificial Programming Intelligence', 'Application Programming Interface', 'Automated Process Integration', 'Advanced Python Interface'], answer: 1 },
+          { q: 'Какво предсказват LLM-ите?', options: ['Времето', 'Цени на акции', 'Най-полезната следваща дума или изречение', 'Паролата ти'], answer: 2 }
         ]
       }
       ,{
         id: 'm4',
         title: 'Your first API call',
         content: `
-          <p>Това е голямото [this is the big one]. Ще напишеш [write] Python скрипт [script], който говори [talks] директно [directly] с
+          <p>Това е голямото. Ще напишеш Python скрипт [script], който говори директно с
           Claude — без браузър [browser], само код [code].</p>
 
-          <h3>Стъпка [step] 1: Вземи [get] API ключ [key]</h3>
-          <p>Помоли [ask] татко за Anthropic API ключ [key]. Изглежда [looks] така:
+          <h3>Стъпка 1: Вземи API ключ [key]</h3>
+          <p>Помоли татко за Anthropic API ключ. Изглежда така:
           <code style="color:var(--green)">sk-ant-...</code>
-          Пази го в тайна [keep it secret] — никога [never] не го споделяй [share] или слагай [put] в интернет [internet].</p>
+          Пази го в тайна — никога не го споделяй или слагай в интернет.</p>
 
-          <h3>Стъпка [step] 2: Инсталирай [install] библиотеката [library]</h3>
+          <h3>Стъпка 2: Инсталирай [install] библиотеката [library]</h3>
           <p>В terminal-а:</p>
           <div class="code-block">
             <pre>pip3 install anthropic</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Стъпка [step] 3: Напиши [write] скрипта [script]</h3>
-          <p>Създай [create] файл [file] с имe <code style="color:var(--green)">ask_claude.py</code>
+          <h3>Стъпка 3: Напиши скрипта</h3>
+          <p>Създай файл [file] с имe <code style="color:var(--green)">ask_claude.py</code>
           в папката [folder] ai-lab:</p>
           <div class="code-block">
             <pre>import anthropic
@@ -1005,72 +1070,72 @@ message = client.messages.create(
 )
 
 print(message.content[0].text)</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <p>Замени [replace] <code style="color:var(--green)">YOUR_API_KEY_HERE</code> с
-          ключа [key], който татко ти даде [gave you]. После стартирай [run]:</p>
+          <p>Замени <code style="color:var(--green)">YOUR_API_KEY_HERE</code> с
+          ключа, който татко ти даде. После стартирай [run]:</p>
           <div class="code-block">
             <pre>python3 ask_claude.py</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Стъпка [step] 4: Персонализирай [customize] prompt-а</h3>
-          <p>Промени [change] текста на съобщението [message text] на каквото [anything] искаш да питаш [ask]. Опитай [try]:
+          <h3>Стъпка 4: Персонализирай prompt-а</h3>
+          <p>Промени текста на съобщението на каквото искаш да питаш. Опитай:
           <em>"Explain loops in Python in one sentence."</em></p>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 4 Предизвикателство [Challenge]</div>
-            <p>1. Вземи [get] API ключа [key] от татко.<br>
-            2. Инсталирай [install] библиотеката [library] с pip3.<br>
-            3. Създай [create] ask_claude.py и го стартирай [run] — трябва да видиш [see] отговора [answer] на Claude в terminal-а.<br>
-            4. Промени [change] prompt-а с твой въпрос [question] и го стартирай [run] отново [again].</p>
-            <p>Когато Claude отговори [answers] на твоя въпрос [question], върни се [come back] и го отбележи [mark it].</p>
-            <button class="mark-done-btn" onclick="markDone('m4')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="challenge-title">⚡ Мисия 4 Предизвикателство</div>
+            <p>1. Вземи API ключа от татко.<br>
+            2. Инсталирай библиотеката с pip3.<br>
+            3. Създай ask_claude.py и го стартирай — трябва да видиш отговора [response] на Claude в terminal-а.<br>
+            4. Промени prompt-а с твой въпрос и го стартирай отново.</p>
+            <p>Когато Claude отговори на твоя въпрос, върни се и го отбележи.</p>
+            <button class="mark-done-btn" onclick="markDone('m4')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Ако получиш [get] грешка [error] като <em>ModuleNotFoundError: No module named 'anthropic'</em>,
-              изпълни [run] <code style="color:var(--green)">pip3 install anthropic</code> отново [again] и се увери [make sure],
-              че пише [says] "Successfully installed".<br><br>
-              Ако pip каже [says] <em>"externally-managed-environment"</em>, опитай [try]:
+              Ако получиш грешка [error] като <em>ModuleNotFoundError: No module named 'anthropic'</em>,
+              изпълни <code style="color:var(--green)">pip3 install anthropic</code> отново и се увери,
+              че пише "Successfully installed".<br><br>
+              Ако pip каже <em>"externally-managed-environment"</em>, опитай:
               <code style="color:var(--green)">pip3 install --user anthropic</code><br><br>
-              Ако получиш [get] <em>AuthenticationError</em>, провери [check] API ключа [key] — увери се [make sure], че си
-              копирал [copied] целия [the whole thing], включително [including] частта [part] <code>sk-ant-</code>.
+              Ако получиш <em>AuthenticationError</em>, провери API ключа — увери се, че си
+              копирал целия, включително частта <code>sk-ant-</code>.
             </div>
           </div>
         `,
         quiz: [
-          { q: 'Коя Python библиотека [library] инсталираш [install] за Claude?', options: ['openai', 'anthropic', 'claude', 'requests'], answer: 1 },
-          { q: 'Какво контролира [controls] max_tokens?', options: ['Скоростта [speed] на отговора [response]', 'Колко дълъг [how long] може да е отговорът [response]', 'Цената [cost] на API', 'Версията [version] на модела [model]'], answer: 1 },
-          { q: 'Къде НИКОГА [never] не трябва да слагаш [put] реалния [real] API ключ [key]?', options: ['В скрипт [script], който commit-ваш в Git', 'В .env файл [file]', 'В паметта [memory] си', 'В конфигурационен [config] файл [file], пазен [kept] в тайна [private]'], answer: 0 }
+          { q: 'Коя Python библиотека инсталираш за Claude?', options: ['openai', 'anthropic', 'claude', 'requests'], answer: 1 },
+          { q: 'Какво контролира max_tokens?', options: ['Скоростта на отговора', 'Колко дълъг може да е отговорът', 'Цената на API', 'Версията на модела'], answer: 1 },
+          { q: 'Къде НИКОГА не трябва да слагаш реалния API ключ?', options: ['В скрипт, който commit-ваш в Git', 'В .env файл', 'В паметта си', 'В конфигурационен файл, пазен в тайна'], answer: 0 }
         ]
       },
       {
         id: 'm5',
         title: 'Build something real',
         content: `
-          <p>Имаш всички части [all the pieces]. Сега ще построиш [build] нещо, което наистина [actually]
-          помага [helps] на проекта [project] на татко за AI.</p>
+          <p>Имаш всички части. Сега ще построиш [build] нещо, което наистина
+          помага на проекта на татко за AI.</p>
 
-          <h3>Какво научи [what you learned]</h3>
-          <p>✓ Навигация [navigate] в terminal<br>
-          ✓ Писане [write] на Python (променливи [variables], функции [functions], цикли [loops], input)<br>
-          ✓ Разбиране [understand] какво са AI и API<br>
-          ✓ Извикване [call] на Claude от Python код [code]</p>
+          <h3>Какво научи</h3>
+          <p>✓ Навигация в terminal<br>
+          ✓ Писане на Python (променливи [variables], функции [functions], цикли [loops], input)<br>
+          ✓ Разбиране какво са AI и API<br>
+          ✓ Извикване на Claude от Python код [code]</p>
 
-          <h3>Твоята мисия [your mission]</h3>
-          <p>Татко ще ти даде [give] конкретна задача [specific task] за проекта [project]. Ако нямаш [don't have] такава още [yet],
-          построи [build] това: скрипт [script], с който можеш [can] да напишеш [type] всякакъв въпрос [any question] и Claude да го отговори [answers]. Може да е:</p>
+          <h3>Твоята мисия</h3>
+          <p>Татко ще ти даде конкретна задача за проекта. Ако нямаш такава още,
+          построи това: скрипт [script], с който можеш да напишеш всякакъв въпрос и Claude да го отговори. Може да е:</p>
           <ul style="margin: 0.5rem 0 0.5rem 1.5rem; line-height: 2;">
-            <li>Скрипт [script], който резюмира [summarizes] текст [text] с Claude</li>
-            <li>Малък инструмент [small tool], който отговаря [answers] на въпроси [questions] по дадена тема [topic]</li>
-            <li>Автоматизиране [automating] на нещо повтарящо се [repetitive] с AI</li>
+            <li>Скрипт, който резюмира текст с Claude</li>
+            <li>Малък инструмент, който отговаря на въпроси по дадена тема</li>
+            <li>Автоматизиране на нещо повтарящо се с AI</li>
           </ul>
-          <p>Използвай [use] <code style="color:var(--green)">ask_claude.py</code> като начална точка [starting point].
-          Промени [modify] prompt-а, добави [add] <code>input()</code> за да могат потребителите [users] да пишат [type] въпроси [questions],
-          или обходи [loop through] списък [list] от неща.</p>
+          <p>Използвай <code style="color:var(--green)">ask_claude.py</code> като начална точка.
+          Промени prompt-а, добави <code>input()</code> за да могат потребителите да пишат въпроси,
+          или обходи списък [list] от неща.</p>
 
-          <h3>Шаблон [template] за начало [to start from]</h3>
+          <h3>Шаблон за начало</h3>
           <div class="code-block">
             <pre>import anthropic
 
@@ -1088,171 +1153,171 @@ def ask(prompt):
 user_input = input("Ask something: ")
 response = ask(user_input)
 print("Claude says:", response)</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 5 Предизвикателство [Challenge]</div>
-            <p>Построй [build] инструмента [tool], описан [described] от татко. Накарай [make] го да работи [work] без грешки [errors].
-            Покажи [show] на татко, че работи [works]. Върни се [come back] и го отбележи [mark it].</p>
-            <button class="mark-done-btn" onclick="markDone('m5')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="challenge-title">⚡ Мисия 5 Предизвикателство</div>
+            <p>Построй инструмента, описан от татко. Накарай го да работи без грешки.
+            Покажи на татко, че работи. Върни се и го отбележи.</p>
+            <button class="mark-done-btn" onclick="markDone('m5')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Започни [start] просто [simple]. Накарай [make] го да работи [work] с един твърдо написан [hard-coded] prompt първо [first],
-              после добави [add] <code>input()</code>, за да стане интерактивен [interactive].
-              Ако си заседнал [stuck], постни [paste] грешката [error message] в Claude и го попитай [ask]
-              да обясни [explain] какво не е наред [what's wrong].
+              Започни просто. Накарай го да работи с един твърдо написан prompt първо,
+              после добави <code>input()</code>, за да стане интерактивен.
+              Ако си заседнал, постни грешката в Claude и го попитай
+              да обясни какво не е наред.
             </div>
           </div>
         `,
         quiz: [
-          { q: 'В шаблона [template], коя функция [function] обвива [wraps] Claude API извикването [call]?', options: ['call()', 'ask()', 'claude()', 'query()'], answer: 1 },
-          { q: 'Коя Python функция [function] получава [gets] вход [input] от потребителя [user]?', options: ['read()', 'scan()', 'input()', 'get()'], answer: 2 },
-          { q: 'Какво трябва да правиш [do], ако скриптът [script] дава грешка [error]?', options: ['Изтрий [delete] го и започни отново [start over]', 'Постни [paste] грешката [error] в Claude и попитай [ask] какво означава [means]', 'Се откажи [give up]', 'Игнорирай [ignore] я'], answer: 1 }
+          { q: 'В шаблона, коя функция [function] обвива Claude API извикването?', options: ['call()', 'ask()', 'claude()', 'query()'], answer: 1 },
+          { q: 'Коя Python функция получава вход от потребителя?', options: ['read()', 'scan()', 'input()', 'get()'], answer: 2 },
+          { q: 'Какво трябва да правиш, ако скриптът дава грешка [error]?', options: ['Изтрий го и започни отново', 'Постни грешката в Claude и попитай какво означава', 'Се откажи', 'Игнорирай я'], answer: 1 }
         ]
       }
       ,{
         id: 'm6',
         title: 'Save your work with Git',
         content: `
-          <p>Всеки инженер [engineer] запазва [saves] работата [work] си с Git. То е като машина на времето [time machine] за кода [code] ти —
-          можеш [can] винаги [always] да се върнеш [go back] към всяка запазена версия [saved version]. Нека го настроим [set it up].</p>
+          <p>Всеки инженер запазва работата си с Git. То е като машина на времето за кода [code] ти —
+          можеш винаги да се върнеш към всяка запазена версия. Нека го настроим.</p>
 
           <h3>Какво е Git?</h3>
-          <p>Git следи [tracks] промените [changes] в твоите файлове [files]. Всеки път [every time], когато запазиш [save] "commit", Git
-          помни [remembers] точно [exactly] как е изглеждал [looked] кодът [code] ти в този момент [at that moment]. Ако счупиш [break] нещо, можеш [can] да се върнеш [go back].</p>
+          <p>Git следи промените в твоите файлове [files]. Всеки път, когато запазиш "commit", Git
+          помни точно как е изглеждал кодът ти в този момент. Ако счупиш нещо, можеш да се върнеш.</p>
 
-          <h3>Настрой [set up] Git (само при първи път [first time only])</h3>
+          <h3>Настрой Git (само при първи път)</h3>
           <div class="code-block">
             <pre>git config --global user.name "Your Name"
 git config --global user.email "your@email.com"</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Инициализирай [initialize] repo в проекта [project] си</h3>
+          <h3>Инициализирай repo в проекта си</h3>
           <div class="code-block">
             <pre>cd ~/ai-lab
 git init</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Запази [save] работата [work] си</h3>
-          <p>Кажи [tell] на Git кои файлове [files] да включи [include]:</p>
+          <h3>Запази работата си</h3>
+          <p>Кажи на Git кои файлове да включи:</p>
           <div class="code-block">
             <pre>git add .</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p>Запази [save] снимка [snapshot] с описание [message] какво си направил [what you did]:</p>
+          <p>Запази снимка с описание какво си направил:</p>
           <div class="code-block">
             <pre>git commit -m "my first AI tool"</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
-          <p>Виж [see] историята [history] си:</p>
+          <p>Виж историята си:</p>
           <div class="code-block">
             <pre>git log --oneline</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 6 Предизвикателство [Challenge]</div>
+            <div class="challenge-title">⚡ Мисия 6 Предизвикателство</div>
             <p style="color:#ff8844;border:1px solid #ff8844;border-radius:4px;padding:0.4rem 0.6rem;font-size:0.85rem;">
-              ⚠️ Преди [before] да направиш [make] commit: отвори [open] Python файловете [files] и замени [replace] реалния [real] API ключ [key] с текста [text]
-              <code>YOUR_API_KEY_HERE</code> отново [again]. Никога [never] не commit-вай реален [real] API ключ [key] в Git.
+              ⚠️ Преди да направиш commit: отвори Python файловете и замени реалния API ключ [key] с текста
+              <code>YOUR_API_KEY_HERE</code> отново. Никога не commit-вай реален API ключ в Git.
             </p>
-            <p>1. Влез [go] в папката [folder] <strong>ai-lab</strong> в terminal-а.<br>
+            <p>1. Влез в папката [folder] <strong>ai-lab</strong> в terminal-а.<br>
             2. Изпълни [run] <code>git init</code>.<br>
-            3. Отвори [open] Python файловете [files] и замени [replace] API ключа [key] с <code>YOUR_API_KEY_HERE</code>.<br>
-            4. Изпълни [run] <code>git add .</code> после <code>git commit -m "my first AI tool"</code>.<br>
-            5. Изпълни [run] <code>git log --oneline</code> — трябва да видиш [see] commit-а си.</p>
-            <p>Когато видиш [see] commit-а в историята [log], ти си истински инженер [real engineer]. Отбележи [mark] го.</p>
-            <button class="mark-done-btn" onclick="markDone('m6')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            3. Отвори Python файловете и замени API ключа с <code>YOUR_API_KEY_HERE</code>.<br>
+            4. Изпълни <code>git add .</code> после <code>git commit -m "my first AI tool"</code>.<br>
+            5. Изпълни <code>git log --oneline</code> — трябва да видиш commit-а си.</p>
+            <p>Когато видиш commit-а в историята, ти си истински инженер. Отбележи го.</p>
+            <button class="mark-done-btn" onclick="markDone('m6')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Ако git не е инсталиран [installed]: <code style="color:var(--green)">sudo apt install git</code><br><br>
-              Ако git се оплаква [complains] за твоето [name/email], изпълни [run] config командите [commands] горе [above] първо [first],
-              замествайки [replacing] "Your Name" и "your@email.com" с твоите данни [details].<br><br>
+              Ако git не е инсталиран: <code style="color:var(--green)">sudo apt install git</code><br><br>
+              Ако git се оплаква за твоето, изпълни config командите [commands] горе първо,
+              замествайки "Your Name" и "your@email.com" с твоите данни.<br><br>
               <code style="color:var(--green)">git config --global user.name "Ada"</code><br>
               <code style="color:var(--green)">git config --global user.email "ada@example.com"</code>
             </div>
           </div>
         `,
         quiz: [
-          { q: 'Коя команда [command] създава [creates] нов git репозитори [repository]?', options: ['git start', 'git create', 'git init', 'git new'], answer: 2 },
-          { q: 'Коя команда [command] добавя [stages] всички файлове [files] за commit?', options: ['git save .', 'git add .', 'git stage .', 'git push .'], answer: 1 },
-          { q: 'Какво показва [shows] git log?', options: ['Текущите [current] ти файлове [files]', 'Историята [history] на commit-ите ти', 'Git настройките [settings]', 'Отдалечени репозитории [remote repositories]'], answer: 1 }
+          { q: 'Коя команда [command] създава нов git репозитори [repository]?', options: ['git start', 'git create', 'git init', 'git new'], answer: 2 },
+          { q: 'Коя команда добавя всички файлове за commit?', options: ['git save .', 'git add .', 'git stage .', 'git push .'], answer: 1 },
+          { q: 'Какво показва git log?', options: ['Текущите ти файлове', 'Историята на commit-ите ти', 'Git настройките', 'Отдалечени репозитории'], answer: 1 }
         ]
       },
       {
         id: 'm7',
         title: 'GitHub — Put Your Code Online',
         content: `
-          <p>Git запазва [saves] кода [code] ти локално [locally]. GitHub го качва [puts it] в интернет [internet] — backup, споделен [shareable] и в безопасност [safe].
-          Всеки [every] истински [real] проект [project] живее [lives] в GitHub.</p>
+          <p>Git запазва кода [code] ти локално. GitHub го качва в интернет — backup, споделен и в безопасност.
+          Всеки истински проект живее в GitHub.</p>
 
           <h3>Какво е GitHub?</h3>
-          <p>GitHub е уебсайт [website], който съхранява [stores] Git репозитории [repositories]. Мисли [think] за него като Google Drive
-          за код [code] — но по-умен [smarter], защото разбира [understands] commit-и и история [history].</p>
+          <p>GitHub е уебсайт, който съхранява Git репозитории. Мисли за него като Google Drive
+          за код — но по-умен, защото разбира commit-и и история.</p>
 
-          <h3>Стъпка [step] 1: Създай [create] акаунт [account]</h3>
-          <p>Отиди [go] на <strong>github.com</strong> и създай [create] безплатен [free] акаунт [account].
-          Помоли [ask] татко да помогне [help] ако имаш нужда [need].</p>
+          <h3>Стъпка 1: Създай акаунт</h3>
+          <p>Отиди на <strong>github.com</strong> и създай безплатен акаунт.
+          Помоли татко да помогне ако имаш нужда.</p>
 
-          <h3>Стъпка [step] 2: Създай [create] нов репозитори [repository]</h3>
-          <p>Натисни [click] бутона [button] <strong>+</strong> → "New repository". Назови [name] го <code style="color:var(--green)">ai-lab</code>.
-          Остави [leave] го публичен [public]. НЕ добавяй [add] README (вече имаш [already have] файловете [files] си). Натисни [click] "Create repository".</p>
+          <h3>Стъпка 2: Създай нов репозитори [repository]</h3>
+          <p>Натисни бутона <strong>+</strong> → "New repository". Назови го <code style="color:var(--green)">ai-lab</code>.
+          Остави го публичен. НЕ добавяй README (вече имаш файловете [files] си). Натисни "Create repository".</p>
 
-          <h3>Стъпка [step] 3: Свържи [connect] и качи [push]</h3>
-          <p>GitHub ще ти покаже [show] команди [commands]. Копирай [copy] тези, започващи [starting] с <code style="color:var(--green)">git remote add</code>.
-          Изглеждат [look] така:</p>
+          <h3>Стъпка 3: Свържи и качи</h3>
+          <p>GitHub ще ти покаже команди [commands]. Копирай тези, започващи с <code style="color:var(--green)">git remote add</code>.
+          Изглеждат така:</p>
           <div class="code-block">
             <pre>git remote add origin https://github.com/YOUR_USERNAME/ai-lab.git
 git branch -M main
 git push -u origin main</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Стъпка [step] 4: Pull — вземи [get] последните промени [latest changes]</h3>
-          <p>Ако някой друг [someone else] промени [changes] кода [code] ти (или ти редактираш [edit] директно [directly] в GitHub), използвай [use]:</p>
+          <h3>Стъпка 4: Pull — вземи последните промени</h3>
+          <p>Ако някой друг промени кода ти (или ти редактираш директно в GitHub), използвай:</p>
           <div class="code-block">
             <pre>git pull</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 7 Предизвикателство [Challenge]</div>
-            <p>1. Създай [create] GitHub акаунт [account] (или използвай [use] на татко).<br>
-            2. Създай [create] нов repo с имe <strong>ai-lab</strong>.<br>
-            3. Качи [push] локалната [local] папка [folder] ai-lab в него.<br>
-            4. Отвори [open] GitHub страницата [page] и виж [see] кода [code] си онлайн [online].</p>
-            <button class="mark-done-btn" onclick="markDone('m7')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="challenge-title">⚡ Мисия 7 Предизвикателство</div>
+            <p>1. Създай GitHub акаунт (или използвай на татко).<br>
+            2. Създай нов repo с имe <strong>ai-lab</strong>.<br>
+            3. Качи локалната папка [folder] ai-lab в него.<br>
+            4. Отвори GitHub страницата и виж кода си онлайн.</p>
+            <button class="mark-done-btn" onclick="markDone('m7')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Увери се [make sure], че си в папката [folder] ai-lab първо [first]:<br>
+              Увери се, че си в папката ai-lab първо:<br>
               <code style="color:var(--green)">cd ~/ai-lab</code><br><br>
-              После изпълни [run] трите команди [three commands], показани [shown] от GitHub след [after] създаването [creating] на repo.
-              Първата [first] е <code style="color:var(--green)">git remote add origin ...</code>
+              После изпълни [run] трите команди, показани от GitHub след създаването на repo.
+              Първата е <code style="color:var(--green)">git remote add origin ...</code>
             </div>
           </div>
         `,
         quiz: [
-          { q: 'Коя команда [command] свързва [connects] локалния [local] repo с GitHub?', options: ['git connect', 'git remote add origin', 'git link', 'git attach'], answer: 1 },
-          { q: 'Коя команда [command] качва [uploads] commit-ите ти в GitHub?', options: ['git upload', 'git send', 'git push', 'git sync'], answer: 2 },
-          { q: 'Коя команда [command] изтегля [downloads] последните промени [latest changes] от GitHub?', options: ['git download', 'git fetch', 'git pull', 'git get'], answer: 2 }
+          { q: 'Коя команда [command] свързва локалния repo с GitHub?', options: ['git connect', 'git remote add origin', 'git link', 'git attach'], answer: 1 },
+          { q: 'Коя команда качва commit-ите ти в GitHub?', options: ['git upload', 'git send', 'git push', 'git sync'], answer: 2 },
+          { q: 'Коя команда изтегля последните промени от GitHub?', options: ['git download', 'git fetch', 'git pull', 'git get'], answer: 2 }
         ]
       }
       ,{
         id: 'm8',
         title: 'Prompt Engineering',
         content: `
-          <p>Можеш [can] да получиш [get] драматично [dramatically] по-добри [better] отговори [answers] от Claude само като промениш [change] начина [the way], по който питаш [ask].
-          Това умение [skill] — писане [writing] на добри prompt-и — се казва [is called] <strong style="color:var(--green)">prompt engineering</strong>.</p>
+          <p>Можеш да получиш драматично по-добри отговори от Claude само като промениш начина, по който питаш.
+          Това умение — писане на добри prompt-и — се казва <strong style="color:var(--green)">prompt engineering</strong>.</p>
 
-          <h3>Бъди конкретен [be specific]</h3>
-          <p>Лошо [bad]: <em>"Tell me about dogs."</em><br>
-          Добро [good]: <em>"In 3 bullet points, explain what makes dogs good pets for families with young children."</em></p>
+          <h3>Бъди конкретен</h3>
+          <p>Лошо: <em>"Tell me about dogs."</em><br>
+          Добро: <em>"In 3 bullet points, explain what makes dogs good pets for families with young children."</em></p>
 
-          <h3>Дай [give] на Claude роля [role] (system prompt)</h3>
-          <p>Можеш [can] да зададеш [set] <strong style="color:var(--green)">system prompt</strong>, за да кажеш [tell] на Claude кой [who] да бъде [to be]:</p>
+          <h3>Дай на Claude роля (system prompt)</h3>
+          <p>Можеш да зададеш <strong style="color:var(--green)">system prompt</strong>, за да кажеш на Claude кой да бъде:</p>
           <div class="code-block">
             <pre>import anthropic
 
@@ -1267,11 +1332,11 @@ message = client.messages.create(
     ]
 )
 print(message.content[0].text)</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Few-shot примери [examples]</h3>
-          <p>Покажи [show] на Claude какво искаш [want], като дадеш [give] примери [examples] преди [before] въпроса [question] си:</p>
+          <h3>Few-shot примери</h3>
+          <p>Покажи на Claude какво искаш, като дадеш примери преди въпроса си:</p>
           <div class="code-block">
             <pre>prompt = """
 Translate these sentences to pirate speak:
@@ -1279,62 +1344,62 @@ Hello → Ahoy!
 How are you? → How be ye?
 Now translate this: What time is it?
 """</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 8 Предизвикателство [Challenge]</div>
-            <p>Напиши [write] две версии [two versions] на prompt, питащ [asking] Claude да обясни [explain] какво е променлива [variable]:<br>
-            1. Неясна версия [vague version] (кратка [short], без контекст [no context])<br>
-            2. Конкретна версия [specific version] (роля [role] + аудитория [audience] + формат [format])<br>
-            Стартирай [run] и двете с твоя скрипт [script] и сравни [compare] отговорите [answers].</p>
-            <button class="mark-done-btn" onclick="markDone('m8')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="challenge-title">⚡ Мисия 8 Предизвикателство</div>
+            <p>Напиши две версии на prompt, питащ Claude да обясни какво е променлива [variable]:<br>
+            1. Неясна версия (кратка, без контекст)<br>
+            2. Конкретна версия (роля + аудитория + формат)<br>
+            Стартирай [run] и двете с твоя скрипт [script] и сравни отговорите.</p>
+            <button class="mark-done-btn" onclick="markDone('m8')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Неясно [vague]: <code style="color:var(--green)">"What is a variable?"</code><br><br>
-              Конкретно [specific]: <code style="color:var(--green)">"You are a teacher for 13-year-olds.
+              Неясно: <code style="color:var(--green)">"What is a variable?"</code><br><br>
+              Конкретно: <code style="color:var(--green)">"You are a teacher for 13-year-olds.
               Explain what a variable is in Python using one real-world analogy. Keep it under 3 sentences."</code>
             </div>
           </div>
         `,
         quiz: [
-          { q: 'Какво е system prompt?', options: ['Съобщение за грешка [error message] от terminal', 'Инструкции [instructions], казващи [telling] на AI как да се държи [behave] преди [before] разговора [conversation] започне [starts]', 'Вид [type of] Python функция [function]', 'Първото съобщение [first message] на потребителя [user]'], answer: 1 },
-          { q: 'Какво е few-shot prompting?', options: ['Използване [using] на малък [small] AI модел [model]', 'Даване [giving] на AI примери [examples] от това [of what], което искаш [want], преди [before] въпроса [question] си', 'Бърз [fast] начин [way] за стартиране [run] на код [code]', 'Изпращане [sending] на кратки [short] съобщения [messages]'], answer: 1 },
-          { q: 'Кой prompt ще получи [get] по-добър [better] отговор [answer]?', options: ['Tell me about loops', 'In 2 sentences for a beginner, explain what a Python for loop does', 'loops?', 'loop info'], answer: 1 }
+          { q: 'Какво е system prompt?', options: ['Съобщение за грешка от terminal', 'Инструкции, казващи на AI как да се държи преди разговора започне', 'Вид Python функция [function]', 'Първото съобщение на потребителя'], answer: 1 },
+          { q: 'Какво е few-shot prompting?', options: ['Използване на малък AI модел', 'Даване на AI примери от това, което искаш, преди въпроса си', 'Бърз начин за стартиране на код [code]', 'Изпращане на кратки съобщения'], answer: 1 },
+          { q: 'Кой prompt ще получи по-добър отговор?', options: ['Tell me about loops', 'In 2 sentences for a beginner, explain what a Python for loop does', 'loops?', 'loop info'], answer: 1 }
         ]
       },
       {
         id: 'm9',
         title: 'Python + Files',
         content: `
-          <p>Истинските програми [real programs] четат [read] и пишат [write] файлове [files] — логове [logs], данни [data], резултати [results]. Нека научим [learn] как
-          Python борави [handles] с файлове [files], после ще подаваме [feed] съдържание [content] на Claude.</p>
+          <p>Истинските програми четат и пишат файлове [files] — логове, данни, резултати. Нека научим как
+          Python борави с файлове, после ще подаваме съдържание на Claude.</p>
 
-          <h3>Запис [writing] на файл [file]</h3>
+          <h3>Запис на файл [file]</h3>
           <div class="code-block">
             <pre>with open("notes.txt", "w") as f:
     f.write("Line one\\n")
     f.write("Line two\\n")</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Четене [reading] на файл [file]</h3>
+          <h3>Четене на файл</h3>
           <div class="code-block">
             <pre>with open("notes.txt", "r") as f:
     content = f.read()
     print(content)</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Четене [reading] ред по ред [line by line]</h3>
+          <h3>Четене ред по ред</h3>
           <div class="code-block">
             <pre>with open("notes.txt", "r") as f:
     for line in f.readlines():
         print(line.strip())</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Изпращане [send] на всеки ред [each line] към Claude</h3>
+          <h3>Изпращане на всеки ред към Claude</h3>
           <div class="code-block">
             <pre>import anthropic
 
@@ -1353,18 +1418,18 @@ with open("notes.txt", "r") as f:
         print(f"Original: {line}")
         print(f"Summary:  {message.content[0].text}")
         print()</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 9 Предизвикателство [Challenge]</div>
-            <p>1. Създай [create] файл [file] с имe <strong>facts.txt</strong> с 3 интересни факта [interesting facts] (по един на ред [one per line]).<br>
-            2. Напиши [write] Python скрипт [script], който чете [reads] всеки ред [each line] и пита [asks] Claude за подходящ [matching] emoji.<br>
-            3. Отпечатай [print] оригиналния факт [original fact] + emoji-то, избрано [chosen] от Claude.</p>
-            <button class="mark-done-btn" onclick="markDone('m9')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="challenge-title">⚡ Мисия 9 Предизвикателство</div>
+            <p>1. Създай файл с имe <strong>facts.txt</strong> с 3 интересни факта (по един на ред).<br>
+            2. Напиши Python скрипт [script], който чете всеки ред и пита Claude за подходящ emoji.<br>
+            3. Отпечатай [print] оригиналния факт + emoji-то, избрано от Claude.</p>
+            <button class="mark-done-btn" onclick="markDone('m9')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Създай [create] facts.txt с nano:<br>
+              Създай facts.txt с nano:<br>
               <code style="color:var(--green)">nano facts.txt</code><br><br>
               Твоят prompt към Claude може да е:<br>
               <code style="color:var(--green)">f"Give exactly one emoji that matches this fact: {line}"</code>
@@ -1372,22 +1437,22 @@ with open("notes.txt", "r") as f:
           </div>
         `,
         quiz: [
-          { q: 'Коя Python функция [function] отваря [opens] файл [file]?', options: ['read()', 'file()', 'open()', 'load()'], answer: 2 },
-          { q: 'Какво прави [does] "with open(filename) as f:"?', options: ['Създава [creates] нов файл [new file]', 'Отваря [opens] файл [file] и автоматично [automatically] го затваря [closes] когато свърши [done]', 'Изтрива [deletes] файл [file]', 'Отпечатва [prints] файл [file]'], answer: 1 },
-          { q: 'Как четеш [read] всички редове [all lines] на файл [file] в списък [list]?', options: ['f.read()', 'f.lines()', 'f.readlines()', 'f.all()'], answer: 2 }
+          { q: 'Коя Python функция [function] отваря файл?', options: ['read()', 'file()', 'open()', 'load()'], answer: 2 },
+          { q: 'Какво прави "with open(filename) as f:"?', options: ['Създава нов файл', 'Отваря файл и автоматично го затваря когато свърши', 'Изтрива файл', 'Отпечатва файл'], answer: 1 },
+          { q: 'Как четеш всички редове на файл в списък [list]?', options: ['f.read()', 'f.lines()', 'f.readlines()', 'f.all()'], answer: 2 }
         ]
       },
       {
         id: 'm10',
         title: 'Multi-turn Chat',
         content: `
-          <p>Засега [so far] всеки скрипт [script] изпраща [sends] едно съобщение [one message] и получава [receives] един отговор [one answer]. Истинските чат-ботове [real chatbots]
-          помнят [remember] какво [what] си казал [said] преди [before]. Нека построим [build] такъв.</p>
+          <p>Засега всеки скрипт [script] изпраща едно съобщение и получава един отговор. Истинските чат-ботове
+          помнят какво си казал преди. Нека построим [build] такъв.</p>
 
-          <h3>Как работи [works] историята на разговора [conversation history]</h3>
-          <p>Anthropic API не запомня [remembers] автоматично [automatically] предишни [previous] съобщения [messages].
-          Пазиш [keep] списък [list] с имe <code style="color:var(--green)">messages</code> и
-          добавяш [add] към него всеки ход [every turn]:</p>
+          <h3>Как работи историята на разговора</h3>
+          <p>Anthropic API не запомня автоматично предишни съобщения.
+          Пазиш списък [list] с имe <code style="color:var(--green)">messages</code> и
+          добавяш към него всеки ход:</p>
           <div class="code-block">
             <pre>messages = []
 
@@ -1398,10 +1463,10 @@ messages.append({"role": "assistant", "content": "Nice to meet you, Ada!"})
 
 # Turn 2 — Claude now knows your name
 messages.append({"role": "user", "content": "What's my name?"})</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
-          <h3>Пълен [full] чат-бот [chatbot] цикъл [loop]</h3>
+          <h3>Пълен чат-бот цикъл [loop]</h3>
           <div class="code-block">
             <pre>import anthropic
 
@@ -1430,28 +1495,28 @@ while True:
     reply = response.content[0].text
     messages.append({"role": "assistant", "content": reply})
     print(f"Claude: {reply}\\n")</pre>
-            <button class="copy-btn" onclick="copyCode(this)">копирай [copy]</button>
+            <button class="copy-btn" onclick="copyCode(this)">копирай</button>
           </div>
 
           <div class="challenge">
-            <div class="challenge-title">⚡ Мисия 10 Предизвикателство [Challenge]</div>
-            <p>1. Копирай [copy] скрипта за чат-бот [chatbot script] горе в файл [file] с имe <strong>chatbot.py</strong>.<br>
-            2. Стартирай [run] го и проведи [have] разговор [conversation] от 5 съобщения [messages] с Claude.<br>
-            3. В съобщение [message] 5, попитай [ask] Claude нещо, което изисква [requires] да помни [remember] съобщение [message] 1.<br>
-            4. Помни ли [does it remember]?</p>
-            <button class="mark-done-btn" onclick="markDone('m10')">Отбележи като готово [mark done] ✓</button>
-            <button class="hint-toggle" onclick="toggleHint(this)">покажи [show] подсказка [hint]</button>
+            <div class="challenge-title">⚡ Мисия 10 Предизвикателство</div>
+            <p>1. Копирай скрипта за чат-бот горе в файл [file] с имe <strong>chatbot.py</strong>.<br>
+            2. Стартирай [run] го и проведи разговор от 5 съобщения с Claude.<br>
+            3. В съобщение 5, попитай Claude нещо, което изисква да помни съобщение 1.<br>
+            4. Помни ли?</p>
+            <button class="mark-done-btn" onclick="markDone('m10')">Отбележи като готово ✓</button>
+            <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Опитай [try] да кажеш [tell] на Claude името [name] си в първото съобщение [first message], после да питаш [ask]
-              "What's my name?" по-късно [later]. Ако историята [history] работи [works], ще знае [will know].<br><br>
-              Ако получиш [get] грешка [error] за token лимит [token limit], намали [reduce] MAX_HISTORY на 4.
+              Опитай да кажеш на Claude името си в първото съобщение, после да питаш
+              "What's my name?" по-късно. Ако историята работи, ще знае.<br><br>
+              Ако получиш грешка [error] за token лимит, намали MAX_HISTORY на 4.
             </div>
           </div>
         `,
         quiz: [
-          { q: 'В Anthropic API, кой списък [list] пази [stores] историята на разговора [conversation history]?', options: ['history', 'chat', 'messages', 'conversation'], answer: 2 },
-          { q: 'Каква роля [role] получава [gets] отговорът [response] на AI в списъка [list] messages?', options: ['ai', 'bot', 'assistant', 'claude'], answer: 2 },
-          { q: 'Защо ограничаваме [limit] дължината [length] на историята [history] на разговора [conversation]?', options: ['Изисква се [required] от API', 'За да спестим [save] API токени [tokens] и намалим [reduce] разходите [cost]', 'Защото Claude забравя [forgets] така или иначе [anyway]', 'За да ускорим [speed up] отговорите [responses]'], answer: 1 }
+          { q: 'В Anthropic API, кой списък пази историята на разговора?', options: ['history', 'chat', 'messages', 'conversation'], answer: 2 },
+          { q: 'Каква роля получава отговорът [response] на AI в списъка messages?', options: ['ai', 'bot', 'assistant', 'claude'], answer: 2 },
+          { q: 'Защо ограничаваме дължината на историята на разговора?', options: ['Изисква се от API', 'За да спестим API токени и намалим разходите', 'Защото Claude забравя така или иначе', 'За да ускорим отговорите'], answer: 1 }
         ]
       }
     ];
@@ -1467,17 +1532,17 @@ while True:
 
     function renderIdeaBox(moduleId) {
       if (!m4Complete()) {
-        return `<div class="idea-box"><p class="idea-locked">Завърши [complete] Мисия [mission] 4 първо, за да отключиш [unlock] Claude чат [chat].</p></div>`;
+        return `<div class="idea-box"><p class="idea-locked">Завърши Мисия 4 първо, за да отключиш Claude чат.</p></div>`;
       }
       if (!hasApiKey()) {
-        return `<div class="idea-box"><p class="idea-locked">Въведи [enter] API ключа [key] си в лентата [bar] долу на страницата [page].</p></div>`;
+        return `<div class="idea-box"><p class="idea-locked">Въведи API ключа си в лентата долу на страницата.</p></div>`;
       }
       return `
         <div class="idea-box">
-          <p class="idea-prompt">💡 Какво би добавил [add] ТИ към тази мисия [mission]? Кажи идеята [idea] си на Claude.</p>
+          <p class="idea-prompt">💡 Какво би добавил ТИ към тази мисия? Кажи идеята си на Claude.</p>
           <textarea class="idea-textarea" id="idea-input-${moduleId}"
-            placeholder="напр. Бих добавил [add] мисия [mission] за правене на уебсайт [website] с AI..."></textarea>
-          <button class="idea-send-btn" id="idea-send-btn-${moduleId}" onclick="submitIdea('${moduleId}')">Изпрати [send] идея [idea] →</button>
+            placeholder="напр. Бих добавил мисия за правене на уебсайт с AI..."></textarea>
+          <button class="idea-send-btn" id="idea-send-btn-${moduleId}" onclick="submitIdea('${moduleId}')">Изпрати идея →</button>
           <div class="idea-response" id="idea-response-${moduleId}"></div>
         </div>
       `;
@@ -1491,7 +1556,7 @@ while True:
       const text = textarea.value.trim();
       if (!text) return;
 
-      btn.textContent = 'Изпращане [sending]...';
+      btn.textContent = 'Изпращане...';
       btn.disabled = true;
       responseEl.style.display = 'none';
 
@@ -1506,17 +1571,17 @@ while True:
       } catch(e) {
         let msg;
         if (e.message === 'no-key') {
-          msg = 'Въведи [enter] API ключа [key] си в лентата [bar] долу първо [first].';
+          msg = 'Въведи API ключа си в лентата долу първо.';
         } else if (e.message && e.message.includes('429')) {
-          msg = 'Забави [slow down] — изпращаш [sending] твърде много [too many] заявки [requests]. Изчакай [wait] малко и опитай [try] отново [again].';
+          msg = 'Забави — изпращаш твърде много заявки. Изчакай малко и опитай отново.';
         } else {
-          msg = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
+          msg = 'Нещо се обърка — провери API ключа си.';
         }
         responseEl.textContent = msg;
         responseEl.style.color = 'var(--warn)';
         responseEl.style.display = 'block';
       } finally {
-        btn.textContent = 'Изпрати [send] идея [idea] →';
+        btn.textContent = 'Изпрати идея →';
         btn.disabled = false;
       }
     }
@@ -1524,11 +1589,11 @@ while True:
     // ── Quiz engine ───────────────────────────────────────────────────
     function renderQuizQuestion(moduleId, quiz) {
       const currentQ = quizState[moduleId] || 0;
-      if (!quiz || quiz.length === 0) return '<div class="quiz-passed">✓ Завършено [complete]</div>';
-      if (currentQ >= quiz.length) return '<div class="quiz-passed">✓ Завършено [complete]</div>';
+      if (!quiz || quiz.length === 0) return '<div class="quiz-passed">✓ Завършено</div>';
+      if (currentQ >= quiz.length) return '<div class="quiz-passed">✓ Завършено</div>';
       const q = quiz[currentQ];
       return `
-        <div class="quiz-progress">Въпрос [question] ${currentQ + 1} от [of] ${quiz.length}</div>
+        <div class="quiz-progress">Въпрос ${currentQ + 1} от ${quiz.length}</div>
         <div class="quiz-question">${esc(q.q)}</div>
         <div class="quiz-options">
           ${q.options.map((opt, i) =>
@@ -1602,14 +1667,14 @@ while True:
 
         el.innerHTML = `
           <div class="module-header" onclick="toggleModule('mod-${mod.id}')">
-            <span class="module-title">Мисия [Mission] ${i+1}: ${mod.title}</span>
-            <span class="module-status">${isDone ? '✓ завършено [complete]' : isUnlocked ? 'отключено [unlocked]' : '🔒 заключено [locked]'}</span>
+            <span class="module-title">Мисия ${i+1}: ${mod.title}</span>
+            <span class="module-status">${isDone ? '✓ завършено' : isUnlocked ? 'отключено' : '🔒 заключено'}</span>
           </div>
           <div class="module-body" id="mod-${mod.id}">
             ${mod.content}
             <div class="quiz-section" id="quiz-${mod.id}">
               ${isDone
-                ? '<div class="quiz-passed">✓ Тестът [quiz] е минат [passed]</div>'
+                ? '<div class="quiz-passed">✓ Тестът е минат</div>'
                 : renderQuizQuestion(mod.id, mod.quiz || [])}
             </div>
             ${isDone ? renderIdeaBox(mod.id) : ''}
@@ -1636,7 +1701,7 @@ while True:
       bar.style.width = pct + '%';
       bar.setAttribute('aria-valuenow', Math.round(pct));
       document.getElementById('progress-label').textContent =
-        completedCount + ' от [of] ' + MODULES.length + ' мисии [missions] завършени [complete]';
+        completedCount + ' от ' + MODULES.length + ' мисии завършени';
       updateAskBarVisibility();
       injectModuleExtras();
     }
@@ -1666,31 +1731,31 @@ while True:
       const text = pre.innerText;
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-          btn.textContent = 'копирано [copied]!';
-          setTimeout(() => btn.textContent = 'копирай [copy]', 1500);
+          btn.textContent = 'копирано!';
+          setTimeout(() => btn.textContent = 'копирай', 1500);
         }).catch(() => {
           // Fallback: select text
           const range = document.createRange();
           range.selectNode(pre);
           window.getSelection().removeAllRanges();
           window.getSelection().addRange(range);
-          btn.textContent = 'избрано [selected]!';
-          setTimeout(() => btn.textContent = 'копирай [copy]', 1500);
+          btn.textContent = 'избрано!';
+          setTimeout(() => btn.textContent = 'копирай', 1500);
         });
       } else {
         const range = document.createRange();
         range.selectNode(pre);
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
-        btn.textContent = 'избрано [selected]!';
-        setTimeout(() => btn.textContent = 'копирай [copy]', 1500);
+        btn.textContent = 'избрано!';
+        setTimeout(() => btn.textContent = 'копирай', 1500);
       }
     }
 
     function toggleHint(btn) {
       const hint = btn.nextElementSibling;
       hint.classList.toggle('visible');
-      btn.textContent = hint.classList.contains('visible') ? 'скрий [hide] подсказка [hint]' : 'покажи [show] подсказка [hint]';
+      btn.textContent = hint.classList.contains('visible') ? 'скрий подсказка' : 'покажи подсказка';
     }
 
     // ── Command-reference panel toggle (Mission 1) ─────────────────────
@@ -1698,8 +1763,8 @@ while True:
       const body = btn.nextElementSibling;
       const open = body.classList.toggle('visible');
       btn.textContent = open
-        ? '📖 Помощен терминал [help terminal] — затвори [close] справочник [reference] ▴'
-        : '📖 Помощен терминал [help terminal] — отвори [open] справочник [reference] на команди [commands] ▾';
+        ? '📖 Помощен терминал — затвори справочник ▴'
+        : '📖 Помощен терминал — отвори справочник на команди ▾';
     }
 
     // ── Try-AI inline prompt (every mission) ───────────────────────────
@@ -1716,7 +1781,7 @@ while True:
           box.className = 'try-ai-box';
           box.id = `try-ai-box-${mod.id}`;
           box.innerHTML = `
-            <div class="try-ai-title">🤖 Опитай сам [try it yourself] — напиши [type] prompt и виж [see] какво отговаря [answers] Claude:</div>
+            <div class="try-ai-title">🤖 Опитай сам — напиши prompt и виж какво отговаря Claude:</div>
             <div id="try-ai-content-${mod.id}"></div>
           `;
           if (challenge) body.insertBefore(box, challenge); else body.appendChild(box);
@@ -1730,9 +1795,9 @@ while True:
           footer.id = `mff-${mod.id}`;
           const labelJs = JSON.stringify(missionLabel);
           footer.innerHTML = `
-            <div class="mff-label">Нещо не е наред [something off] в тази мисия [in this mission]?</div>
-            <button class="module-feedback-btn bug" onclick='openModuleFeedback(${labelJs}, "bug")'>🐞 Докладвай грешка [report a bug]</button>
-            <button class="module-feedback-btn idea" onclick='openModuleFeedback(${labelJs}, "idea")'>💡 Предложи подобрение [suggest improvement]</button>
+            <div class="mff-label">Нещо не е наред в тази мисия?</div>
+            <button class="module-feedback-btn bug" onclick='openModuleFeedback(${labelJs}, "bug")'>🐞 Докладвай грешка</button>
+            <button class="module-feedback-btn idea" onclick='openModuleFeedback(${labelJs}, "idea")'>💡 Предложи подобрение</button>
           `;
           body.appendChild(footer);
         }
@@ -1742,16 +1807,43 @@ while True:
     function renderTryAi(missionId) {
       const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
-      if (!m4Complete() || !hasApiKey()) {
-        slot.innerHTML = `<p class="try-ai-locked">Завърши [complete] Мисия [Mission] 4 и въведи [enter] API ключа [key] си, за да отключиш [unlock] този полето [this field]. Дотогава [until then] можеш [you can] да опиташ [try] на <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> в браузъра [browser] си.</p>`;
-        return;
-      }
+      const note = hasApiKey()
+        ? `<small class="try-ai-note">⚡ Използва твоя Claude ключ.</small>`
+        : `<small class="try-ai-note">💡 Безплатно с Pollinations. Въведи Claude ключ долу за по-добри отговори.</small>`;
       slot.innerHTML = `
+        ${note}
         <textarea class="try-ai-textarea" id="try-ai-input-${missionId}"
-          placeholder="напр. [e.g.] Обясни [explain] какво е променлива [variable] в едно изречение [in one sentence]"></textarea>
-        <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Изпрати [send] →</button>
+          placeholder="напр. Обясни какво е променлива в едно изречение"></textarea>
+        <span id="try-ai-btnwrap-${missionId}" style="display:inline-block">
+          <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Изпрати →</button>
+        </span>
         <div class="try-ai-response" id="try-ai-response-${missionId}"></div>
       `;
+    }
+
+    function focusApiKeyInput() {
+      const bar = document.getElementById('ask-bar');
+      const input = document.getElementById('ask-bar-input');
+      const btn = document.getElementById('ask-bar-btn');
+      const label = document.getElementById('ask-bar-label');
+      if (!bar || !input) return;
+      if (bar.style.display === 'none' || getComputedStyle(bar).display === 'none') {
+        bar.style.display = 'block';
+        document.body.classList.add('ask-bar-visible');
+      }
+      if (!hasApiKey()) {
+        askBarMode = 'key';
+        if (label) label.textContent = 'Въведи Anthropic API ключа си тук:';
+        input.placeholder = 'sk-ant-...'; // gitleaks:allow
+        input.type = 'password';
+        if (btn) btn.textContent = 'Запази →';
+      }
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.classList.remove('ask-bar-pulse');
+      void input.offsetWidth;
+      input.classList.add('ask-bar-pulse');
+      setTimeout(() => input.classList.remove('ask-bar-pulse'), 1500);
+      try { input.focus({ preventScroll: true }); } catch(_) { input.focus(); }
     }
 
     async function submitTryAi(missionId) {
@@ -1761,12 +1853,12 @@ while True:
       if (!input || !btn || !responseEl) return;
       const text = input.value.trim();
       if (!text) return;
-      btn.textContent = 'мисля [thinking]...';
+      btn.textContent = 'мисля...';
       btn.disabled = true;
       responseEl.style.display = 'none';
       responseEl.style.color = '';
       try {
-        const reply = await callClaude(
+        const reply = await callLLM(
           text,
           'You are helping a 13-year-old learn about AI and programming. Keep your answer simple, friendly, and under 4 sentences. Always respond in Bulgarian.',
           256
@@ -1775,45 +1867,46 @@ while True:
         responseEl.style.display = 'block';
       } catch(e) {
         let msg;
-        if (e.message === 'no-key') {
-          msg = 'Въведи [enter] API ключа [key] си в лентата [bar] долу първо [first].';
-        } else if (e.message && e.message.includes('429')) {
-          msg = 'Забави [slow down] — твърде много [too many] заявки [requests]. Изчакай [wait] малко.';
+        if (e.message && e.message.includes('429')) {
+          msg = 'Забави — твърде много заявки. Изчакай малко.';
+        } else if (e.message && e.message.startsWith('Pollinations')) {
+          msg = e.message;
         } else {
-          msg = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
+          msg = 'Нещо се обърка — опитай отново.';
         }
         responseEl.textContent = msg;
         responseEl.style.color = 'var(--warn)';
         responseEl.style.display = 'block';
       } finally {
-        btn.textContent = 'Изпрати [send] →';
+        btn.textContent = 'Изпрати →';
         btn.disabled = false;
       }
     }
 
     // ── Feedback widget ────────────────────────────────────────────────
-    let feedbackContext = { title: 'Обратна връзка [feedback] от обучението', bodyPrefix: '' };
+    let feedbackContext = { title: 'Обратна връзка от обучението', bodyPrefix: '', labels: 'auto,enhancement' };
 
     function openFeedback() {
-      feedbackContext = { title: 'Обратна връзка [feedback] от обучението', bodyPrefix: '' };
+      feedbackContext = { title: 'Обратна връзка от обучението', bodyPrefix: '', labels: 'auto,enhancement' };
       _showFeedbackModal(
-        '💬 Изпрати обратна връзка [send feedback]',
-        "Какво не работи [doesn't work]? Какво те обърква [confuses you]? Какво искаш [you want] да добавим [to add]? Напиши [type] го тук — отива [it goes] директно [directly] на татко в GitHub."
+        '💬 Изпрати обратна връзка',
+        "Какво не работи? Какво те обърква? Какво искаш да добавим? Напиши го тук — отива директно на татко в GitHub."
       );
     }
     function openModuleFeedback(missionLabel, type) {
       const isBug = type === 'bug';
       feedbackContext = {
-        title: `[${missionLabel}] ${isBug ? 'Грешка [bug report]' : 'Предложение [suggestion]'}`,
-        bodyPrefix: `Мисия [mission]: ${missionLabel}\n\n`
+        title: `[${missionLabel}] ${isBug ? 'Грешка' : 'Предложение'}`,
+        bodyPrefix: `Мисия: ${missionLabel}\n\n`,
+        labels: isBug ? 'auto,bug' : 'auto,enhancement'
       };
       _showFeedbackModal(
         isBug
-          ? `🐞 Докладвай грешка [report a bug] — ${missionLabel}`
-          : `💡 Предложи подобрение [suggest improvement] — ${missionLabel}`,
+          ? `🐞 Докладвай грешка — ${missionLabel}`
+          : `💡 Предложи подобрение — ${missionLabel}`,
         isBug
-          ? 'Какво не работи [doesn\'t work] или те обърква [confuses] в тази мисия [in this mission]? Името [name] на мисията [mission] се добавя [is added] автоматично [automatically].'
-          : 'Какво би направило [would make] тази мисия [this mission] по-добра [better]? Името [name] на мисията [mission] се добавя [is added] автоматично [automatically].'
+          ? 'Какво не работи или те обърква в тази мисия? Името на мисията се добавя автоматично.'
+          : 'Какво би направило тази мисия по-добра? Името на мисията се добавя автоматично.'
       );
     }
     function _showFeedbackModal(heading, blurb) {
@@ -1835,12 +1928,14 @@ while True:
       const title = feedbackContext.title;
       const body =
         (feedbackContext.bodyPrefix || '') +
-        '**Какво се случи [what happened] / какво искам [what I want]:**\n\n' +
-        (text || '(опиши [describe] тук)') +
-        '\n\n---\n_Изпратено от вградения [embedded] feedback бутон [button]._';
+        '**Какво се случи / какво искам:**\n\n' +
+        (text || '(опиши тук)') +
+        '\n\n---\n_Изпратено от вградения feedback бутон._';
+      const labels = feedbackContext.labels || 'auto,enhancement';
       const url = 'https://github.com/derwin4o/kid-ai-tutorial/issues/new'
         + '?title=' + encodeURIComponent(title)
-        + '&body=' + encodeURIComponent(body);
+        + '&body=' + encodeURIComponent(body)
+        + '&labels=' + encodeURIComponent(labels);
       window.open(url, '_blank', 'noopener');
       if (ta) ta.value = '';
       closeFeedback();
@@ -1860,18 +1955,14 @@ while True:
       if (!m4Complete()) { bar.style.display = 'none'; document.body.classList.remove('ask-bar-visible'); return; }
       bar.style.display = 'block';
       document.body.classList.add('ask-bar-visible');
-      if (!hasApiKey()) {
-        askBarMode = 'key';
-        document.getElementById('ask-bar-label').textContent = 'Въведи [enter] Anthropic API ключа [key] си, за да отключиш [unlock] Claude чат [chat]:';
-        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...'; // gitleaks:allow
-        document.getElementById('ask-bar-input').type = 'password';
-        document.getElementById('ask-bar-btn').textContent = 'Запази [save] →';
+      askBarMode = 'question';
+      document.getElementById('ask-bar-input').type = 'text';
+      document.getElementById('ask-bar-input').placeholder = 'Напиши въпрос... (или поставяй sk-ant-... ключ, за да активираш Claude)';
+      document.getElementById('ask-bar-btn').textContent = 'Питай →';
+      if (hasApiKey()) {
+        document.getElementById('ask-bar-label').textContent = '⚡ Попитай Claude нещо за наученото →';
       } else {
-        askBarMode = 'question';
-        document.getElementById('ask-bar-label').textContent = 'Попитай [ask] Claude нещо за наученото [what you learned] →';
-        document.getElementById('ask-bar-input').placeholder = 'Напиши [type] въпрос [question]...';
-        document.getElementById('ask-bar-input').type = 'text';
-        document.getElementById('ask-bar-btn').textContent = 'Питай [ask] →';
+        document.getElementById('ask-bar-label').textContent = '💡 Питай свободно (безплатно с Pollinations). Поставяй sk-ant-... ключ, за да активираш Claude.';
       }
     }
 
@@ -1883,21 +1974,20 @@ while True:
       if (!val) return;
       errorEl.style.display = 'none';
 
-      if (askBarMode === 'key') {
-        localStorage.setItem('anthropicKey', val);
+      if (val.startsWith('sk-ant-')) {
+        localStorage.setItem('anthropicKey', val); // gitleaks:allow
         input.value = '';
         updateAskBarVisibility();
-        renderModules(); // re-render to update idea boxes
+        renderModules();
         return;
       }
 
-      // Ask mode
-      btn.textContent = 'мисля [thinking]...';
+      btn.textContent = 'мисля...';
       btn.disabled = true;
       input.disabled = true;
 
       try {
-        const answer = await callClaude(
+        const answer = await callLLM(
           val,
           'You are helping a 13-year-old learn programming and AI. Answer clearly in plain language, maximum 3 sentences. Always respond in Bulgarian.',
           256
@@ -1905,10 +1995,13 @@ while True:
         addAskResponse(val, answer);
         input.value = '';
       } catch(e) {
-        errorEl.textContent = 'Нещо се обърка [went wrong] — провери [check] API ключа [key] си.';
+        const msg = (e && e.message && e.message.startsWith('Pollinations'))
+          ? e.message
+          : 'Нещо се обърка — опитай отново.';
+        errorEl.textContent = msg;
         errorEl.style.display = 'block';
       } finally {
-        btn.textContent = 'Питай [ask] →';
+        btn.textContent = 'Питай →';
         btn.disabled = false;
         input.disabled = false;
         input.focus();
@@ -1921,7 +2014,7 @@ while True:
       item.className = 'ask-response-item';
       const qLine = document.createElement('div');
       qLine.className = 'ask-response-q';
-      qLine.textContent = 'Ти попита [you asked]: ' + question;
+      qLine.textContent = 'Ти попита: ' + question;
       const aLine = document.createElement('div');
       aLine.textContent = answer;
       item.appendChild(qLine);

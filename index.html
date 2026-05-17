@@ -468,6 +468,24 @@
       font-size: 0.8rem;
       font-style: italic;
     }
+    .try-ai-hint {
+      color: var(--grey);
+      font-size: 0.75rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    .try-ai-note {
+      display: block;
+      color: var(--green-dim);
+      font-size: 0.72rem;
+      margin-bottom: 0.4rem;
+      opacity: 0.85;
+    }
+    @keyframes ask-bar-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0); }
+      50%      { box-shadow: 0 0 0 6px rgba(0, 255, 153, 0.45); }
+    }
+    .ask-bar-pulse { animation: ask-bar-pulse 0.6s ease-in-out 2; border-color: var(--green) !important; }
     /* ── Floating feedback widget ─────────────────────────────── */
     .feedback-fab {
       position: fixed;
@@ -589,7 +607,7 @@
   <header>
     <h1>&gt; AI Engineer Training</h1>
     <p class="subtitle">10 missions. Complete them in order. No skipping.</p>
-    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+" target="_blank">🐛 Found a bug? Report it</a>
+    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+&labels=auto,bug" target="_blank">🐛 Found a bug? Report it</a>
   </header>
   <div class="ls-warning" id="ls-warning">
     Warning: progress won't be saved in private/incognito mode.
@@ -682,6 +700,53 @@
       const text = data?.content?.[0]?.text;
       if (typeof text !== 'string') throw new Error('api-error:unexpected-response');
       return text;
+    }
+
+    async function callPollinations(userMessage, systemPrompt, maxTokens) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 30000);
+      let response;
+      try {
+        response = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userMessage }
+            ]
+          }),
+          signal: controller.signal
+        });
+      } catch (e) {
+        clearTimeout(timer);
+        throw new Error('Pollinations unreachable — try again in a moment.');
+      }
+      clearTimeout(timer);
+      if (!response.ok) {
+        throw new Error('Pollinations unreachable — try again in a moment.');
+      }
+      const data = await response.json().catch(() => null);
+      const text = data?.choices?.[0]?.message?.content;
+      if (typeof text !== 'string') {
+        throw new Error('Pollinations unreachable — try again in a moment.');
+      }
+      return text;
+    }
+
+    async function callLLM(userMessage, systemPrompt, maxTokens) {
+      if (hasApiKey()) {
+        try {
+          return await callClaude(userMessage, systemPrompt, maxTokens);
+        } catch (e) {
+          if (e && e.message === 'no-key') {
+            return await callPollinations(userMessage, systemPrompt, maxTokens);
+          }
+          throw e;
+        }
+      }
+      return await callPollinations(userMessage, systemPrompt, maxTokens);
     }
 
     // ── Module definitions (content added in Tasks 3-7) ──────────────
@@ -1744,16 +1809,43 @@ while True:
     function renderTryAi(missionId) {
       const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
-      if (!m4Complete() || !hasApiKey()) {
-        slot.innerHTML = `<p class="try-ai-locked">Finish Mission 4 and enter your API key to unlock this field. Until then you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>`;
-        return;
-      }
+      const note = hasApiKey()
+        ? `<small class="try-ai-note">⚡ Using your Claude key.</small>`
+        : `<small class="try-ai-note">💡 Free via Pollinations. Enter a Claude key below for better answers.</small>`;
       slot.innerHTML = `
+        ${note}
         <textarea class="try-ai-textarea" id="try-ai-input-${missionId}"
           placeholder="e.g. Explain what a variable is in one sentence"></textarea>
-        <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Send →</button>
+        <span id="try-ai-btnwrap-${missionId}" style="display:inline-block">
+          <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Send →</button>
+        </span>
         <div class="try-ai-response" id="try-ai-response-${missionId}"></div>
       `;
+    }
+
+    function focusApiKeyInput() {
+      const bar = document.getElementById('ask-bar');
+      const input = document.getElementById('ask-bar-input');
+      const btn = document.getElementById('ask-bar-btn');
+      const label = document.getElementById('ask-bar-label');
+      if (!bar || !input) return;
+      if (bar.style.display === 'none' || getComputedStyle(bar).display === 'none') {
+        bar.style.display = 'block';
+        document.body.classList.add('ask-bar-visible');
+      }
+      if (!hasApiKey()) {
+        askBarMode = 'key';
+        if (label) label.textContent = 'Enter your Anthropic API key here:';
+        input.placeholder = 'sk-ant-...'; // gitleaks:allow
+        input.type = 'password';
+        if (btn) btn.textContent = 'Save →';
+      }
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.classList.remove('ask-bar-pulse');
+      void input.offsetWidth;
+      input.classList.add('ask-bar-pulse');
+      setTimeout(() => input.classList.remove('ask-bar-pulse'), 1500);
+      try { input.focus({ preventScroll: true }); } catch(_) { input.focus(); }
     }
 
     async function submitTryAi(missionId) {
@@ -1768,7 +1860,7 @@ while True:
       responseEl.style.display = 'none';
       responseEl.style.color = '';
       try {
-        const reply = await callClaude(
+        const reply = await callLLM(
           text,
           'You are helping a 13-year-old learn about AI and programming. Keep your answer simple, friendly, and under 4 sentences.',
           256
@@ -1777,12 +1869,12 @@ while True:
         responseEl.style.display = 'block';
       } catch(e) {
         let msg;
-        if (e.message === 'no-key') {
-          msg = 'Enter your API key in the bar at the bottom first.';
-        } else if (e.message && e.message.includes('429')) {
+        if (e.message && e.message.includes('429')) {
           msg = 'Slow down — too many requests. Wait a bit and try again.';
+        } else if (e.message && e.message.startsWith('Pollinations')) {
+          msg = e.message;
         } else {
-          msg = 'Something went wrong — check your API key.';
+          msg = 'Something went wrong — try again.';
         }
         responseEl.textContent = msg;
         responseEl.style.color = 'var(--warn)';
@@ -1794,17 +1886,18 @@ while True:
     }
 
     // ── Feedback widget ────────────────────────────────────────────────
-    let feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '' };
+    let feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto,enhancement' };
 
     function openFeedback() {
-      feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '' };
+      feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto,enhancement' };
       _showFeedbackModal('💬 Send feedback', "What didn't work? What was confusing? What do you want us to add? Write it here — it goes straight to dad on GitHub.");
     }
     function openModuleFeedback(missionLabel, type) {
       const isBug = type === 'bug';
       feedbackContext = {
         title: `[${missionLabel}] ${isBug ? 'Bug report' : 'Suggestion'}`,
-        bodyPrefix: `Mission: ${missionLabel}\n\n`
+        bodyPrefix: `Mission: ${missionLabel}\n\n`,
+        labels: isBug ? 'auto,bug' : 'auto,enhancement'
       };
       _showFeedbackModal(
         isBug ? `🐞 Report a bug — ${missionLabel}` : `💡 Suggest improvement — ${missionLabel}`,
@@ -1835,9 +1928,11 @@ while True:
         '**What happened / what I want:**\n\n' +
         (text || '(describe here)') +
         '\n\n---\n_Sent from the embedded feedback button._';
+      const labels = feedbackContext.labels || 'auto,enhancement';
       const url = 'https://github.com/derwin4o/kid-ai-tutorial/issues/new'
         + '?title=' + encodeURIComponent(title)
-        + '&body=' + encodeURIComponent(body);
+        + '&body=' + encodeURIComponent(body)
+        + '&labels=' + encodeURIComponent(labels);
       window.open(url, '_blank', 'noopener');
       if (ta) ta.value = '';
       closeFeedback();
@@ -1857,18 +1952,14 @@ while True:
       if (!m4Complete()) { bar.style.display = 'none'; document.body.classList.remove('ask-bar-visible'); return; }
       bar.style.display = 'block';
       document.body.classList.add('ask-bar-visible');
-      if (!hasApiKey()) {
-        askBarMode = 'key';
-        document.getElementById('ask-bar-label').textContent = 'Enter your Anthropic API key to unlock Claude chat:';
-        document.getElementById('ask-bar-input').placeholder = 'sk-ant-...';
-        document.getElementById('ask-bar-input').type = 'password';
-        document.getElementById('ask-bar-btn').textContent = 'Save →';
+      askBarMode = 'question';
+      document.getElementById('ask-bar-input').type = 'text';
+      document.getElementById('ask-bar-input').placeholder = 'Type a question... (or paste sk-ant-... to enable Claude)';
+      document.getElementById('ask-bar-btn').textContent = 'Ask →';
+      if (hasApiKey()) {
+        document.getElementById('ask-bar-label').textContent = '⚡ Ask Claude anything about what you learned →';
       } else {
-        askBarMode = 'question';
-        document.getElementById('ask-bar-label').textContent = 'Ask Claude anything about what you learned →';
-        document.getElementById('ask-bar-input').placeholder = 'Type a question...';
-        document.getElementById('ask-bar-input').type = 'text';
-        document.getElementById('ask-bar-btn').textContent = 'Ask →';
+        document.getElementById('ask-bar-label').textContent = '💡 Ask freely (free via Pollinations). Paste sk-ant-... to enable Claude.';
       }
     }
 
@@ -1880,21 +1971,20 @@ while True:
       if (!val) return;
       errorEl.style.display = 'none';
 
-      if (askBarMode === 'key') {
-        localStorage.setItem('anthropicKey', val);
+      if (val.startsWith('sk-ant-')) {
+        localStorage.setItem('anthropicKey', val); // gitleaks:allow
         input.value = '';
         updateAskBarVisibility();
-        renderModules(); // re-render to update idea boxes
+        renderModules();
         return;
       }
 
-      // Ask mode
       btn.textContent = 'thinking...';
       btn.disabled = true;
       input.disabled = true;
 
       try {
-        const answer = await callClaude(
+        const answer = await callLLM(
           val,
           'You are helping a 13-year-old learn programming and AI. Answer clearly in plain language, maximum 3 sentences.',
           256
@@ -1902,7 +1992,10 @@ while True:
         addAskResponse(val, answer);
         input.value = '';
       } catch(e) {
-        errorEl.textContent = 'Something went wrong — check your API key.';
+        const msg = (e && e.message && e.message.startsWith('Pollinations'))
+          ? e.message
+          : 'Something went wrong — try again.';
+        errorEl.textContent = msg;
         errorEl.style.display = 'block';
       } finally {
         btn.textContent = 'Ask →';
