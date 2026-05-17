@@ -885,17 +885,18 @@ cat greeting.txt   # → Hello, Ada!</pre>
           <div class="challenge">
             <div class="challenge-title">⚡ Mission 1 Challenge</div>
             <p>1. Open a terminal.<br>
-            2. Create a folder called <strong>ai-lab</strong>.<br>
-            3. Go inside it with <code>cd ai-lab</code>.<br>
-            4. Run <code>ls</code> — it should show nothing (empty folder).<br>
-            5. Run <code>python3 -c "print('I am an AI engineer')"</code></p>
+            2. Pick a folder name YOU invent — use your own name or anything you like (for example <code>ada-lab</code>, <code>robo-lab</code>, <code>cookie-lab</code>). Don't reuse <code>ai-lab</code> — you already have that one from the lesson!<br>
+            3. Create your folder with <code>mkdir &lt;your-folder-name&gt;</code>.<br>
+            4. Go inside it with <code>cd &lt;your-folder-name&gt;</code>.<br>
+            5. Run <code>ls</code> — it should show nothing (empty folder).<br>
+            6. Run <code>python3 -c "print('I am an AI engineer')"</code></p>
             <p>When you see your message printed, come back here and mark it done.</p>
             <button class="mark-done-btn" onclick="markDone('m1')">Mark it done ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">show hint</button>
             <div class="hint-body">
-              Open terminal with Ctrl+Alt+T, then type each command and press Enter:<br><br>
-              <code style="color:var(--green)">mkdir ai-lab</code><br>
-              <code style="color:var(--green)">cd ai-lab</code><br>
+              Open terminal with Ctrl+Alt+T. First, choose a folder name (try your name + <code>-lab</code>). Then type each command and press Enter. Example using <code>ada-lab</code>:<br><br>
+              <code style="color:var(--green)">mkdir ada-lab</code><br>
+              <code style="color:var(--green)">cd ada-lab</code><br>
               <code style="color:var(--green)">ls</code><br>
               <code style="color:var(--green)">python3 -c "print('I am an AI engineer')"</code>
             </div>
@@ -903,7 +904,7 @@ cat greeting.txt   # → Hello, Ada!</pre>
         `,
         quiz: [
           { q: 'What command shows your current folder?', options: ['ls', 'pwd', 'cd', 'mkdir'], answer: 1 },
-          { q: 'What command creates a new folder called ai-lab?', options: ['pwd ai-lab', 'cd ai-lab', 'mkdir ai-lab', 'touch ai-lab'], answer: 2 },
+          { q: 'What command creates a new folder called my-lab?', options: ['pwd my-lab', 'cd my-lab', 'mkdir my-lab', 'touch my-lab'], answer: 2 },
           { q: 'How do you run a Python script called hello.py?', options: ['run hello.py', 'python3 hello.py', 'start hello.py', 'execute hello.py'], answer: 1 }
         ]
       },
