@@ -589,7 +589,7 @@
   <header>
     <h1>&gt; AI Engineer Training</h1>
     <p class="subtitle">10 missions. Complete them in order. No skipping.</p>
-    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+&labels=auto-fix,bug" target="_blank">🐛 Found a bug? Report it</a>
+    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+&labels=auto,bug" target="_blank">🐛 Found a bug? Report it</a>
   </header>
   <div class="ls-warning" id="ls-warning">
     Warning: progress won't be saved in private/incognito mode.
@@ -1794,10 +1794,10 @@ while True:
     }
 
     // ── Feedback widget ────────────────────────────────────────────────
-    let feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto-fix,enhancement' };
+    let feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto,enhancement' };
 
     function openFeedback() {
-      feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto-fix,enhancement' };
+      feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto,enhancement' };
       _showFeedbackModal('💬 Send feedback', "What didn't work? What was confusing? What do you want us to add? Write it here — it goes straight to dad on GitHub.");
     }
     function openModuleFeedback(missionLabel, type) {
@@ -1805,7 +1805,7 @@ while True:
       feedbackContext = {
         title: `[${missionLabel}] ${isBug ? 'Bug report' : 'Suggestion'}`,
         bodyPrefix: `Mission: ${missionLabel}\n\n`,
-        labels: isBug ? 'auto-fix,bug' : 'auto-fix,enhancement'
+        labels: isBug ? 'auto,bug' : 'auto,enhancement'
       };
       _showFeedbackModal(
         isBug ? `🐞 Report a bug — ${missionLabel}` : `💡 Suggest improvement — ${missionLabel}`,
@@ -1836,7 +1836,7 @@ while True:
         '**What happened / what I want:**\n\n' +
         (text || '(describe here)') +
         '\n\n---\n_Sent from the embedded feedback button._';
-      const labels = feedbackContext.labels || 'auto-fix,enhancement';
+      const labels = feedbackContext.labels || 'auto,enhancement';
       const url = 'https://github.com/derwin4o/kid-ai-tutorial/issues/new'
         + '?title=' + encodeURIComponent(title)
         + '&body=' + encodeURIComponent(body)

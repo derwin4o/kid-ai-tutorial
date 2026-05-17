@@ -589,7 +589,7 @@
   <header>
     <h1>&gt; Обучение за AI инженер</h1>
     <p class="subtitle">10 мисии. Изпълнявай ги по ред. Без прескачане.</p>
-    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Грешка+в+мисия&body=**Мисия:**+%28напр.+Мисия+3%29%0A**Какво+правех:**+%0A**Какво+се+случи:**+&labels=auto-fix,bug" target="_blank">🐛 Намерих грешка</a>
+    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Грешка+в+мисия&body=**Мисия:**+%28напр.+Мисия+3%29%0A**Какво+правех:**+%0A**Какво+се+случи:**+&labels=auto,bug" target="_blank">🐛 Намерих грешка</a>
   </header>
   <div class="ls-warning" id="ls-warning">
     Внимание: прогресът няма да се запази в режим инкогнито.
@@ -1792,10 +1792,10 @@ while True:
     }
 
     // ── Feedback widget ────────────────────────────────────────────────
-    let feedbackContext = { title: 'Обратна връзка от обучението', bodyPrefix: '', labels: 'auto-fix,enhancement' };
+    let feedbackContext = { title: 'Обратна връзка от обучението', bodyPrefix: '', labels: 'auto,enhancement' };
 
     function openFeedback() {
-      feedbackContext = { title: 'Обратна връзка от обучението', bodyPrefix: '', labels: 'auto-fix,enhancement' };
+      feedbackContext = { title: 'Обратна връзка от обучението', bodyPrefix: '', labels: 'auto,enhancement' };
       _showFeedbackModal(
         '💬 Изпрати обратна връзка',
         "Какво не работи? Какво те обърква? Какво искаш да добавим? Напиши го тук — отива директно на татко в GitHub."
@@ -1806,7 +1806,7 @@ while True:
       feedbackContext = {
         title: `[${missionLabel}] ${isBug ? 'Грешка' : 'Предложение'}`,
         bodyPrefix: `Мисия: ${missionLabel}\n\n`,
-        labels: isBug ? 'auto-fix,bug' : 'auto-fix,enhancement'
+        labels: isBug ? 'auto,bug' : 'auto,enhancement'
       };
       _showFeedbackModal(
         isBug
@@ -1839,7 +1839,7 @@ while True:
         '**Какво се случи / какво искам:**\n\n' +
         (text || '(опиши тук)') +
         '\n\n---\n_Изпратено от вградения feedback бутон._';
-      const labels = feedbackContext.labels || 'auto-fix,enhancement';
+      const labels = feedbackContext.labels || 'auto,enhancement';
       const url = 'https://github.com/derwin4o/kid-ai-tutorial/issues/new'
         + '?title=' + encodeURIComponent(title)
         + '&body=' + encodeURIComponent(body)
