@@ -884,20 +884,22 @@ cat greeting.txt   # → Hello, Ada!</pre>
 
           <div class="challenge">
             <div class="challenge-title">⚡ Мисия 1 Предизвикателство</div>
-            <p>1. Отвори terminal.<br>
-            2. Създай папка с ime <strong>ai-lab</strong>.<br>
-            3. Влез в нея с <code>cd ai-lab</code>.<br>
-            4. Изпълни <code>ls</code> — трябва да е празно (празна папка).<br>
-            5. Изпълни <code>python3 -c "print('I am an AI engineer')"</code></p>
-            <p>Когато видиш съобщението отпечатано, върни се тук и го отбележи.</p>
+            <p>1. Отвори terminal и измисли свое собствено име за папка. Правила: <strong>не</strong> <code>ai-lab</code>, само малки латински букви и тирета, без интервали. Създай я с <code>mkdir ТВОЯ-ПАПКА</code>, после влез в нея с <code>cd ТВОЯ-ПАПКА</code>.<br>
+            2. Измисли име за файл (същите правила, завършващо на <code>.txt</code>) и запиши свое кратко съобщение в него с <code>echo "твоето съобщение" &gt; ТВОЙ-ФАЙЛ.txt</code>.<br>
+            3. Изпълни <code>ls</code> — трябва да видиш файла си.<br>
+            4. Изпълни <code>cat ТВОЙ-ФАЙЛ.txt</code>, за да го прочетеш.<br>
+            5. Изпълни <code>python3 -c "print('твое съобщение')"</code> — избери какво искаш да каже.</p>
+            <p>Когато видиш своето собствено съобщение отпечатано, върни се тук и го отбележи.</p>
             <button class="mark-done-btn" onclick="markDone('m1')">Отбележи като готово ✓</button>
             <button class="hint-toggle" onclick="toggleHint(this)">покажи подсказка</button>
             <div class="hint-body">
-              Отвори terminal с Ctrl+Alt+T, после напиши всяка команда и натисни Enter:<br><br>
-              <code style="color:var(--green)">mkdir ai-lab</code><br>
-              <code style="color:var(--green)">cd ai-lab</code><br>
+              Отвори terminal с Ctrl+Alt+T. Пример с папка <code>my-stuff</code> и файл <code>notes.txt</code> — но избери свои:<br><br>
+              <code style="color:var(--green)">mkdir my-stuff</code><br>
+              <code style="color:var(--green)">cd my-stuff</code><br>
+              <code style="color:var(--green)">echo "здрасти от Ада" &gt; notes.txt</code><br>
               <code style="color:var(--green)">ls</code><br>
-              <code style="color:var(--green)">python3 -c "print('I am an AI engineer')"</code>
+              <code style="color:var(--green)">cat notes.txt</code><br>
+              <code style="color:var(--green)">python3 -c "print('кодът е забавен')"</code>
             </div>
           </div>
         `,
