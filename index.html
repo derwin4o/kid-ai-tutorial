@@ -589,7 +589,7 @@
   <header>
     <h1>&gt; AI Engineer Training</h1>
     <p class="subtitle">10 missions. Complete them in order. No skipping.</p>
-    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+" target="_blank">🐛 Found a bug? Report it</a>
+    <a class="bug-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=Bug+report&body=**Mission:**+%28e.g.+Mission+3%29%0A**What+I+was+doing:**+%0A**What+happened:**+&labels=auto-fix,bug" target="_blank">🐛 Found a bug? Report it</a>
   </header>
   <div class="ls-warning" id="ls-warning">
     Warning: progress won't be saved in private/incognito mode.
@@ -1794,17 +1794,18 @@ while True:
     }
 
     // ── Feedback widget ────────────────────────────────────────────────
-    let feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '' };
+    let feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto-fix,enhancement' };
 
     function openFeedback() {
-      feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '' };
+      feedbackContext = { title: 'Feedback from the tutorial', bodyPrefix: '', labels: 'auto-fix,enhancement' };
       _showFeedbackModal('💬 Send feedback', "What didn't work? What was confusing? What do you want us to add? Write it here — it goes straight to dad on GitHub.");
     }
     function openModuleFeedback(missionLabel, type) {
       const isBug = type === 'bug';
       feedbackContext = {
         title: `[${missionLabel}] ${isBug ? 'Bug report' : 'Suggestion'}`,
-        bodyPrefix: `Mission: ${missionLabel}\n\n`
+        bodyPrefix: `Mission: ${missionLabel}\n\n`,
+        labels: isBug ? 'auto-fix,bug' : 'auto-fix,enhancement'
       };
       _showFeedbackModal(
         isBug ? `🐞 Report a bug — ${missionLabel}` : `💡 Suggest improvement — ${missionLabel}`,
@@ -1835,9 +1836,11 @@ while True:
         '**What happened / what I want:**\n\n' +
         (text || '(describe here)') +
         '\n\n---\n_Sent from the embedded feedback button._';
+      const labels = feedbackContext.labels || 'auto-fix,enhancement';
       const url = 'https://github.com/derwin4o/kid-ai-tutorial/issues/new'
         + '?title=' + encodeURIComponent(title)
-        + '&body=' + encodeURIComponent(body);
+        + '&body=' + encodeURIComponent(body)
+        + '&labels=' + encodeURIComponent(labels);
       window.open(url, '_blank', 'noopener');
       if (ta) ta.value = '';
       closeFeedback();
