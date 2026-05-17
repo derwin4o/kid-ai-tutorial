@@ -468,6 +468,17 @@
       font-size: 0.8rem;
       font-style: italic;
     }
+    .try-ai-hint {
+      color: var(--grey);
+      font-size: 0.75rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    @keyframes ask-bar-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 153, 0); }
+      50%      { box-shadow: 0 0 0 6px rgba(0, 255, 153, 0.45); }
+    }
+    .ask-bar-pulse { animation: ask-bar-pulse 0.6s ease-in-out 2; border-color: var(--green) !important; }
     /* ── Floating feedback widget ─────────────────────────────── */
     .feedback-fab {
       position: fixed;
@@ -1744,16 +1755,48 @@ while True:
     function renderTryAi(missionId) {
       const slot = document.getElementById(`try-ai-content-${missionId}`);
       if (!slot) return;
-      if (!m4Complete() || !hasApiKey()) {
-        slot.innerHTML = `<p class="try-ai-locked">Finish Mission 4 and enter your API key to unlock this field. Until then you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a> in your browser.</p>`;
-        return;
-      }
+      const locked = !m4Complete() || !hasApiKey();
+      const hint = locked
+        ? `<p class="try-ai-hint">🔒 Enter your API key below to enable (meanwhile you can try it at <a href="https://claude.ai" target="_blank" style="color:var(--green-dim)">claude.ai</a>).</p>`
+        : '';
       slot.innerHTML = `
+        ${hint}
         <textarea class="try-ai-textarea" id="try-ai-input-${missionId}"
           placeholder="e.g. Explain what a variable is in one sentence"></textarea>
-        <button class="try-ai-btn" id="try-ai-btn-${missionId}" onclick="submitTryAi('${missionId}')">Send →</button>
+        <span id="try-ai-btnwrap-${missionId}" style="display:inline-block">
+          <button class="try-ai-btn" id="try-ai-btn-${missionId}"${locked ? ' disabled' : ''} onclick="submitTryAi('${missionId}')">Send →</button>
+        </span>
         <div class="try-ai-response" id="try-ai-response-${missionId}"></div>
       `;
+      if (locked) {
+        const wrap = document.getElementById(`try-ai-btnwrap-${missionId}`);
+        if (wrap) wrap.addEventListener('click', () => focusApiKeyInput(), { once: false });
+      }
+    }
+
+    function focusApiKeyInput() {
+      const bar = document.getElementById('ask-bar');
+      const input = document.getElementById('ask-bar-input');
+      const btn = document.getElementById('ask-bar-btn');
+      const label = document.getElementById('ask-bar-label');
+      if (!bar || !input) return;
+      if (bar.style.display === 'none' || getComputedStyle(bar).display === 'none') {
+        bar.style.display = 'block';
+        document.body.classList.add('ask-bar-visible');
+      }
+      if (!hasApiKey()) {
+        askBarMode = 'key';
+        if (label) label.textContent = 'Enter your Anthropic API key here:';
+        input.placeholder = 'sk-ant-...'; // gitleaks:allow
+        input.type = 'password';
+        if (btn) btn.textContent = 'Save →';
+      }
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.classList.remove('ask-bar-pulse');
+      void input.offsetWidth;
+      input.classList.add('ask-bar-pulse');
+      setTimeout(() => input.classList.remove('ask-bar-pulse'), 1500);
+      try { input.focus({ preventScroll: true }); } catch(_) { input.focus(); }
     }
 
     async function submitTryAi(missionId) {
