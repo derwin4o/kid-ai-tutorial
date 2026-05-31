@@ -917,6 +917,11 @@ cat greeting.txt   # → Hello, Ada!</pre>
           enough to do real things.</p>
 
           <h3>Variables — storing information</h3>
+          <p>A variable is like a labeled box. You put something inside it and give the
+          box a name. Whenever you need that information, you just tell Python the box's
+          name and it gives you back what's inside. In the example, <code>name</code>
+          holds the text <code>"Ada"</code> and <code>age</code> holds the number
+          <code>13</code>.</p>
           <div class="code-block">
             <pre>name = "Ada"
 age = 13
@@ -925,6 +930,10 @@ print(name, "is", age, "years old")</pre>
           </div>
 
           <h3>Functions — reusable blocks of code</h3>
+          <p>A function is like a named recipe. You write the steps once, give them a
+          name using <code>def</code>, then call that name as many times as you like.
+          Without functions you'd copy the same code all over the place — with a
+          function you write it once and reuse it anywhere.</p>
           <div class="code-block">
             <pre>def greet(name):
     print("Hello,", name)
@@ -935,6 +944,9 @@ greet("World")</pre>
           </div>
 
           <h3>Loops — doing things many times</h3>
+          <p>A loop tells the computer: "do this many times without me writing it over
+          and over." <code>range(5)</code> produces the numbers 0, 1, 2, 3, 4 — and
+          the code inside the loop runs once for each of them.</p>
           <div class="code-block">
             <pre>for i in range(5):
     print("Line", i)</pre>
