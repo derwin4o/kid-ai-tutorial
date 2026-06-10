@@ -1,6 +1,6 @@
 # Kid AI Tutorial
 
-A 10-mission, no-install tutorial that teaches a kid to go from "what is a terminal" to "I can call Claude from Python" in a single afternoon.
+A 10-mission static tutorial that teaches a 13-year-old beginner to start using Codex locally on Ubuntu, then build, debug, save, and publish a small Python project.
 
 ## Open it
 
@@ -9,15 +9,18 @@ The tutorial is a static HTML page — no server, no install. Just open one of t
 - `index.html` — English version
 - `index-bg.html` — Bulgarian version (Български)
 
-Works out of the box using free Pollinations. Add your Anthropic API key in the bar at the bottom for higher-quality Claude responses. Progress and the optional API key are saved in your browser's `localStorage`, so you can close the tab and come back later without losing where you were. (Private/incognito mode skips this — the page will warn you.)
+Works out of the box using free Pollinations for the built-in question helper.
+Progress is saved in your browser's `localStorage`, so you can close the tab
+and come back later without losing where you were. Private/incognito mode skips
+this, and the page will warn you.
 
 ## What's inside
 
-Each mission has a short reading section, copy-ready code blocks, a hands-on challenge, and a small quiz at the end. Missions unlock one at a time so the kid finishes the previous one before opening the next.
+Each mission has a short reading section, copy-ready commands, a hands-on challenge, and a small quiz at the end. Missions unlock one at a time so the kid finishes the previous one before opening the next.
 
-Mission 1 also includes an "open commands reference" panel that explains every terminal command used in the tutorial with two worked examples each, plus a step-by-step guide for creating files three different ways (`touch`, `echo >`, and Python's `open()`).
+The Bulgarian version is now focused on local Ubuntu + Codex CLI onboarding: terminal basics, official Codex install, first Codex task, Python edits, debugging, Git checkpoints, GitHub, prompt quality, README writing, and a final mini project.
 
-The inline "Try it yourself" prompt is available in every mission and works without any key — answers come from free Pollinations by default. From Mission 4 onward, the "Ask Claude" bar pinned to the bottom of the page is also available. Adding an Anthropic API key (paste it in that bar) upgrades both to higher-quality Claude responses.
+The inline "Try it yourself" prompt is available in every mission and works without any key — answers come from free Pollinations by default. The real coding workflow is done with local `codex` in the terminal.
 
 ## Found a bug? Want to give feedback?
 
