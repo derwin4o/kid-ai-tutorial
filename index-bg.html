@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=1180, initial-scale=1.0" />
-  <meta name="description" content="10 desktop мисии за 13-годишен начинаещ: Ubuntu, terminal, OpenCode, MiniMax Code, Python, Git и първи реален AI проект." />
+  <meta name="description" content="2 desktop модула за 13-годишен начинаещ: OpenCode, MiniMax Code, context, skills, memory, plugins, models, Python и Git." />
   <meta property="og:title" content="Agent Quest — OpenCode и MiniMax за начинаещи" />
-  <meta property="og:description" content="Игрово обучение за старт с OpenCode или MiniMax Code на локален компютър." />
+  <meta property="og:description" content="Игрово обучение след първия старт с OpenCode или MiniMax Code: context, skills, memory, plugins, models и безопасна работа." />
   <meta property="og:image" content="assets/codex-quest-hero.png" />
   <title>Agent Quest — OpenCode и MiniMax за начинаещи</title>
   <style>
@@ -399,6 +399,34 @@
     }
     .section-head p { max-width: 520px; margin: 0; color: var(--muted); }
 
+    .module-group-head {
+      margin: 1.5rem 0 0.8rem;
+      padding: 1rem 1.1rem;
+      border-radius: 22px;
+      background: rgba(16, 24, 32, 0.9);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 16px 42px rgba(16,24,32,0.12);
+    }
+    .module-group-kicker {
+      display: block;
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 0.82rem;
+      margin-bottom: 0.35rem;
+    }
+    .module-group-head h3 {
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.1;
+    }
+    .module-group-head p {
+      margin: 0.35rem 0 0;
+      max-width: 760px;
+      color: rgba(255,255,255,0.78);
+    }
+
     .module {
       background: rgba(255,255,255,0.74);
       border: 1px solid rgba(16,24,32,0.12);
@@ -738,13 +766,13 @@
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#missions">Към мисиите</a>
+  <a class="skip-link" href="#missions">Към модулите</a>
   <nav class="topbar" aria-label="Главна навигация">
     <div class="topbar-inner">
       <div class="brand"><span class="brand-mark">AI</span><span>Agent Quest</span></div>
       <div class="nav-actions">
         <a class="nav-link" href="#start">Старт</a>
-        <a class="nav-link" href="#missions">Мисии</a>
+        <a class="nav-link" href="#missions">Модули</a>
         <a class="small-link" href="https://github.com/derwin4o/kid-ai-tutorial/issues/new?title=%D0%93%D1%80%D0%B5%D1%88%D0%BA%D0%B0+%D0%B2+%D1%83%D1%80%D0%BE%D0%BA&labels=auto,bug" target="_blank" rel="noopener">Докладвай проблем</a>
       </div>
     </div>
@@ -753,21 +781,21 @@
   <header class="hero shell" id="start">
     <div>
       <div class="eyebrow">Desktop Ubuntu + OpenCode + MiniMax Code</div>
-      <h1>Стани AI инженер с 10 мисии</h1>
-      <p class="hero-copy">Направено за 13-годишен начинаещ на лаптоп или desktop компютър: от първото отваряне на terminal до първи проект, в който OpenCode или MiniMax Code помага да пишеш, дебъгваш и запазваш код.</p>
+      <h1>Стани AI инженер с 2 модула</h1>
+      <p class="hero-copy">Направено за 13-годишен начинаещ на лаптоп или desktop компютър: модул 1 пази първите 10 урока за терминал, Python и Git, а модул 2 добавя context, skills, memory, plugins, models и безопасно управление на agent-а.</p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="#missions">Започни мисия 1</a>
+        <a class="btn btn-primary" href="#missions">Започни урок 1</a>
         <a class="btn btn-ghost" href="https://opencode.ai/download" target="_blank" rel="noopener">OpenCode download</a>
         <a class="btn btn-ghost" href="https://agent.minimax.io/download" target="_blank" rel="noopener">MiniMax Code</a>
       </div>
       <div class="stats" aria-label="Какво има вътре">
-        <div class="stat"><strong>10</strong><span>кратки мисии</span></div>
+        <div class="stat"><strong>20</strong><span>урока в 2 модула</span></div>
         <div class="stat"><strong>0</strong><span>нужни предишни знания</span></div>
         <div class="stat"><strong>1</strong><span>локален desktop проект</span></div>
       </div>
     </div>
 
-    <div class="hero-art" aria-label="Илюстрация: Ubuntu terminal и AI agent мисии">
+    <div class="hero-art" aria-label="Илюстрация: Ubuntu terminal и AI agent уроци">
       <img class="hero-image" src="assets/codex-quest-hero.png" alt="Илюстрация на Ubuntu desktop, terminal и AI coding помощник" />
       <div class="terminal-card">
         <div class="terminal-top"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span>~/ai-lab · opencode</span></div>
@@ -779,7 +807,7 @@
       <div class="quest-path" aria-hidden="true">
         <div class="path-node"><span class="node-icon">01</span> Terminal база</div>
         <div class="path-node"><span class="node-icon">02</span> OpenCode старт</div>
-        <div class="path-node"><span class="node-icon">10</span> Финален проект</div>
+        <div class="path-node"><span class="node-icon">20</span> Agent принципи</div>
       </div>
     </div>
   </header>
@@ -789,7 +817,7 @@
 
     <section class="progress-panel" aria-label="Прогрес">
       <div class="progress-row">
-        <span class="progress-label" id="progress-label">0 от 10 мисии завършени</span>
+        <span class="progress-label" id="progress-label">0 от 20 урока завършени</span>
         <button class="btn btn-ghost" type="button" onclick="resetProgress()">Започни отначало</button>
       </div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Прогрес"></div></div>
@@ -798,11 +826,11 @@
     <section class="quickstart" aria-label="Бърз старт">
       <div class="quick-card">
         <h2>Първите 15 минути на компютър</h2>
-        <p>Не гони перфектност. Целта е да видиш AI coding agent да работи в твоята папка на лаптоп или desktop машина.</p>
+        <p>Не гони перфектност. Модул 1 е първият проект; модул 2 е как да мислиш с agent-а, след като OpenCode и MiniMax вече са тръгнали.</p>
         <ul class="quick-list">
           <li><b>1.</b><span>Отвори terminal с <code>Ctrl + Alt + T</code>.</span></li>
           <li><b>2.</b><span>Създай папка <code>ai-lab</code>.</span></li>
-          <li><b>3.</b><span>Инсталирай и стартирай <code>opencode</code> или отвори MiniMax Code.</span></li>
+          <li><b>3.</b><span>Отвори <code>opencode</code> и провери какъв context ще му дадеш.</span></li>
         </ul>
       </div>
       <div class="quick-card light">
@@ -813,8 +841,8 @@
     </section>
 
     <div class="section-head">
-      <h2>Мисиите</h2>
-      <p>Всяка мисия има кратък урок, команди за копиране, предизвикателство и мини тест. След като минеш теста, следващата мисия се отключва.</p>
+      <h2>Модулите</h2>
+      <p>Всеки урок има кратко обяснение, пример за копиране, предизвикателство и мини тест. Първите 10 урока остават модул 1; след това се отключва модул 2 за agent принципи.</p>
     </div>
 
     <div id="modules-container"></div>
@@ -826,7 +854,7 @@
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
       <h3 id="feedback-title">Изпрати обратна връзка</h3>
       <p id="feedback-blurb">Какво не работи? Какво е объркващо? Напиши го тук и ще се отвори GitHub issue.</p>
-      <textarea id="feedback-text" placeholder="напр. В мисия 2 не разбрах коя команда да копирам..."></textarea>
+      <textarea id="feedback-text" placeholder="напр. В урок 12 не разбрах коя команда да копирам..."></textarea>
       <div class="feedback-actions">
         <button type="button" onclick="closeFeedback()">Отказ</button>
         <button class="send" type="button" onclick="sendFeedback()">Изпрати</button>
@@ -873,7 +901,7 @@
       localStorage.setItem('agentQuestProgressBg', JSON.stringify(p));
     }
     function resetProgress() {
-      if (!confirm('Да изчистя ли прогреса и да започнеш от мисия 1?')) return;
+      if (!confirm('Да изчистя ли прогреса и да започнеш от урок 1?')) return;
       if (lsAvailable) {
         localStorage.removeItem('agentQuestProgressBg');
         localStorage.removeItem('codexQuestProgressBg');
@@ -1217,6 +1245,297 @@ After each change, tell me the exact test command.</pre><button class="copy-btn"
           { q: 'Какво доказва, че проектът работи?', options: ['Стартиран тест/команда без грешка', 'Красиво име само', 'Много дълъг файл', 'Няма README'], answer: 0 },
           { q: 'Как завършваш като инженер?', options: ['Тестваш, README, commit, показваш резултата', 'Затваряш без save', 'Игнорираш Git', 'Пишеш само prompt'], answer: 0 }
         ]
+      },
+      {
+        id: 'm11',
+        title: 'Context: какво знае agent-ът',
+        meta: 'Дай правилните файлове, цели и ограничения',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Context не е магия</h3>
+              <p>Agent-ът отговаря според това, което вижда: prompt-а, отворените файлове, правилата и предишните съобщения. Ако context-ът е объркан, отговорът също става объркан.</p>
+              <div class="callout safe"><strong>Правило:</strong> Давай малко, но точно: цел, важни файлове, какво да не пипа и как да провери резултата.</div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Context prompt</h3>
+              <div class="code-block"><pre>We are in ~/ai-lab.
+Important files: guessing_game.py and README.md.
+Goal: explain the project structure.
+Do not edit files yet.
+Ask me if you need more context.</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+              <div class="badge-row"><span class="badge">goal</span><span class="badge">files</span><span class="badge">limits</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 11</div><p>Помоли agent-а да обясни проекта само с context и без да редактира файлове.</p><button class="mark-done-btn" onclick="markDone('m11')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Ако започне да предлага промени, спри го и кажи: <code>Explain only. Do not edit yet.</code></div></div>
+        `,
+        quiz: [
+          { q: 'Какво е context?', options: ['Информацията, която agent-ът вижда', 'Само името на модела', 'GitHub парола', 'Ubuntu тема'], answer: 0 },
+          { q: 'Какъв context е най-полезен?', options: ['Точен и кратък', 'Всички файлове винаги', 'Никакъв context', 'Само emoji'], answer: 0 },
+          { q: 'Какво казваш, ако не искаш промени?', options: ['Do not edit yet', 'Delete all', 'Push now', 'Ignore tests'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm12',
+        title: 'Правила: AGENTS.md',
+        meta: 'Проектните инструкции са пътните знаци',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Защо правила?</h3>
+              <p>Ако всеки път повтаряш “пиши просто, тествай, не пипай тайни”, губиш време. Сложи постоянните правила в <code>AGENTS.md</code>, за да ги вижда agent-ът в проекта.</p>
+              <div class="code-block"><pre>printf "# AI Lab rules\n\n- Keep Python beginner-friendly.\n- Explain before editing.\n- Change one small thing at a time.\n- Run the test command after edits.\n- Never write secrets into files.\n" > AGENTS.md
+cat AGENTS.md</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Добро правило</h3>
+              <p><code>Change one small thing at a time.</code></p>
+              <h3>Лошо правило</h3>
+              <p><code>Always make everything amazing.</code></p>
+              <div class="badge-row"><span class="badge">rules</span><span class="badge">style</span><span class="badge">safety</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 12</div><p>Създай <code>AGENTS.md</code> с 5 правила и помоли agent-а да ги обобщи, преди да работи.</p><button class="mark-done-btn" onclick="markDone('m12')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Кажи: <code>Read AGENTS.md and tell me the rules in Bulgarian before editing.</code></div></div>
+        `,
+        quiz: [
+          { q: 'За какво е AGENTS.md?', options: ['Постоянни инструкции за проекта', 'Снимки', 'Пароли', 'Python интерпретатор'], answer: 0 },
+          { q: 'Кое е добро правило?', options: ['Change one small thing at a time', 'Rewrite everything always', 'Hide the diff', 'Skip testing'], answer: 0 },
+          { q: 'Кога agent-ът трябва да чете правилата?', options: ['Преди работа', 'Само след грешка', 'Никога', 'След push'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm13',
+        title: 'Skills: малки playbook-и',
+        meta: 'Повтарящите се задачи стават инструкции',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Какво е skill?</h3>
+              <p>Skill е кратък playbook за задача, която ще правиш пак: debug, README, тест, refactor. Вместо да обясняваш от нулата, казваш “използвай debug skill-а”.</p>
+              <div class="code-block"><pre>mkdir -p skills/debug-python
+printf "# Debug Python skill\n\n1. Run the file.\n2. Read the full traceback.\n3. Explain the cause simply.\n4. Suggest the smallest fix.\n5. Run the file again.\n" > skills/debug-python/SKILL.md
+cat skills/debug-python/SKILL.md</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Skill prompt</h3>
+              <div class="code-block"><pre>Use skills/debug-python/SKILL.md.
+Help me debug guessing_game.py.
+Do not rewrite the whole file.</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+              <div class="badge-row"><span class="badge">repeatable</span><span class="badge">checklist</span><span class="badge">small fix</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 13</div><p>Създай първи skill за debug и го използвай върху играта.</p><button class="mark-done-btn" onclick="markDone('m13')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Skill-ът е просто файл с ясни стъпки. Не трябва да е сложен.</div></div>
+        `,
+        quiz: [
+          { q: 'Какво е skill?', options: ['Повтаряем playbook', 'Парола', 'Грешка в Python', 'Git branch'], answer: 0 },
+          { q: 'Кой skill е полезен за начинаещ?', options: ['Debug Python', 'Delete project', 'Skip reading', 'Hide errors'], answer: 0 },
+          { q: 'Какво трябва да съдържа skill?', options: ['Ясни стъпки', 'Тайни ключове', 'Случайни думи', 'Само заглавие'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm14',
+        title: 'Memory: какво да помни',
+        meta: 'Пази стабилните факти, не временния шум',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Memory е бележник</h3>
+              <p>Memory помага agent-ът да не пита едно и също. Но memory трябва да съдържа стабилни факти: предпочитан стил, цел на проекта, важни команди. Не записвай тайни или временни грешки.</p>
+              <div class="code-block"><pre>printf "# Project memory\n\n- I am learning with beginner-friendly Python.\n- Main file: guessing_game.py.\n- Test command: python3 guessing_game.py.\n- Explain changes in Bulgarian.\n" > MEMORY.md
+cat MEMORY.md</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Помни / не помни</h3>
+              <ul><li>Помни: стил, команди, структура.</li><li>Не помни: passwords, token-и, лични данни.</li><li>Обновявай memory, когато проектът се промени.</li></ul>
+              <div class="badge-row"><span class="badge">stable facts</span><span class="badge">no secrets</span><span class="badge">update</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 14</div><p>Създай <code>MEMORY.md</code> с 4 стабилни факта за проекта и помоли agent-а да го използва.</p><button class="mark-done-btn" onclick="markDone('m14')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Кажи: <code>Use MEMORY.md as project memory for this task.</code></div></div>
+        `,
+        quiz: [
+          { q: 'Какво е добро за memory?', options: ['Стабилен факт', 'Парола', 'Еднократна грешка', 'Случаен log'], answer: 0 },
+          { q: 'Какво НЕ се записва в memory?', options: ['Тайни и лични данни', 'Test command', 'Име на главен файл', 'Стил на обяснение'], answer: 0 },
+          { q: 'Кога обновяваш memory?', options: ['Когато проектът се промени', 'Никога', 'Всяка минута', 'Само след срив'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm15',
+        title: 'Plugins и tools',
+        meta: 'Как agent-ът получава нови способности',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Plugins са инструменти</h3>
+              <p>Моделът мисли и пише. Tools и plugins му дават допълнителни способности: да чете docs, да отваря browser, да говори с GitHub или да търси в проект. Не включвай tool, ако задачата не го изисква.</p>
+              <div class="code-block"><pre>mkdir -p docs
+printf "# Plugin ideas\n\n- docs search: when API docs are needed\n- browser: when visual page checks are needed\n- github: when issues or PRs are needed\n" > docs/plugin-ideas.md
+cat docs/plugin-ideas.md</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Tool question</h3>
+              <p>Преди да включиш plugin, попитай: “Какъв проблем решава?” Ако няма ясен отговор, не го използвай.</p>
+              <div class="badge-row"><span class="badge">docs</span><span class="badge">browser</span><span class="badge">github</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 15</div><p>Направи списък с 3 plugin идеи и напиши кога НЕ трябва да ги използваш.</p><button class="mark-done-btn" onclick="markDone('m15')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Пример: browser plugin не е нужен, ако задачата е само да поправиш малък Python bug.</div></div>
+        `,
+        quiz: [
+          { q: 'Какво прави plugin/tool?', options: ['Дава допълнителна способност', 'Заменя мисленето', 'Пази пароли', 'Изключва Git'], answer: 0 },
+          { q: 'Кога включваш tool?', options: ['Когато има ясна нужда', 'Винаги', 'Никога', 'За да изглежда сложно'], answer: 0 },
+          { q: 'Кой tool е логичен за визуална проверка?', options: ['browser', 'password', 'rm', 'sleep'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm16',
+        title: 'Models: fast, cheap, strong',
+        meta: 'Избери модел според задачата',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Не всеки модел е за всичко</h3>
+              <p>Малка задача иска бърз модел. Труден bug или архитектура иска по-силен модел. Важното е да избираш според риска, цената и нужната точност.</p>
+              <div class="code-block"><pre>Task: classify this work as easy, medium, or hard.
+Project: beginner Python guessing game.
+Goal: add score counter.
+Tell me which model strength is enough and why.</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Моделна карта</h3>
+              <ul><li>Fast: обяснения, малки промени.</li><li>Balanced: нормален coding task.</li><li>Strong: сложен bug, дизайн, голям refactor.</li></ul>
+              <div class="badge-row"><span class="badge">speed</span><span class="badge">cost</span><span class="badge">quality</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 16</div><p>Помоли agent-а да оцени 3 задачи като easy/medium/hard и да предложи каква сила на модел е достатъчна.</p><button class="mark-done-btn" onclick="markDone('m16')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Не търсим “най-скъпия модел винаги”. Търсим достатъчно добър модел за задачата.</div></div>
+        `,
+        quiz: [
+          { q: 'Кога ползваш по-силен модел?', options: ['При сложен или рисков task', 'За всяка дума', 'Само за README', 'Никога'], answer: 0 },
+          { q: 'Какво балансираш при модел?', options: ['скорост, цена, качество', 'цвят, звук, тема', 'само цена', 'само име'], answer: 0 },
+          { q: 'Малка промяна обикновено иска...', options: ['достатъчно добър модел', 'най-скъпия модел винаги', 'никакъв test', 'парола'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm17',
+        title: 'Context budget',
+        meta: 'Пази вниманието на agent-а чисто',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Context budget е място за внимание</h3>
+              <p>Ако дадеш твърде много шум, agent-ът може да пропусне важното. Ако дадеш твърде малко, ще гадае. Добър engineer избира context като раница: само нужното за урока.</p>
+              <div class="code-block"><pre>Relevant:
+- guessing_game.py
+- error traceback
+- expected behavior
+Not relevant:
+- old screenshots
+- unrelated downloads
+- secret files</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Clean prompt</h3>
+              <div class="code-block"><pre>Here is only the relevant context.
+If you need another file, ask before guessing.</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+              <div class="badge-row"><span class="badge">relevant</span><span class="badge">small</span><span class="badge">ask</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 17</div><p>Направи два списъка: “relevant context” и “not relevant context” за твоя проект.</p><button class="mark-done-btn" onclick="markDone('m17')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Ако задачата е bug в играта, README може да е по-малко важен от traceback-а.</div></div>
+        `,
+        quiz: [
+          { q: 'Какво е context budget?', options: ['Ограничено място за внимание', 'Банкова сметка', 'Git branch', 'Python loop'], answer: 0 },
+          { q: 'Какво прави шумният context?', options: ['Скрива важното', 'Ускорява всичко', 'Пази тайни', 'Пуска тестове'], answer: 0 },
+          { q: 'Какво казваш при липсващ файл?', options: ['Ask before guessing', 'Guess always', 'Delete file', 'Push'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm18',
+        title: 'Agent loop: plan, edit, verify',
+        meta: 'Работи на малки цикли',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Цикълът</h3>
+              <p>Добрата agent работа не е “направи всичко”. Тя е цикъл: план, малка промяна, проверка, diff, commit. Така грешките остават малки.</p>
+              <div class="code-block"><pre>Before editing:
+1. Explain the plan.
+2. Change only one feature.
+3. Run the test command.
+4. Show me the diff summary.
+5. Wait before the next change.</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Команди за проверка</h3>
+              <div class="code-block"><pre>python3 guessing_game.py
+git diff
+git status</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+              <div class="badge-row"><span class="badge">plan</span><span class="badge">edit</span><span class="badge">verify</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 18</div><p>Използвай цикъла plan-edit-verify за една малка промяна в играта.</p><button class="mark-done-btn" onclick="markDone('m18')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Малка промяна: например добави поздрав или промени текста на едно съобщение.</div></div>
+        `,
+        quiz: [
+          { q: 'Кой е добрият цикъл?', options: ['plan, edit, verify', 'delete, guess, push', 'skip, hide, hope', 'copy, panic, close'], answer: 0 },
+          { q: 'Защо малки промени?', options: ['По-лесно се проверяват', 'По-трудно е нарочно', 'Git не работи иначе', 'За да няма tests'], answer: 0 },
+          { q: 'Коя команда показва diff?', options: ['git diff', 'python3', 'mkdir', 'pwd'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm19',
+        title: 'Review: не вярвай сляпо',
+        meta: 'Agent-ът помага, ти проверяваш',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Trust, but verify</h3>
+              <p>Agent-ът може да звучи уверен и пак да греши. Ти проверяваш diff-а, стартираш програмата и питаш “защо тази промяна?”. Това е инженерно мислене.</p>
+              <div class="code-block"><pre>Review your own changes:
+- What files changed?
+- Why did they change?
+- How did we test?
+- What could break?</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Review prompt</h3>
+              <div class="code-block"><pre>Review the diff like a careful teacher.
+Find bugs, confusing code, and missing tests.
+Do not make new edits yet.</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+              <div class="badge-row"><span class="badge">diff</span><span class="badge">bugs</span><span class="badge">tests</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 19</div><p>След една agent промяна, помоли за review без нови edits и поправи само ако има реален проблем.</p><button class="mark-done-btn" onclick="markDone('m19')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Review не е “направи още”. Review е “провери дали текущото е вярно”.</div></div>
+        `,
+        quiz: [
+          { q: 'Кой носи отговорност за резултата?', options: ['Ти', 'Само agent-ът', 'GitHub', 'Terminal'], answer: 0 },
+          { q: 'Какво гледаш в review?', options: ['diff, bugs, tests', 'само цвета', 'само заглавието', 'нищо'], answer: 0 },
+          { q: 'Какво значи “Do not make new edits yet”?', options: ['Само преглед, без промени', 'Изтрий всичко', 'Push веднага', 'Скрий diff-а'], answer: 0 }
+        ]
+      },
+      {
+        id: 'm20',
+        title: 'Финал: agent playbook',
+        meta: 'Събери context, rules, skills, memory и model избор',
+        content: `
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Твоят playbook</h3>
+              <p>Финалът на модул 2 е да направиш кратък наръчник за себе си: как стартираш agent задача, какъв context даваш, кои правила важат, кой skill използваш и как проверяваш.</p>
+              <div class="code-block"><pre>printf "# Agent playbook\n\n1. State the goal.\n2. Give relevant context.\n3. Read AGENTS.md and MEMORY.md.\n4. Pick a skill if useful.\n5. Choose enough model strength.\n6. Plan, edit, verify.\n7. Review diff before commit.\n" > AGENT_PLAYBOOK.md
+cat AGENT_PLAYBOOK.md</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+            </div>
+            <div class="lesson-card dark">
+              <h3>Финален prompt</h3>
+              <div class="code-block"><pre>Use AGENT_PLAYBOOK.md.
+Help me choose the next tiny improvement for this project.
+Ask 3 questions before editing.</pre><button class="copy-btn" onclick="copyCode(this)">копирай</button></div>
+              <div class="badge-row"><span class="badge">playbook</span><span class="badge">questions</span><span class="badge">next step</span></div>
+            </div>
+          </div>
+          <div class="challenge"><div class="challenge-title">Урок 20</div><p>Създай <code>AGENT_PLAYBOOK.md</code> и го използвай за следващата малка промяна в проекта.</p><button class="mark-done-btn" onclick="markDone('m20')">Готово</button><button class="hint-toggle" onclick="toggleHint(this)">подсказка</button><div class="hint-body">Ако playbook-ът стане дълъг, съкрати го. Най-добрите правила са ясни и използваеми.</div></div>
+        `,
+        quiz: [
+          { q: 'Какво събира playbook-ът?', options: ['Процес за agent работа', 'Пароли', 'Случайни screenshots', 'Само jokes'], answer: 0 },
+          { q: 'Как започва добрата agent задача?', options: ['С цел и context', 'С push', 'С тайна', 'С panic'], answer: 0 },
+          { q: 'Как завършва добрата промяна?', options: ['verify, review, commit', 'guess, hide, close', 'delete, push, hope', 'skip tests'], answer: 0 }
+        ]
       }
     ];
 
@@ -1262,7 +1581,7 @@ After each change, tell me the exact test command.</pre><button class="copy-btn"
 
     function renderIdeaBox(moduleId) {
       if (!getProgress()[moduleId]) return '';
-      return `<div class="idea-box"><p class="idea-prompt">Какво би подобрил в тази мисия?</p><textarea class="idea-textarea" id="idea-input-${moduleId}" placeholder="Напиши идея или въпрос..."></textarea><button class="idea-send-btn" id="idea-send-btn-${moduleId}" onclick="submitIdea('${moduleId}')">Питай помощника</button><div class="idea-response" id="idea-response-${moduleId}"></div></div>`;
+      return `<div class="idea-box"><p class="idea-prompt">Какво би подобрил в този урок?</p><textarea class="idea-textarea" id="idea-input-${moduleId}" placeholder="Напиши идея или въпрос..."></textarea><button class="idea-send-btn" id="idea-send-btn-${moduleId}" onclick="submitIdea('${moduleId}')">Питай помощника</button><div class="idea-response" id="idea-response-${moduleId}"></div></div>`;
     }
 
     async function submitIdea(moduleId) {
@@ -1289,7 +1608,7 @@ After each change, tell me the exact test command.</pre><button class="copy-btn"
     }
 
     function renderTryAi(mod) {
-      return `<div class="try-ai-box"><div class="try-ai-title">Бърз въпрос към AI помощника</div><small class="try-ai-note">Работи през безплатен web помощник. За истинско coding действие използвай OpenCode или MiniMax Code в своята проектна папка.</small><textarea class="try-ai-textarea" id="try-ai-input-${mod.id}" placeholder="напр. Обясни тази мисия с пример"></textarea><button class="try-ai-btn" id="try-ai-btn-${mod.id}" onclick="submitTryAi('${mod.id}')">Питай</button><div class="try-ai-response" id="try-ai-response-${mod.id}"></div></div>`;
+      return `<div class="try-ai-box"><div class="try-ai-title">Бърз въпрос към AI помощника</div><small class="try-ai-note">Работи през безплатен web помощник. За истинско coding действие използвай OpenCode или MiniMax Code в своята проектна папка.</small><textarea class="try-ai-textarea" id="try-ai-input-${mod.id}" placeholder="напр. Обясни този урок с пример"></textarea><button class="try-ai-btn" id="try-ai-btn-${mod.id}" onclick="submitTryAi('${mod.id}')">Питай</button><div class="try-ai-response" id="try-ai-response-${mod.id}"></div></div>`;
     }
 
     async function submitTryAi(moduleId) {
@@ -1321,6 +1640,14 @@ After each change, tell me the exact test command.</pre><button class="copy-btn"
       container.innerHTML = '';
       let completedCount = 0;
       MODULES.forEach((mod, i) => {
+        if (i === 0 || i === 10) {
+          const group = document.createElement('section');
+          group.className = 'module-group-head';
+          group.innerHTML = i === 0
+            ? `<span class="module-group-kicker">Модул 1 · Уроци 1-10</span><h3>Първи проект с AI agent</h3><p>Terminal, OpenCode, Python, debug, Git, GitHub, prompt-и и финален малък проект.</p>`
+            : `<span class="module-group-kicker">Модул 2 · Уроци 11-20</span><h3>Как да управляваш agent-а</h3><p>Context, AGENTS.md, skills, memory, plugins, models, context budget, agent loop, review и личен playbook.</p>`;
+          container.appendChild(group);
+        }
         const isDone = !!progress[mod.id];
         const prevDone = i === 0 || !!progress[MODULES[i - 1].id];
         const isUnlocked = prevDone;
@@ -1339,7 +1666,7 @@ After each change, tell me the exact test command.</pre><button class="copy-btn"
             ${renderTryAi(mod)}
             <div class="quiz-section" id="quiz-${mod.id}">${isDone ? '<div class="quiz-passed">Тестът е минат</div>' : renderQuizQuestion(mod.id, mod.quiz)}</div>
             ${renderIdeaBox(mod.id)}
-            <div class="module-feedback-footer"><span class="mff-label">Нещо в тази мисия не е ясно?</span><button class="module-feedback-btn bug" onclick='openModuleFeedback(${JSON.stringify('Мисия ' + (i + 1) + ' — ' + mod.title)}, "bug")'>Проблем</button><button class="module-feedback-btn idea" onclick='openModuleFeedback(${JSON.stringify('Мисия ' + (i + 1) + ' — ' + mod.title)}, "idea")'>Идея</button></div>
+            <div class="module-feedback-footer"><span class="mff-label">Нещо в този урок не е ясно?</span><button class="module-feedback-btn bug" onclick='openModuleFeedback(${JSON.stringify('Урок ' + (i + 1) + ' — ' + mod.title)}, "bug")'>Проблем</button><button class="module-feedback-btn idea" onclick='openModuleFeedback(${JSON.stringify('Урок ' + (i + 1) + ' — ' + mod.title)}, "idea")'>Идея</button></div>
           </div>`;
         if (isCurrent || isDone) el.classList.add('open');
         if (!isUnlocked) {
@@ -1353,7 +1680,7 @@ After each change, tell me the exact test command.</pre><button class="copy-btn"
       const bar = document.getElementById('progress-bar');
       bar.style.width = pct + '%';
       bar.setAttribute('aria-valuenow', Math.round(pct));
-      document.getElementById('progress-label').textContent = `${completedCount} от ${MODULES.length} мисии завършени`;
+      document.getElementById('progress-label').textContent = `${completedCount} от ${MODULES.length} урока завършени`;
     }
 
     function toggleModule(bodyId) {
